@@ -457,4 +457,364 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
     import {
-      ge
+      getFirestore, collection, addDoc, doc, updateDoc, deleteDoc,
+      serverTimestamp, query, orderBy, onSnapshot
+    } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+
+    // ✅ Colección separada
+    const COLLECTION = "reclamos";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDIGkNekvGn0XrqGvDAuutCBSglod03644",
+      authDomain: "carpetas-17846.firebaseapp.com",
+      projectId: "carpetas-17846",
+      storageBucket: "carpetas-17846.firebasestorage.app",
+      messagingSenderId: "513234224676",
+      appId: "1:513234224676:web:a61b7ab9685594d1b5bab1",
+      measurementId: "G-8Z18FTM0L6"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const $ = (id) => document.getElementById(id);
+    const tbody = $("tbody");
+    const msgEl = $("msg");
+    const toastEl = $("toast");
+    const addBtn = $("addBtn");
+
+    let editingRowId = null;
+    let cache = [];
+    let view = [];
+
+    function showToast(text, isError=false){
+      toastEl.textContent = text;
+      toastEl.classList.toggle("err", isError);
+      toastEl.style.display = "block";
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => toastEl.style.display = "none", 4500);
+    }
+
+    function escapeHtml(s){
+      return String(s ?? "")
+        .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+        .replaceAll('"','&quot;').replaceAll("'","&#039;");
+    }
+
+    function formatDateVal(v){
+      if (!v) return "";
+      if (v instanceof Date){
+        const dd = String(v.getDate()).padStart(2,'0');
+        const mm = String(v.getMonth()+1).padStart(2,'0');
+        const yyyy = v.getFullYear();
+        return `${dd}/${mm}/${yyyy}`;
+      }
+      const m = String(v).match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (m) return `${m[3]}/${m[2]}/${m[1]}`;
+      const d = new Date(v);
+      if (!isNaN(d)) return formatDateVal(d);
+      return String(v);
+    }
+
+    function clearAddForm(){
+      $("material").value = "";
+      $("cantidad").value = "";
+      $("oc").value = "";
+      $("caja").value = "";
+      $("monto_unitario").value = "";
+      $("monto_total").value = "";
+      $("factura").value = "";
+      $("nro_reclamo").value = "";
+      $("fecha_reclamo").value = "";
+      $("respuesta_fabrica").value = "";
+      $("fecha_respuesta").value = "";
+      $("observacion").value = "";
+      $("unidad").value = "";
+    }
+
+    function matchesText(row, q){
+      if(!q) return true;
+      const hay = [
+        row.material, row.cantidad, row.oc, row.caja, row.monto_unitario, row.monto_total,
+        row.factura, row.nro_reclamo, row.fecha_reclamo, row.respuesta_fabrica,
+        row.fecha_respuesta, row.observacion, row.unidad
+      ].map(s=> (s||"").toString().toLowerCase()).join(" |");
+      return hay.includes(q);
+    }
+
+    function inDateRange(row, from, to){
+      const d = row.fecha_reclamo || "";
+      if(!from && !to) return true;
+      if(!d) return false;
+      if(from && d < from) return false;
+      if(to && d > to) return false;
+      return true;
+    }
+
+    function applyFilters(){
+      const q = ($("q").value||"").toString().trim().toLowerCase();
+      const from = $("fDateFrom").value || "";
+      const to = $("fDateTo").value || "";
+
+      view = cache.filter(x => {
+        const r = x.data;
+        if(!matchesText(r,q)) return false;
+        if(!inDateRange(r, from, to)) return false;
+        return true;
+      });
+      draw();
+    }
+
+    $("q").addEventListener("input", applyFilters);
+    $("fDateFrom").addEventListener("change", applyFilters);
+    $("fDateTo").addEventListener("change", applyFilters);
+    $("clearFiltersBtn").addEventListener("click", ()=>{
+      $("q").value = ""; $("fDateFrom").value = ""; $("fDateTo").value = "";
+      applyFilters();
+    });
+
+    // XLSX import
+    const importBtn = $("importBtn");
+    const importInput = $("importXls");
+
+    function normalizeHeader(h){
+      return String(h||"").toLowerCase().trim()
+        .normalize('NFD').replace(/\p{Diacritic}/gu, '')
+        .replace(/\s+/g, '_').replace(/[^a-z0-9_]/g,'');
+    }
+
+    function mapRowObject(raw){
+      const map = {};
+      for(const k in raw){
+        const nk = normalizeHeader(k);
+        const v = raw[k];
+        if(!v && v !== 0) { map[nk] = ''; continue; }
+        if(v instanceof Date){
+          const yyyy = v.getFullYear();
+          const mm = String(v.getMonth()+1).padStart(2,'0');
+          const dd = String(v.getDate()).padStart(2,'0');
+          map[nk] = `${yyyy}-${mm}-${dd}`;
+          continue;
+        }
+        const s = String(v).trim();
+        const m = s.match(/^(\d{2})[\/\-](\d{2})[\/\-](\d{4})$/);
+        if(m){
+          map[nk] = `${m[3]}-${m[2]}-${m[1]}`;
+          continue;
+        }
+        map[nk] = s;
+      }
+      return {
+        material: map.material || '',
+        cantidad: map.cantidad || '',
+        oc: map.oc || '',
+        caja: map.caja || '',
+        monto_unitario: map.monto_unitario || '',
+        monto_total: map.monto_total || '',
+        factura: map.factura || '',
+        nro_reclamo: map.nro_reclamo || map.n_de_reclamo || map.n_reclamo || '',
+        fecha_reclamo: map.fecha_reclamo || map.fecha_de_reclamo || '',
+        respuesta_fabrica: map.respuesta_fabrica || map.respuesta_de_fabrica || '',
+        fecha_respuesta: map.fecha_respuesta || map.fecha_de_respuesta || '',
+        observacion: map.observacion || '',
+        unidad: map.unidad || ''
+      };
+    }
+
+    importBtn.addEventListener('click', ()=> importInput.click());
+    importInput.addEventListener('change', async (e)=>{
+      const f = (e.target.files||[])[0]; importInput.value = '';
+      if(!f) return;
+      if(!confirm(`Importar ${f.name} y agregar sus filas a la base de datos?`)) return;
+
+      try{
+        const arr = await f.arrayBuffer();
+        const wb = XLSX.read(arr, {type:'array', cellDates:true});
+        const first = wb.SheetNames[0];
+        const ws = wb.Sheets[first];
+        const rows = XLSX.utils.sheet_to_json(ws, {defval:'', raw:false});
+        if(!rows.length){ alert('El archivo no contiene filas.'); return; }
+
+        let added = 0; let failed = 0;
+        msgEl.textContent = `Importando ${rows.length} filas...`;
+        for(const raw of rows){
+          const mapped = mapRowObject(raw);
+          const docData = { ...mapped, createdAt: serverTimestamp(), updatedAt: serverTimestamp() };
+          try{ await addDoc(collection(db, COLLECTION), docData); added++; }
+          catch(err){ console.error('add error', err); failed++; }
+        }
+        msgEl.textContent = '';
+        showToast(`Import completo: ${added} agregadas, ${failed} fallidas`, failed>0);
+      } catch(err){
+        console.error(err);
+        alert('Error leyendo XLSX: '+(err.message||err));
+      }
+    });
+
+    // ✅ ADD (colección reclamos)
+    addBtn.addEventListener("click", async () => {
+      const data = {
+        material: $("material").value.trim(),
+        cantidad: $("cantidad").value.trim(),
+        oc: $("oc").value.trim(),
+        caja: $("caja").value.trim(),
+        monto_unitario: $("monto_unitario").value.trim(),
+        monto_total: $("monto_total").value.trim(),
+        factura: $("factura").value.trim(),
+        nro_reclamo: $("nro_reclamo").value.trim(),
+        fecha_reclamo: $("fecha_reclamo").value || "",
+        respuesta_fabrica: $("respuesta_fabrica").value.trim(),
+        fecha_respuesta: $("fecha_respuesta").value || "",
+        observacion: $("observacion").value.trim(),
+        unidad: $("unidad").value.trim(),
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      };
+
+      const empty = !data.material && !data.factura && !data.nro_reclamo && !data.oc;
+      if(empty){ alert('Ingresá al menos un dato para agregar.'); return; }
+
+      addBtn.disabled = true;
+      msgEl.textContent = 'Guardando...';
+      try{
+        await addDoc(collection(db, COLLECTION), data);
+        clearAddForm();
+        showToast('Agregado con éxito');
+      } catch(e){
+        console.error(e);
+        showToast(`Error: ${e.message||e}`, true);
+        alert(e.message||e);
+      } finally{
+        addBtn.disabled = false;
+        msgEl.textContent = '';
+      }
+    });
+
+    function renderRow(id, r){
+      const isEditing = (editingRowId === id);
+
+      if(!isEditing){
+        return `
+          <tr data-id="${id}">
+            <td><div class="cellInner">${escapeHtml(r.material)}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.cantidad)}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.oc)}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.caja)}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.monto_unitario)}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.monto_total)}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.factura)}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.nro_reclamo)}</div></td>
+            <td><div class="cellInner">${escapeHtml(formatDateVal(r.fecha_reclamo))}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.respuesta_fabrica)}</div></td>
+            <td><div class="cellInner">${escapeHtml(formatDateVal(r.fecha_respuesta))}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.observacion)}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.unidad)}</div></td>
+            <td>
+              <div class="cellInner">
+                <div class="actions">
+                  <button class="small" data-action="edit">Editar</button>
+                  <button class="small danger" data-action="delete">Eliminar</button>
+                </div>
+              </div>
+            </td>
+          </tr>
+        `;
+      }
+
+      const material = escapeHtml(r.material||'');
+      const cantidad = escapeHtml(r.cantidad||'');
+      const oc = escapeHtml(r.oc||'');
+      const caja = escapeHtml(r.caja||'');
+      const monto_unitario = escapeHtml(r.monto_unitario||'');
+      const monto_total = escapeHtml(r.monto_total||'');
+      const factura = escapeHtml(r.factura||'');
+      const nro_reclamo = escapeHtml(r.nro_reclamo||'');
+      const fecha_reclamo = escapeHtml(r.fecha_reclamo||'');
+      const respuesta_fabrica = escapeHtml(r.respuesta_fabrica||'');
+      const fecha_respuesta = escapeHtml(r.fecha_respuesta||'');
+      const observacion = escapeHtml(r.observacion||'');
+      const unidad = escapeHtml(r.unidad||'');
+
+      return `
+        <tr data-id="${id}">
+          <td><div class="cellInner"><input class="cell-input w200" data-field="material" value="${material}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w140" data-field="cantidad" value="${cantidad}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w140" data-field="oc" value="${oc}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w140" data-field="caja" value="${caja}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w140" data-field="monto_unitario" value="${monto_unitario}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w140" data-field="monto_total" value="${monto_total}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w140" data-field="factura" value="${factura}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w140" data-field="nro_reclamo" value="${nro_reclamo}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w160" type="date" data-field="fecha_reclamo" value="${fecha_reclamo}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w200" data-field="respuesta_fabrica" value="${respuesta_fabrica}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w160" type="date" data-field="fecha_respuesta" value="${fecha_respuesta}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w200" data-field="observacion" value="${observacion}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w110" data-field="unidad" value="${unidad}"></div></td>
+          <td>
+            <div class="cellInner">
+              <div class="actions">
+                <button class="small primary" data-action="save">Guardar</button>
+                <button class="small" data-action="cancel">Cancelar</button>
+                <button class="small danger" data-action="delete">Eliminar</button>
+              </div>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+
+    function draw(){
+      const dataToDraw = (view.length ? view : cache);
+      tbody.innerHTML = dataToDraw.map(x => renderRow(x.id, x.data)).join('');
+    }
+
+    // ✅ LISTEN (colección reclamos)
+    const qSnap = query(collection(db, COLLECTION), orderBy('createdAt','desc'));
+    onSnapshot(qSnap, (snap)=>{
+      cache = [];
+      snap.forEach(d => cache.push({ id: d.id, data: d.data() }));
+      applyFilters();
+    }, (err)=>{ console.error(err); showToast('No se pudo leer Firestore', true); });
+
+    tbody.addEventListener('click', async (e)=>{
+      const btn = e.target.closest('[data-action]'); if(!btn) return;
+      const tr = e.target.closest('tr[data-id]'); if(!tr) return;
+      const id = tr.dataset.id; const action = btn.dataset.action;
+
+      if(action === 'edit'){ editingRowId = id; draw(); return; }
+      if(action === 'cancel'){ editingRowId = null; draw(); return; }
+
+      if(action === 'save'){
+        const fields = tr.querySelectorAll('[data-field]');
+        const updated = {};
+        fields.forEach(el => updated[el.dataset.field] = (el.value||'').toString().trim());
+        try{
+          btn.disabled = true;
+          await updateDoc(doc(db, COLLECTION, id), { ...updated, updatedAt: serverTimestamp() });
+          editingRowId = null;
+          showToast('Modificado con éxito');
+        } catch(err){
+          console.error(err);
+          showToast(`Error: ${err.message||err}`, true);
+          alert(err.message||err);
+        } finally { btn.disabled = false; }
+        return;
+      }
+
+      if(action === 'delete'){
+        if(!confirm('¿Seguro que querés eliminar esta fila?')) return;
+        try{
+          btn.disabled = true;
+          await deleteDoc(doc(db, COLLECTION, id));
+          if(editingRowId===id) editingRowId = null;
+          showToast('Eliminado con éxito');
+        } catch(err){
+          console.error(err);
+          showToast(`Error: ${err.message||err}`, true);
+          alert(err.message||err);
+        } finally { btn.disabled = false; }
+      }
+    });
+  </script>
+</body>
+</html>
