@@ -1,770 +1,310 @@
-<!doctype html>
-<html lang="es">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Reservas de Importaciones</title>
-
-  <!-- XLSX (SheetJS) para exportar a Excel -->
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-
-  <style>
-    :root{
-      /* John Deere accents */
-      --jd-green:#367C2B;
-      --jd-yellow:#FFDE00;
-
-      /* Darker / more black */
-      --bg:#050705;
-      --panel:#0a0f0a;
-      --panel2:#0c140c;
-      --row:#070b07;
-      --row-alt:#090f09;
-
-      --text:#e9f3e9;
-      --muted:#a7c1a7;
-
-      --line:rgba(255,222,0,.16);
-      --radius:14px;
-      --shadow: 0 18px 45px rgba(0,0,0,.60);
-      --sans: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    }
-
-    *{ box-sizing:border-box; }
-
-    body{
-      margin:0;
-      font-family:var(--sans);
-      background:
-        radial-gradient(900px 600px at 15% 0%, rgba(54,124,43,.20), transparent 60%),
-        radial-gradient(700px 500px at 85% 10%, rgba(255,222,0,.10), transparent 55%),
-        linear-gradient(180deg, #040604 0%, #050905 100%);
-      color:var(--text);
-    }
-
-    .wrap{ width:100%; margin:0; padding:18px; }
-
-    header{
-      display:flex; flex-wrap:wrap; gap:14px;
-      justify-content:space-between; align-items:flex-end;
-      margin-bottom:14px;
-    }
-
-    .title{ display:flex; flex-direction:column; gap:6px; }
-    .title h1{ margin:0; font-size:22px; letter-spacing:.3px; }
-    .title p{ margin:0; font-size:13px; color:var(--muted); }
-
-    .toolbar{
-      display:flex; flex-wrap:wrap; gap:10px;
-      align-items:center; justify-content:flex-end;
-    }
-
-    .control{
-      background:linear-gradient(180deg, rgba(10,15,10,.95), rgba(8,12,8,.95));
-      border:1px solid rgba(255,222,0,.18);
-      border-radius:12px;
-      padding:10px 12px;
-      color:var(--text);
-      min-height:42px;
-      outline:none;
-      box-shadow: inset 0 0 0 1px rgba(54,124,43,.12);
-    }
-    .control::placeholder{ color:rgba(233,243,233,.40); }
-
-    .btn{
-      background:linear-gradient(180deg, rgba(10,15,10,.92), rgba(8,12,8,.92));
-      border:1px solid rgba(255,222,0,.18);
-      color:var(--text);
-      border-radius:12px;
-      padding:10px 14px;
-      min-height:42px;
-      cursor:pointer;
-      transition:.15s ease;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      user-select:none;
-      outline:none;
-      box-shadow: 0 8px 18px rgba(0,0,0,.35);
-    }
-    .btn:hover{ border-color:rgba(255,222,0,.35); transform:translateY(-1px); }
-    .btn.primary{
-      background:linear-gradient(135deg, rgba(54,124,43,.85), rgba(10,15,10,.92));
-      border-color:rgba(255,222,0,.45);
-      box-shadow: 0 10px 22px rgba(54,124,43,.18);
-    }
-    .btn.danger{
-      background:linear-gradient(135deg, rgba(120,20,20,.40), rgba(10,15,10,.92));
-      border-color:rgba(255,80,80,.45);
-    }
-
-    .card{
-      background:linear-gradient(180deg, rgba(12,20,12,.86), rgba(8,12,8,.88));
-      border:1px solid rgba(255,222,0,.14);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      overflow:hidden;
-    }
-
-    .meta{
-      display:flex; justify-content:space-between; align-items:center;
-      gap:10px; flex-wrap:wrap;
-      padding:12px 14px;
-      background:linear-gradient(90deg, rgba(54,124,43,.45), rgba(0,0,0,.35));
-      border-bottom:1px solid rgba(255,222,0,.14);
-    }
-
-    .pill{
-      font-size:12px;
-      border:1px solid rgba(255,222,0,.14);
-      border-radius:999px;
-      padding:6px 12px;
-      color:var(--muted);
-      background:rgba(0,0,0,.30);
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-    }
-
-    .dot{
-      width:8px; height:8px; border-radius:999px;
-      background:var(--jd-yellow);
-      box-shadow:0 0 0 6px rgba(255,222,0,.10);
-    }
-
-    .table-wrap{ width:100%; overflow:auto; max-height:calc(100vh - 230px); }
-
-    table{
-      width:100%;
-      min-width:1500px;
-      border-collapse:separate;
-      border-spacing:0;
-      font-size:13px;
-    }
-
-    thead th{
-      position:sticky; top:0; z-index:5;
-      background:linear-gradient(180deg, rgba(54,124,43,.92), rgba(20,55,18,.92));
-      color:#fff;
-      padding:11px 10px;
-      border-bottom:2px solid var(--jd-yellow);
-      white-space:nowrap;
-      font-weight:800;
-      letter-spacing:.2px;
-      text-align:center;
-    }
-
-    tbody td{
-      padding:8px 10px;
-      border-bottom:1px solid rgba(255,222,0,.06);
-      background:var(--row);
-      white-space:nowrap;
-      vertical-align:middle;
-      text-align:center;
-    }
-
-    tbody tr:nth-child(even) td{ background:var(--row-alt); }
-    tbody tr:hover td{ background:rgba(54,124,43,.22); }
-
-    tbody td[contenteditable="true"]:focus{
-      outline:2px solid rgba(255,222,0,.55);
-      border-radius:8px;
-      background: rgba(0,0,0,.55);
-      color: var(--text);
-    }
-
-    .col-small{ width: 120px; }
-    .col-xs{ width: 90px; }
-    .col-mid{ width: 160px; }
-    .col-wide{ width: 240px; }
-
-    .jd-select{
-      width:100%;
-      min-width:150px;
-      background:rgba(0,0,0,.45);
-      color:var(--text);
-      border:1px solid rgba(255,222,0,.18);
-      border-radius:10px;
-      padding:6px 10px;
-      outline:none;
-      text-align:center;
-    }
-    .jd-select:focus{
-      border-color:rgba(255,222,0,.55);
-      box-shadow:0 0 0 3px rgba(255,222,0,.10);
-    }
-
-    .row-actions{
-      display:flex; gap:8px;
-      align-items:center; justify-content:center;
-    }
-
-    .icon-btn{
-      width:34px; height:34px;
-      border-radius:10px;
-      border:1px solid rgba(255,222,0,.14);
-      background:rgba(0,0,0,.45);
-      color:var(--text);
-      cursor:pointer;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      transition:.15s ease;
-    }
-    .icon-btn:hover{ border-color:rgba(255,222,0,.45); transform:translateY(-1px); }
-    .icon-btn.danger{ border-color:rgba(255,80,80,.45); background:rgba(120,20,20,.35); }
-
-    .footer{
-      padding:12px 14px;
-      border-top:1px solid rgba(255,222,0,.12);
-      background:rgba(0,0,0,.45);
-      color:var(--muted);
-      font-size:12px;
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-    .footer code{ font-family:var(--mono); color:var(--text); }
-
-    @media (max-width: 760px){
-      .toolbar{ justify-content:stretch; }
-      .control, .btn{ flex: 1; }
-      table{ min-width: 1400px; }
-    }
-  </style>
-</head>
-
-<body>
-  <div class="wrap">
-    <header>
-      <div class="title">
-        <h1>Reservas de Importaciones</h1>
-        <p>Tabla editable · buscador + filtro · exportación Excel (XLSX) · sincroniza en vivo (Firestore)</p>
-      </div>
-
-      <div class="toolbar">
-        <input id="search" class="control" style="min-width:260px" placeholder="Buscar (caja, material, OC, descripción...)" />
-        <select id="filterCumplido" class="control">
-          <option value="all">Cumplido: Todos</option>
-          <option value="si">Cumplido: Sí</option>
-          <option value="no">Cumplido: No</option>
-          <option value="sin realizar">Cumplido: Sin realizar</option>
-        </select>
-
-        <button class="btn primary" id="addRow">＋ Agregar fila</button>
-        <button class="btn" id="exportXlsx">⬇ Exportar XLSX</button>
-        <button class="btn danger" id="clearAll">🗑 Vaciar</button>
-      </div>
-    </header>
-
-    <div class="card">
-      <div class="meta">
-        <div class="pill"><span class="dot"></span> Vista principal</div>
-        <div class="pill">Filas: <strong id="rowCount" style="color:var(--text)">0</strong></div>
-        <div class="pill">Estado: <strong id="syncStatus" style="color:var(--text)">Conectando…</strong></div>
-      </div>
-
-      <div class="table-wrap">
-        <table id="grid">
-          <thead>
-            <tr>
-              <th class="col-small">Caja</th>
-              <th class="col-small">Material</th>
-              <th class="col-xs">Cantidad pack</th>
-              <th class="col-xs">Cantid</th>
-              <th class="col-wide">Descripción</th>
-              <th class="col-wide">Comentario</th>
-              <th class="col-mid">O/C</th>
-              <th class="col-xs">Carpeta</th>
-              <th class="col-mid">Pedido Trasla</th>
-              <th class="col-xs">Sucurs</th>
-              <th class="col-mid">Fecha</th>
-              <th class="col-mid">Hora de carga</th>
-              <th class="col-small">Cumplido</th>
-              <th class="col-xs">Acción</th>
-            </tr>
-          </thead>
-          <tbody id="tbody"></tbody>
-        </table>
-      </div>
-
-      <div class="footer">
-        <div>Tip: click en una celda para editar. Enter confirma. Cambios se sincronizan para todas las PCs.</div>
-        <div>Back-end: <code>Firebase Firestore</code> · (se quitó <code>localStorage</code>)</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- IMPORTANTE:
-       Este script usa "type=module" (Firebase v9+). No lo abras con file://
-       Abrilo desde un servidor/hosting (Firebase Hosting, IIS, Apache, etc). -->
-  <script type="module">
-    // =========================
-    // FIREBASE (Firestore realtime + Auth anónimo)
-    // =========================
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
-    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
-    import {
-      getFirestore,
-      collection,
-      doc,
-      addDoc,
-      updateDoc,
-      deleteDoc,
-      onSnapshot,
-      query,
-      orderBy,
-      serverTimestamp,
-      getDocs,
-      writeBatch,
-      limit
-    } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
-
-    // (Opcional) Storage si querés subir el XLSX exportado
-    // import { getStorage, ref as sRef, uploadBytes } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-storage.js";
-
-    // ==== TU firebaseConfig (tal cual lo pasaste) ====
-    const firebaseConfig = {
-      apiKey: "AIzaSyA0xgTpM2NjDoyBD5Eo5F2FN-Dxy6UgI9Y",
-      authDomain: "reservas-importaciones.firebaseapp.com",
-      projectId: "reservas-importaciones",
-      storageBucket: "reservas-importaciones.firebasestorage.app",
-      messagingSenderId: "404230429294",
-      appId: "1:404230429294:web:c11b2d0c15a43ce0f6247f",
-      measurementId: "G-S05S1H4XZ0"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    // const storage = getStorage(app);
-
-    // =========================
-    // TU APP (misma UI + Firestore en vez de localStorage)
-    // =========================
-    const columns = [
-      "caja","material","cantidadPack","cantid","descripcion","comentario",
-      "oc","carpeta","pedidoTrasla","sucurs","fecha","horaCarga","cumplido"
-    ];
-
-    const tbody = document.getElementById("tbody");
-    const search = document.getElementById("search");
-    const filterCumplido = document.getElementById("filterCumplido");
-    const rowCount = document.getElementById("rowCount");
-    const syncStatus = document.getElementById("syncStatus");
-
-    function pad2(n){ return String(n).padStart(2,"0"); }
-
-    function nowDateStr(){
-      const d = new Date();
-      return `${pad2(d.getDate())}/${pad2(d.getMonth()+1)}/${d.getFullYear()}`;
-    }
-
-    function nowTimeStr(){
-      const d = new Date();
-      return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
-    }
-
-    function seedData(){
-      return [{
-        caja:"SBKM5D",
-        material:"KK25029",
-        cantidadPack:"4",
-        cantid:"2",
-        descripcion:"APOYO",
-        comentario:"",
-        oc:"1200021702",
-        carpeta:"88789",
-        pedidoTrasla:"1601220470",
-        sucurs:"S002",
-        fecha:"27/11/2025",
-        horaCarga:"08:30",
-        cumplido:"SIN REALIZAR"
-      }];
-    }
-
-    // Datos en memoria (la fuente real es Firestore)
-    let data = [];
-
-    // Colección donde se guardan filas
-    const reservasCol = collection(db, "reservas");
-    const reservasQuery = query(reservasCol, orderBy("createdAt", "desc"));
-
-    function matchesFilters(row){
-      const q = search.value.trim().toLowerCase();
-      const f = filterCumplido.value;
-
-      const haystack = columns.map(k => (row[k] ?? "").toString().toLowerCase()).join(" | ");
-      const okSearch = !q || haystack.includes(q);
-
-      let okCumplido = true;
-      if(f !== "all"){
-        const v = (row.cumplido ?? "").toString().trim().toLowerCase();
-        const isYes = (v === "si" || v === "sí");
-        const isNo = (v === "no");
-        const isPending = (v === "sin realizar" || v === "");
-        if(f === "si") okCumplido = isYes;
-        if(f === "no") okCumplido = isNo;
-        if(f === "sin realizar") okCumplido = isPending;
-      }
-
-      return okSearch && okCumplido;
-    }
-
-    function render(){
-      tbody.innerHTML = "";
-
-      const visible = data
-        .map((row, idx) => ({row, idx}))
-        .filter(({row}) => matchesFilters(row));
-
-      rowCount.textContent = visible.length;
-
-      for(const {row, idx} of visible){
-        const tr = document.createElement("tr");
-
-        for(const key of columns){
-          const td = document.createElement("td");
-          td.setAttribute("data-key", key);
-          td.setAttribute("data-idx", idx);
-
-          if(key === "cumplido"){
-            const current = (row[key] ?? "SIN REALIZAR").toString().trim().toUpperCase();
-            const normalized = (current === "" ? "SIN REALIZAR" : current);
-
-            td.innerHTML = `
-              <select class="jd-select" data-idx="${idx}" data-key="cumplido" aria-label="Cumplido">
-                <option value="SIN REALIZAR" ${normalized === "SIN REALIZAR" ? "selected" : ""}>SIN REALIZAR</option>
-                <option value="SI" ${normalized === "SI" ? "selected" : ""}>SI</option>
-                <option value="NO" ${normalized === "NO" ? "selected" : ""}>NO</option>
-              </select>
-            `;
-          }else{
-            td.textContent = row[key] ?? "";
-            td.contentEditable = "true";
-          }
-
-          tr.appendChild(td);
-        }
-
-        const tdA = document.createElement("td");
-        tdA.className = "col-xs";
-        tdA.innerHTML = `
-          <div class="row-actions">
-            <button class="icon-btn" title="Duplicar" data-action="dup" data-idx="${idx}">⎘</button>
-            <button class="icon-btn danger" title="Eliminar" data-action="del" data-idx="${idx}">✕</button>
-          </div>
-        `;
-        tr.appendChild(tdA);
-
-        tbody.appendChild(tr);
-      }
-    }
-
-    // =========================
-    // FIRESTORE: Seed inicial si está vacío
-    // =========================
-    async function ensureSeedIfEmpty(){
-      // Pregunta rápida: ¿hay al menos 1 doc?
-      const q1 = query(reservasCol, limit(1));
-      const snap = await getDocs(q1);
-      if(snap.size > 0) return;
-
-      const seed = seedData();
-      for(const row of seed){
-        await addDoc(reservasCol, {
-          ...row,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp()
-        });
-      }
-    }
-
-    // =========================
-    // FIRESTORE: realtime listener
-    // =========================
-    async function startRealtime(){
-      try{
-        syncStatus.textContent = "Autenticando…";
-        await signInAnonymously(auth);
-
-        syncStatus.textContent = "Cargando…";
-        await ensureSeedIfEmpty();
-
-        syncStatus.textContent = "En vivo ✅";
-
-        onSnapshot(reservasQuery, (snap) => {
-          data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-          render();
-        }, (err) => {
-          console.error(err);
-          syncStatus.textContent = "Error 🔴";
-          alert("Error de sincronización. Revisá reglas de Firestore/credenciales.");
-        });
-
-      }catch(err){
-        console.error(err);
-        syncStatus.textContent = "Error 🔴";
-        alert("No se pudo conectar a Firebase. Revisá firebaseConfig y reglas.");
-      }
-    }
-
-    // =========================
-    // EDITAR: updateDoc al salir de celda
-    // =========================
-    tbody.addEventListener("focusout", async (e) => {
-      const td = e.target.closest("td");
-      if(!td || !td.dataset.key) return;
-
-      const idx = Number(td.dataset.idx);
-      const key = td.dataset.key;
-
-      if(!Number.isFinite(idx) || !data[idx]) return;
-      if(key === "cumplido") return;
-
-      const rowId = data[idx].id;
-      const value = td.innerText.trim();
-
-      try{
-        await updateDoc(doc(db, "reservas", rowId), {
-          [key]: value,
-          updatedAt: serverTimestamp()
-        });
-      }catch(err){
-        console.error(err);
-        alert("No se pudo guardar el cambio (Firestore).");
-      }
-    });
-
-    // Enter: evitar saltos de línea
-    tbody.addEventListener("keydown", (e) => {
-      if(e.key === "Enter"){
-        e.preventDefault();
-        e.target.blur();
-      }
-    });
-
-    // Cumplido: guardar por cambio del select
-    tbody.addEventListener("change", async (e) => {
-      const sel = e.target.closest("select.jd-select");
-      if(!sel) return;
-
-      const idx = Number(sel.dataset.idx);
-      if(!Number.isFinite(idx) || !data[idx]) return;
-
-      const rowId = data[idx].id;
-
-      try{
-        await updateDoc(doc(db, "reservas", rowId), {
-          cumplido: sel.value,
-          updatedAt: serverTimestamp()
-        });
-      }catch(err){
-        console.error(err);
-        alert("No se pudo guardar 'Cumplido'.");
-      }
-    });
-
-    // Duplicar / Eliminar
-    tbody.addEventListener("click", async (e) => {
-      const btn = e.target.closest("button[data-action]");
-      if(!btn) return;
-
-      const action = btn.dataset.action;
-      const idx = Number(btn.dataset.idx);
-      if(!Number.isFinite(idx) || !data[idx]) return;
-
-      const row = data[idx];
-
-      if(action === "del"){
-        if(!confirm("¿Eliminar esta fila?")) return;
-        try{
-          await deleteDoc(doc(db, "reservas", row.id));
-        }catch(err){
-          console.error(err);
-          alert("No se pudo eliminar.");
-        }
-      }
-
-      if(action === "dup"){
-        const copy = structuredClone(row);
-        delete copy.id;
-        delete copy.createdAt;
-        delete copy.updatedAt;
-
-        try{
-          await addDoc(reservasCol, {
-            ...copy,
-            createdAt: serverTimestamp(),
-            updatedAt: serverTimestamp()
-          });
-        }catch(err){
-          console.error(err);
-          alert("No se pudo duplicar.");
-        }
-      }
-    });
-
-    // Agregar fila
-    document.getElementById("addRow").addEventListener("click", async () => {
-      const empty = Object.fromEntries(columns.map(c => [c, ""]));
-      empty.cumplido = "SIN REALIZAR";
-      empty.fecha = nowDateStr();
-      empty.horaCarga = nowTimeStr();
-
-      try{
-        await addDoc(reservasCol, {
-          ...empty,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp()
-        });
-      }catch(err){
-        console.error(err);
-        alert("No se pudo agregar la fila.");
-      }
-    });
-
-    // Vaciar todo (borra todos los docs de la colección en lotes de 500)
-    document.getElementById("clearAll").addEventListener("click", async () => {
-      if(!confirm("¿Seguro que querés vaciar toda la tabla? (se borra para TODOS)")) return;
-
-      try{
-        syncStatus.textContent = "Vaciando…";
-
-        const snap = await getDocs(reservasCol);
-        const docs = snap.docs;
-
-        const CHUNK = 500;
-        for(let i=0; i<docs.length; i+=CHUNK){
-          const batch = writeBatch(db);
-          const chunk = docs.slice(i, i+CHUNK);
-          for(const d of chunk){
-            batch.delete(d.ref);
-          }
-          await batch.commit();
-        }
-
-        syncStatus.textContent = "En vivo ✅";
-      }catch(err){
-        console.error(err);
-        syncStatus.textContent = "Error 🔴";
-        alert("No se pudo vaciar. Revisá reglas/permisos.");
-      }
-    });
-
-    // Filtros UI
-    search.addEventListener("input", render);
-    filterCumplido.addEventListener("change", render);
-
-    /* =========================
-       EXPORTAR XLSX (tu mismo código)
-    ========================== */
-
-    function parseDateDMY(s){
-      const str = (s ?? "").toString().trim();
-      const m = str.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-      if(!m) return null;
-      const dd = Number(m[1]), mm = Number(m[2]), yyyy = Number(m[3]);
-      const d = new Date(yyyy, mm-1, dd);
-      return Number.isFinite(d.getTime()) ? d : null;
-    }
-
-    function parseTimeHMToExcel(s){
-      const str = (s ?? "").toString().trim();
-      const m = str.match(/^(\d{1,2}):(\d{2})$/);
-      if(!m) return null;
-      const hh = Number(m[1]), mi = Number(m[2]);
-      if(hh < 0 || hh > 23 || mi < 0 || mi > 59) return null;
-      return (hh * 3600 + mi * 60) / 86400;
-    }
-
-    function autoColsFromAOA(aoa){
-      const colCount = Math.max(...aoa.map(r => r.length));
-      const maxLen = new Array(colCount).fill(0);
-
-      for(const row of aoa){
-        for(let c=0; c<colCount; c++){
-          const v = row[c];
-          let len = 0;
-
-          if(v == null) len = 0;
-          else if(v instanceof Date) len = 10;
-          else if(typeof v === "number") len = 5;
-          else len = String(v).length;
-
-          if(len > maxLen[c]) maxLen[c] = len;
-        }
-      }
-
-      return maxLen.map(n => ({
-        wch: Math.min(40, Math.max(10, n + 2))
-      }));
-    }
-
-    document.getElementById("exportXlsx").addEventListener("click", () => {
-      const rows = data.filter(matchesFilters);
-
-      const header = [
-        "Caja","Material","Cantidad pack","Cantid","Descripción","Comentario",
-        "O/C","Carpeta","Pedido Trasla","Sucurs","Fecha","Hora de carga","Cumplido"
-      ];
-
-      const aoa = [
-        header,
-        ...rows.map(r => ([
-          r.caja ?? "",
-          r.material ?? "",
-          r.cantidadPack ?? "",
-          r.cantid ?? "",
-          r.descripcion ?? "",
-          r.comentario ?? "",
-          r.oc ?? "",
-          r.carpeta ?? "",
-          r.pedidoTrasla ?? "",
-          r.sucurs ?? "",
-          parseDateDMY(r.fecha) ?? "",
-          parseTimeHMToExcel(r.horaCarga) ?? "",
-          r.cumplido ?? ""
-        ]))
-      ];
-
-      const wb = XLSX.utils.book_new();
-      const ws = XLSX.utils.aoa_to_sheet(aoa, { cellDates: true });
-
-      const range = XLSX.utils.decode_range(ws["!ref"]);
-      for(let R = range.s.r + 1; R <= range.e.r; R++){
-        const dateCellAddr = XLSX.utils.encode_cell({ r:R, c:10 });
-        const timeCellAddr = XLSX.utils.encode_cell({ r:R, c:11 });
-
-        const dc = ws[dateCellAddr];
-        if(dc && dc.v instanceof Date){
-          dc.t = "d";
-          dc.z = "dd/mm/yyyy";
-        }
-
-        const tc = ws[timeCellAddr];
-        if(tc && typeof tc.v === "number"){
-          tc.t = "n";
-          tc.z = "hh:mm";
-        }
-      }
-
-      ws["!freeze"] = { xSplit: 0, ySplit: 1 };
-      ws["!autofilter"] = { ref: ws["!ref"] };
-      ws["!cols"] = autoColsFromAOA(aoa);
-
-      XLSX.utils.book_append_sheet(wb, ws, "Reservas");
-
-      const d = new Date();
-      const fileName = `reservas_importaciones_${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}.xlsx`;
-      XLSX.writeFile(wb, fileName);
-    });
-
-    // Iniciar realtime
-    startRealtime();
-  </script>
-</body>
-</html>
+<style>
+  :root{
+    --green:#367c2b;
+    --yellow:#ffde00;
+
+    --bg:#f6f7fb;
+    --text:#071218;
+    --muted:#56626b;
+
+    --card:#ffffff;
+    --border:#e6e9ef;
+    --shadow: 0 14px 34px rgba(15,23,32,.10);
+    --radius:18px;
+
+    --sans: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  *{ box-sizing:border-box; }
+
+  body{
+    margin:0;
+    font-family:var(--sans);
+    color:var(--text);
+    background:
+      radial-gradient(1200px 650px at 10% 0%, rgba(54,124,43,.10), transparent 55%),
+      radial-gradient(1200px 650px at 90% 0%, rgba(255,222,0,.08), transparent 55%),
+      var(--bg);
+    min-height:100vh;
+  }
+
+  .wrap{
+    width:min(1200px, 94vw);
+    margin: 28px auto;
+    padding: 0 6px 24px;
+  }
+
+  header{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px;
+    justify-content:space-between;
+    align-items:flex-end;
+    margin-bottom:16px;
+  }
+
+  .title{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+
+  .title h1{
+    margin:0;
+    font-size:24px;
+    letter-spacing:.2px;
+  }
+
+  .title p{
+    margin:0;
+    font-size:13px;
+    color:var(--muted);
+    max-width: 720px;
+  }
+
+  .toolbar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    align-items:center;
+    justify-content:flex-end;
+  }
+
+  .control{
+    background: rgba(255,255,255,.95);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:10px 12px;
+    color:var(--text);
+    min-height:42px;
+    outline:none;
+    box-shadow: 0 10px 20px rgba(15,23,32,.05);
+  }
+  .control::placeholder{ color: rgba(7,18,24,.35); }
+  .control:focus{
+    border-color: rgba(54,124,43,.35);
+    box-shadow: 0 0 0 4px rgba(54,124,43,.10);
+  }
+
+  .btn{
+    background: rgba(255,255,255,.95);
+    border:1px solid var(--border);
+    color:var(--text);
+    border-radius:12px;
+    padding:10px 14px;
+    min-height:42px;
+    cursor:pointer;
+    transition:.15s ease;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    user-select:none;
+    outline:none;
+    box-shadow: 0 10px 20px rgba(15,23,32,.06);
+  }
+  .btn:hover{
+    transform: translateY(-1px);
+    border-color: rgba(54,124,43,.28);
+    box-shadow: 0 16px 30px rgba(15,23,32,.10);
+  }
+
+  .btn.primary{
+    background: linear-gradient(135deg, rgba(54,124,43,.95), rgba(54,124,43,.78));
+    color:#fff;
+    border-color: rgba(54,124,43,.35);
+    box-shadow: 0 14px 28px rgba(54,124,43,.18);
+  }
+  .btn.primary:hover{
+    filter: brightness(.98);
+    border-color: rgba(54,124,43,.45);
+  }
+
+  .btn.danger{
+    background: rgba(255,255,255,.95);
+    border-color: rgba(239,68,68,.35);
+    color:#b42318;
+  }
+  .btn.danger:hover{
+    border-color: rgba(239,68,68,.55);
+  }
+
+  .card{
+    background: linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,.92));
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    box-shadow: var(--shadow);
+    overflow:hidden;
+  }
+
+  .meta{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+    padding:12px 14px;
+    background: linear-gradient(90deg, rgba(54,124,43,.08), rgba(255,222,0,.06));
+    border-bottom:1px solid var(--border);
+    position:relative;
+  }
+  .meta::before{
+    content:"";
+    position:absolute;
+    inset:-1px -1px auto -1px;
+    height:6px;
+    background: linear-gradient(90deg, var(--green), var(--yellow));
+    opacity:.95;
+  }
+
+  .pill{
+    font-size:12px;
+    border:1px solid var(--border);
+    border-radius:999px;
+    padding:6px 12px;
+    color:var(--muted);
+    background: rgba(255,255,255,.75);
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    box-shadow: 0 10px 18px rgba(15,23,32,.06);
+    backdrop-filter: blur(6px);
+  }
+
+  .dot{
+    width:8px;
+    height:8px;
+    border-radius:999px;
+    background:var(--yellow);
+    box-shadow:0 0 0 6px rgba(255,222,0,.18);
+  }
+
+  .table-wrap{
+    width:100%;
+    overflow:auto;
+    max-height: calc(100vh - 240px);
+  }
+
+  table{
+    width:100%;
+    min-width: 1500px;
+    border-collapse:separate;
+    border-spacing:0;
+    font-size:13px;
+  }
+
+  thead th{
+    position:sticky;
+    top:0;
+    z-index:5;
+    background: linear-gradient(180deg, rgba(17,24,39,1), rgba(17,24,39,.94));
+    color:#fff;
+    padding:11px 10px;
+    border-bottom: 2px solid var(--yellow);
+    white-space:nowrap;
+    font-weight:800;
+    letter-spacing:.2px;
+    text-align:center;
+  }
+
+  tbody td{
+    padding:8px 10px;
+    border-bottom:1px solid rgba(230,233,239,.9);
+    background:#fff;
+    white-space:nowrap;
+    vertical-align:middle;
+    text-align:center;
+  }
+
+  tbody tr:nth-child(even) td{
+    background: rgba(246,247,251,.65);
+  }
+  tbody tr:hover td{
+    background: rgba(54,124,43,.08);
+  }
+
+  tbody td[contenteditable="true"]:focus{
+    outline:2px solid rgba(54,124,43,.35);
+    border-radius:10px;
+    background: rgba(54,124,43,.06);
+    color: var(--text);
+  }
+
+  .col-small{ width: 120px; }
+  .col-xs{ width: 90px; }
+  .col-mid{ width: 160px; }
+  .col-wide{ width: 240px; }
+
+  .jd-select{
+    width:100%;
+    min-width:150px;
+    background: rgba(255,255,255,.95);
+    color:var(--text);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:6px 10px;
+    outline:none;
+    text-align:center;
+    box-shadow: 0 10px 18px rgba(15,23,32,.06);
+  }
+  .jd-select:focus{
+    border-color: rgba(54,124,43,.35);
+    box-shadow: 0 0 0 4px rgba(54,124,43,.10);
+  }
+
+  .row-actions{
+    display:flex;
+    gap:8px;
+    align-items:center;
+    justify-content:center;
+  }
+
+  .icon-btn{
+    width:34px;
+    height:34px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background: rgba(255,255,255,.95);
+    color:var(--text);
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    transition:.15s ease;
+    box-shadow: 0 10px 18px rgba(15,23,32,.06);
+  }
+  .icon-btn:hover{
+    border-color: rgba(54,124,43,.28);
+    transform: translateY(-1px);
+    box-shadow: 0 16px 26px rgba(15,23,32,.10);
+  }
+
+  .icon-btn.danger{
+    border-color: rgba(239,68,68,.35);
+    color:#b42318;
+  }
+  .icon-btn.danger:hover{
+    border-color: rgba(239,68,68,.55);
+  }
+
+  .footer{
+    padding:12px 14px;
+    border-top:1px solid var(--border);
+    background: rgba(255,255,255,.65);
+    color:var(--muted);
+    font-size:12px;
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    flex-wrap:wrap;
+    backdrop-filter: blur(6px);
+  }
+  .footer code{ font-family:var(--mono); color:var(--text); }
+
+  @media (max-width: 760px){
+    .toolbar{ justify-content:stretch; }
+    .control, .btn{ flex: 1; }
+    table{ min-width: 1400px; }
+  }
+</style>
