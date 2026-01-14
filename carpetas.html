@@ -11,9 +11,9 @@
       --jd-yellow:#ffde00;
 
       --bg:#f6f7fb;
-      --text:#071218;
-      --title-color:#000;
-      --row-text:#3b4950;
+      --text:#071218; /* texto principal */
+      --title-color:#000; /* títulos en negro */
+      --row-text:#3b4950; /* texto de las filas, más claro que el título */
       --muted:#5b646d;
 
       --border:#e6e9ef;
@@ -67,7 +67,9 @@
       margin-bottom: 14px;
       overflow:hidden;
     }
-    .accentBar{display:none;}
+    .accentBar{
+      display:none; /* oculto: usuario pidió sin la barra amarillo/verde */
+    }
     .cardHeader{
       display:flex;align-items:center;justify-content:space-between;
       gap:10px;flex-wrap:wrap;margin-bottom:10px;
@@ -137,7 +139,7 @@
     table{
       width:100%;
       border-collapse:separate;
-      border-spacing:0 14px;
+      border-spacing:0 14px; /* separacion vertical entre filas */
       background: transparent;
       border:1px solid var(--border);
       border-radius: var(--radius);
@@ -150,6 +152,7 @@
       text-align:center;
     }
     th,td{
+      /* td sin padding: lo maneja .cellInner */
       border-bottom: none;
       padding:0;font-size:14px;vertical-align:middle;
       white-space:nowrap;text-align:center;color:var(--text);
@@ -157,15 +160,17 @@
       background-clip: padding-box;
     }
 
+    /* Contenedor interno por celda que pinta el fondo y paddings */
     .cellInner{
       display:flex;align-items:center;justify-content:center;
       padding:14px 10px;border-radius:10px;min-height:48px;
       width:100%;box-sizing:border-box;
-      font-weight:600;
+      font-weight:600; /* filas menos pesadas que el título */
       color: var(--row-text);
       border:1px solid rgba(15,23,32,.04);
       box-shadow: 0 10px 18px rgba(15,23,32,.06);
     }
+    /* fondos más oscuros para distinguir claramente cada fila */
     tbody tr:nth-child(odd) .cellInner{background: #e3eaee}
     tbody tr:nth-child(even) .cellInner{background: #d3dde2}
     tbody tr:hover .cellInner{background: rgba(54,124,43,.12)}
@@ -174,13 +179,15 @@
       font-size:13px;letter-spacing:.06em;text-transform:uppercase;
       color:var(--muted);position:relative;padding:12px 8px;
     }
-    th::after{display:none}
+    th::after{display:none} /* quitar la línea amarilla/verde debajo de los encabezados */
     tbody tr:nth-child(odd){background: #f3f6f8}
     tbody tr:nth-child(even){background: #e9eef2}
     tbody tr{transition: background .12s ease}
     tbody tr:hover{background: rgba(54,124,43,.09)}
 
+    /* reforzar separacion: sombra sutil por fila */
     tbody tr{box-shadow: 0 8px 20px rgba(15,23,32,.06);border-radius:10px}
+    /* asegurar que las celdas no pinten sobre el fondo del <tr> */
     tbody tr td{background:transparent}
 
     .actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
@@ -209,6 +216,7 @@
     }
     .footer b{color:var(--jd-green)}
 
+    /* Adjuntos UI */
     .attLinks{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center}
     a{color:var(--jd-green);font-weight:700}
     .pillX{
@@ -220,6 +228,7 @@
       cursor:pointer;
     }
 
+    /* Botones pequeños: hacerlos más visibles sobre fondo claro */
     button.small.secondary{
       border-color: rgba(54,124,43,.55);
       color: var(--jd-green);
@@ -227,11 +236,14 @@
       box-shadow: 0 6px 12px rgba(54,124,43,.04);
     }
     button.small.primary{box-shadow: 0 10px 18px rgba(54,124,43,.10)}
+
+    /* Acciones: texto negro para mejorar legibilidad */
     .actions button{color:#000 !important; font-weight:700}
 
+    /* ✅ FIX SUPERPOSICIÓN: el formulario ahora WRAPEA */
     .row-add{
       display:flex;
-      flex-wrap: wrap;
+      flex-wrap: wrap;   /* ← antes estaba nowrap, eso causaba superposición */
       gap:10px;
       align-items:flex-end;
     }
@@ -241,8 +253,9 @@
     .row-add .w140{min-width:120px}
     .row-add input[type="date"]{min-width:140px}
 
+    /* cuando el ancho es chico, no dejamos nada "apretado" */
     @media (max-width: 1200px){
-      .row-add > div{flex: 1 1 210px;}
+      .row-add > div{flex: 1 1 210px;}   /* cada campo ocupa su bloque y baja */
       .row-add button#addBtn{flex: 0 0 auto;}
     }
   </style>
@@ -318,7 +331,7 @@
     <div class="muted">Los filtros se aplican automáticamente sobre la tabla.</div>
   </div>
 
-  <!-- FORMULARIO AGREGAR -->
+  <!-- FORMULARIO AGREGAR (SIN EXCEL/ADJUNTOS) -->
   <div class="card">
     <div class="accentBar"></div>
     <h3>Agregar fila</h3>
@@ -403,7 +416,7 @@
     <div id="toast" class="toast"></div>
   </div>
 
-  <!-- pickers ocultos -->
+  <!-- pickers ocultos para subir desde la tabla -->
   <input
     id="packingRowPicker"
     type="file"
@@ -437,7 +450,9 @@
         <th>Fecha depósito</th>
         <th>Confirmación de llegada</th>
 
+        <!-- ✅ RENOMBRADO -->
         <th>Packing</th>
+
         <th>Adjuntos</th>
         <th>Acciones</th>
       </tr>
@@ -456,9 +471,6 @@
     import {
       getStorage, ref as sRef, uploadBytesResumable, getDownloadURL, deleteObject
     } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
-
-    // ✅ Colección separada
-    const COLLECTION = "carpetas";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDIGkNekvGn0XrqGvDAuutCBSglod03644",
@@ -509,10 +521,13 @@
         const yyyy = v.getFullYear();
         return `${dd}/${mm}/${yyyy}`;
       }
+      // ISO yyyy-mm-dd
       const m = String(v).match(/^(\d{4})-(\d{2})-(\d{2})/);
       if (m) return `${m[3]}/${m[2]}/${m[1]}`;
       const d = new Date(v);
-      if (!isNaN(d)) return formatDateVal(d);
+      if (!isNaN(d)){
+        return formatDateVal(d);
+      }
       return String(v);
     }
 
@@ -524,6 +539,7 @@
 
     function safeYesNo(v){ return (v === "NO") ? "NO" : "SI"; }
     function uid(){ return (crypto?.randomUUID ? crypto.randomUUID() : `${Date.now()}_${Math.random().toString(16).slice(2)}`); }
+
     function norm(s){ return (s ?? "").toString().trim().toLowerCase(); }
 
     function isExcelFile(file){
@@ -641,16 +657,14 @@
     async function uploadAttachments(rowId, files){
       const out = [];
       for (const f of files){
-        // ✅ Storage separado
-        const path = `carpetas/${rowId}/attachments/${uid()}_${f.name}`;
+        const path = `rows/${rowId}/attachments/${uid()}_${f.name}`;
         out.push(await uploadFileTo(path, f, "Subiendo adjuntos"));
       }
       return out;
     }
 
     async function uploadPacking(rowId, file){
-      // ✅ Storage separado
-      const path = `carpetas/${rowId}/packing/${uid()}_${file.name}`;
+      const path = `rows/${rowId}/packing/${uid()}_${file.name}`;
       return await uploadFileTo(path, file, "Subiendo packing");
     }
 
@@ -696,7 +710,6 @@
       `;
     }
 
-    // ✅ ADD (colección carpetas)
     addBtn.addEventListener("click", async () => {
       const data = {
         factura: $("factura").value.trim(),
@@ -713,6 +726,7 @@
         wis: safeYesNo($("wis").value),
         confirmacion_llegada: safeYesNo($("confirmacion_llegada").value),
 
+        // ✅ ahora se gestiona desde la tabla
         packingAttachment: null,
         attachments: [],
 
@@ -731,7 +745,7 @@
       msgEl.textContent = "Guardando...";
 
       try {
-        await addDoc(collection(db, COLLECTION), data);
+        await addDoc(collection(db, "rows"), data);
         clearAddForm();
         showToast("Agregado con éxito");
       } catch (e) {
@@ -860,8 +874,7 @@
       tbody.innerHTML = dataToDraw.map(x => renderRow(x.id, x.data)).join("");
     }
 
-    // ✅ LISTEN (colección carpetas)
-    const qSnap = query(collection(db, COLLECTION), orderBy("createdAt", "desc"));
+    const qSnap = query(collection(db, "rows"), orderBy("createdAt", "desc"));
     onSnapshot(qSnap, (snap) => {
       cache = [];
       snap.forEach(d => cache.push({ id: d.id, data: d.data() }));
@@ -897,7 +910,7 @@
           await deleteObject(sRef(storage, prev.path));
         }
         const uploaded = await uploadPacking(rowId, f);
-        await updateDoc(doc(db, COLLECTION, rowId), { packingAttachment: uploaded, updatedAt: serverTimestamp() });
+        await updateDoc(doc(db, "rows", rowId), { packingAttachment: uploaded, updatedAt: serverTimestamp() });
         showToast("Packing actualizado");
       } catch(err){
         console.error(err);
@@ -925,7 +938,7 @@
         msgEl.textContent = "Subiendo adjuntos...";
         const uploaded = await uploadAttachments(rowId, files);
         const next = current.concat(uploaded);
-        await updateDoc(doc(db, COLLECTION, rowId), { attachments: next, updatedAt: serverTimestamp() });
+        await updateDoc(doc(db, "rows", rowId), { attachments: next, updatedAt: serverTimestamp() });
         showToast("Adjuntos actualizados");
       } catch(err){
         console.error(err);
@@ -969,7 +982,7 @@
         try{
           btn.disabled = true;
           await deleteObject(sRef(storage, p.path));
-          await updateDoc(doc(db, COLLECTION, id), { packingAttachment: null, updatedAt: serverTimestamp() });
+          await updateDoc(doc(db, "rows", id), { packingAttachment: null, updatedAt: serverTimestamp() });
           showToast("Packing borrado");
         } catch(err){
           console.error(err);
@@ -994,7 +1007,7 @@
           btn.disabled = true;
           await deleteObject(sRef(storage, att.path));
           const next = atts.filter((_, i) => i !== idx);
-          await updateDoc(doc(db, COLLECTION, id), { attachments: next, updatedAt: serverTimestamp() });
+          await updateDoc(doc(db, "rows", id), { attachments: next, updatedAt: serverTimestamp() });
           showToast("Adjunto borrado");
         } catch(err){
           console.error(err);
@@ -1018,7 +1031,7 @@
 
         try {
           btn.disabled = true;
-          await updateDoc(doc(db, COLLECTION, id), { ...updated, updatedAt: serverTimestamp() });
+          await updateDoc(doc(db, "rows", id), { ...updated, updatedAt: serverTimestamp() });
           editingRowId = null;
           showToast("Modificado con éxito");
         } catch (err) {
@@ -1047,7 +1060,7 @@
 
           if (p?.path) await deleteObject(sRef(storage, p.path));
 
-          await deleteDoc(doc(db, COLLECTION, id));
+          await deleteDoc(doc(db, "rows", id));
           if (editingRowId === id) editingRowId = null;
           showToast("Eliminado con éxito");
         } catch(err){
