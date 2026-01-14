@@ -1,0 +1,1077 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Carga de datos - Interagrovial</title>
+
+  <style>
+    :root{
+      --jd-green:#367c2b;
+      --jd-yellow:#ffde00;
+
+      --bg:#f6f7fb;
+      --text:#071218; /* texto principal */
+      --title-color:#000; /* títulos en negro */
+      --row-text:#3b4950; /* texto de las filas, más claro que el título */
+      --muted:#5b646d;
+
+      --border:#e6e9ef;
+      --border-strong:#c9d2d9;
+
+      --shadow:0 12px 30px rgba(15,23,32,.06);
+      --shadow2:0 6px 14px rgba(15,23,32,.04);
+      --radius:16px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      margin: 22px;
+      background: radial-gradient(1200px 600px at 15% 0%, rgba(54,124,43,.06), transparent 55%),
+                  radial-gradient(1200px 600px at 85% 0%, rgba(255,222,0,.03), transparent 55%),
+                  var(--bg);
+      color: var(--text);
+    }
+
+    .topbar{
+      display:flex;align-items:center;justify-content:space-between;
+      gap:14px;flex-wrap:wrap;margin-bottom:14px;
+    }
+    .title{
+      display:flex;align-items:center;gap:12px;margin:0;
+      font-size:22px;font-weight:900;letter-spacing:.2px;
+      color: #000000 !important;
+    }
+    .brandDot{
+      width:14px;height:14px;border-radius:999px;
+      background: var(--jd-green);
+      box-shadow: inset 0 0 0 3px var(--jd-yellow);
+    }
+    .subpill{
+      display:inline-flex;align-items:center;gap:8px;
+      border:1px solid var(--border);
+      padding:8px 12px;border-radius:999px;
+      background: rgba(0,0,0,.03);
+      font-size:12px;color:var(--muted);
+      box-shadow: var(--shadow2);
+    }
+    .subpill b{color:var(--jd-green)}
+
+    .card{
+      background: linear-gradient(180deg, rgba(0,0,0,.03), rgba(0,0,0,.01));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+      margin-bottom: 14px;
+      overflow:hidden;
+    }
+    .accentBar{
+      display:none; /* oculto: usuario pidió sin la barra amarillo/verde */
+    }
+    .cardHeader{
+      display:flex;align-items:center;justify-content:space-between;
+      gap:10px;flex-wrap:wrap;margin-bottom:10px;
+    }
+    .card h3{
+      margin:6px 0 12px;font-size:20px;
+      text-transform:uppercase;letter-spacing:.08em;
+      color:#000000 !important;
+      font-weight:900 !important;
+      display:inline-block;
+      background: rgba(255,255,255,0.98);
+      padding:8px 12px;border-radius:8px;border:1px solid var(--border);
+    }
+
+    .cardHeader{border-bottom:1px solid var(--border);padding-bottom:14px;margin-bottom:18px}
+
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+    label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px;font-weight:800}
+
+    input,select{
+      padding:10px 12px;
+      border:1px solid var(--border-strong);
+      border-radius:14px;
+      font-size:14px;
+      min-width:160px;
+      background: rgba(0,0,0,.04);
+      color: var(--text);
+      outline:none;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
+    }
+    input::placeholder{color:var(--muted)}
+    input:focus,select:focus{
+      border-color: rgba(54,124,43,.85);
+      box-shadow: 0 0 0 4px rgba(54,124,43,.20);
+    }
+    input[type="date"]{min-width:170px;color-scheme:dark}
+
+    button{
+      padding:10px 12px;border:1px solid var(--border-strong);
+      background: rgba(0,0,0,.04);
+      border-radius:14px;cursor:pointer;
+      transition:.12s ease;font-weight:900;color:var(--text);
+      box-shadow: var(--shadow2);
+    }
+    button:hover{transform: translateY(-1px)}
+    button.primary{
+      background: rgba(54,124,43,.85);
+      border-color: rgba(54,124,43,.85);
+      color:#fff;
+      box-shadow: 0 12px 22px rgba(54,124,43,.18);
+    }
+    button.secondary{
+      border-color: rgba(54,124,43,.55);
+      color:#d9f1d3;
+      background: rgba(54,124,43,.12);
+    }
+    button.danger{
+      color:#ffd7dc;border-color:#5a2731;background: rgba(176,0,32,.16);
+    }
+    button.small{padding:7px 10px;border-radius:12px;font-size:12px;box-shadow:none;font-weight:900}
+    button[disabled]{opacity:.6;cursor:not-allowed;transform:none}
+
+    .muted{color:var(--muted);font-size:12px;margin-top:8px}
+    .toast{margin-top:10px;font-size:13px;color:#9cf08a;display:none;font-weight:900}
+    .toast.err{color:#ff8b97}
+
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0 14px; /* separacion vertical entre filas */
+      background: transparent;
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      overflow:visible;
+      box-shadow: var(--shadow);
+    }
+    thead th{
+      background: rgba(0,0,0,.03);
+      position:sticky;top:0;z-index:2;
+      text-align:center;
+    }
+    th,td{
+      /* td sin padding: lo maneja .cellInner */
+      border-bottom: none;
+      padding:0;font-size:14px;vertical-align:middle;
+      white-space:nowrap;text-align:center;color:var(--text);
+      font-weight:600;
+      background-clip: padding-box;
+    }
+
+    /* Contenedor interno por celda que pinta el fondo y paddings */
+    .cellInner{
+      display:flex;align-items:center;justify-content:center;
+      padding:14px 10px;border-radius:10px;min-height:48px;
+      width:100%;box-sizing:border-box;
+      font-weight:600; /* filas menos pesadas que el título */
+      color: var(--row-text);
+      border:1px solid rgba(15,23,32,.04);
+      box-shadow: 0 10px 18px rgba(15,23,32,.06);
+    }
+    /* fondos más oscuros para distinguir claramente cada fila */
+    tbody tr:nth-child(odd) .cellInner{background: #e3eaee}
+    tbody tr:nth-child(even) .cellInner{background: #d3dde2}
+    tbody tr:hover .cellInner{background: rgba(54,124,43,.12)}
+    .cellInner .cell-input{width:100%;box-sizing:border-box;background:transparent;border:none;padding:0;}
+    th{
+      font-size:13px;letter-spacing:.06em;text-transform:uppercase;
+      color:var(--muted);position:relative;padding:12px 8px;
+    }
+    th::after{display:none} /* quitar la línea amarilla/verde debajo de los encabezados */
+    tbody tr:nth-child(odd){background: #f3f6f8}
+    tbody tr:nth-child(even){background: #e9eef2}
+    tbody tr{transition: background .12s ease}
+    tbody tr:hover{background: rgba(54,124,43,.09)}
+
+    /* reforzar separacion: sombra sutil por fila */
+    tbody tr{box-shadow: 0 8px 20px rgba(15,23,32,.06);border-radius:10px}
+    /* asegurar que las celdas no pinten sobre el fondo del <tr> */
+    tbody tr td{background:transparent}
+
+    .actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+    .cell-input{
+      min-width:120px;padding:7px 10px;border-radius:12px;
+      border:1px solid var(--border-strong);
+      background: rgba(255,255,255,.03);
+      color: var(--text);
+      text-align:center;
+    }
+
+    .w220{min-width:220px}
+    .w200{min-width:200px}
+    .w160{min-width:160px}
+    .w140{min-width:140px}
+    .w110{min-width:110px}
+
+    .footer{
+      position:fixed;left:16px;bottom:12px;font-size:12px;
+      color:var(--text);background: rgba(255,255,255,.98);
+      border:1px solid var(--border);
+      border-left:7px solid var(--jd-green);
+      padding:9px 12px;border-radius:14px;
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(6px);
+    }
+    .footer b{color:var(--jd-green)}
+
+    /* Adjuntos UI */
+    .attLinks{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center}
+    a{color:var(--jd-green);font-weight:700}
+    .pillX{
+      display:inline-flex;align-items:center;justify-content:center;
+      width:22px;height:22px;border-radius:999px;
+      border:1px solid rgba(161,0,26,.16);
+      background: rgba(161,0,26,.12);
+      color:#7f0014;font-weight:900;
+      cursor:pointer;
+    }
+
+    /* Botones pequeños: hacerlos más visibles sobre fondo claro */
+    button.small.secondary{
+      border-color: rgba(54,124,43,.55);
+      color: var(--jd-green);
+      background: rgba(54,124,43,.12);
+      box-shadow: 0 6px 12px rgba(54,124,43,.04);
+    }
+    button.small.primary{box-shadow: 0 10px 18px rgba(54,124,43,.10)}
+
+    /* Acciones: texto negro para mejorar legibilidad */
+    .actions button{color:#000 !important; font-weight:700}
+
+    /* ✅ FIX SUPERPOSICIÓN: el formulario ahora WRAPEA */
+    .row-add{
+      display:flex;
+      flex-wrap: wrap;   /* ← antes estaba nowrap, eso causaba superposición */
+      gap:10px;
+      align-items:flex-end;
+    }
+    .row-add > div{flex:0 1 auto; min-width:0;}
+    .row-add input, .row-add select{min-width:120px;}
+    .row-add .w200{min-width:160px}
+    .row-add .w140{min-width:120px}
+    .row-add input[type="date"]{min-width:140px}
+
+    /* cuando el ancho es chico, no dejamos nada "apretado" */
+    @media (max-width: 1200px){
+      .row-add > div{flex: 1 1 210px;}   /* cada campo ocupa su bloque y baja */
+      .row-add button#addBtn{flex: 0 0 auto;}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="topbar">
+    <h1 class="title"><span class="brandDot"></span> Carga de datos</h1>
+    <div class="subpill">Estilo <b>Interagrovial</b> · verde/amarillo</div>
+  </div>
+
+  <!-- FILTROS -->
+  <div class="card">
+    <div class="accentBar"></div>
+    <div class="cardHeader">
+      <h3>Filtros</h3>
+      <div class="row" style="gap:8px">
+        <button id="clearFiltersBtn" class="secondary" type="button">Limpiar filtros</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Buscar (cualquier campo)</label>
+        <input id="q" class="w220" placeholder="Ej: 12004566 / AGRO / 88855"/>
+      </div>
+
+      <div>
+        <label>División</label>
+        <select id="fDivision">
+          <option value="">(Todas)</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Condiciones</label>
+        <select id="fCond">
+          <option value="">(Todas)</option>
+          <option value="SI">SI</option>
+          <option value="NO">NO</option>
+        </select>
+      </div>
+
+      <div>
+        <label>WIS</label>
+        <select id="fWis">
+          <option value="">(Todas)</option>
+          <option value="SI">SI</option>
+          <option value="NO">NO</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Cierre de carpeta</label>
+        <select id="fCierre">
+          <option value="">(Todas)</option>
+          <option value="SI">SI</option>
+          <option value="NO">NO</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Fecha estimada UY desde</label>
+        <input id="fDateFrom" type="date"/>
+      </div>
+
+      <div>
+        <label>Fecha estimada UY hasta</label>
+        <input id="fDateTo" type="date"/>
+      </div>
+    </div>
+
+    <div class="muted">Los filtros se aplican automáticamente sobre la tabla.</div>
+  </div>
+
+  <!-- FORMULARIO AGREGAR (SIN EXCEL/ADJUNTOS) -->
+  <div class="card">
+    <div class="accentBar"></div>
+    <h3>Agregar fila</h3>
+
+    <div class="row row-add">
+      <div>
+        <label>Factura</label>
+        <input id="factura" class="w140" inputmode="numeric" placeholder="Ej: 456222"/>
+      </div>
+
+      <div>
+        <label>División</label>
+        <input id="division" class="w200" placeholder="Ej: AGRO"/>
+      </div>
+
+      <div>
+        <label>Transporte</label>
+        <input id="transporte" class="w200" placeholder="Ej: Barco / Avión"/>
+      </div>
+
+      <div>
+        <label>Carpeta</label>
+        <input id="carpeta" class="w140" placeholder="Ej: 88855"/>
+      </div>
+
+      <div>
+        <label>DUA</label>
+        <input id="dua" class="w140" placeholder="Ej: 123456"/>
+      </div>
+
+      <div>
+        <label>Fecha estimada UY</label>
+        <input id="fecha_estimada" type="date" />
+      </div>
+
+      <div>
+        <label>Fecha depósito</label>
+        <input id="fecha_deposito" type="date" />
+      </div>
+
+      <div>
+        <label>Orden de compra</label>
+        <input id="oc" class="w140" inputmode="numeric" placeholder="Ej: 12004566"/>
+      </div>
+
+      <div>
+        <label>Cierre de carpeta</label>
+        <select id="cierre">
+          <option value="SI">SI</option>
+          <option value="NO">NO</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Condiciones</label>
+        <select id="cond">
+          <option value="SI">SI</option>
+          <option value="NO">NO</option>
+        </select>
+      </div>
+
+      <div>
+        <label>WIS</label>
+        <select id="wis">
+          <option value="SI">SI</option>
+          <option value="NO">NO</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Confirmación de llegada</label>
+        <select id="confirmacion_llegada">
+          <option value="SI">SI</option>
+          <option value="NO" selected>NO</option>
+        </select>
+      </div>
+
+      <button id="addBtn" class="primary" type="button">Agregar</button>
+    </div>
+
+    <div id="msg" class="muted"></div>
+    <div id="toast" class="toast"></div>
+  </div>
+
+  <!-- pickers ocultos para subir desde la tabla -->
+  <input
+    id="packingRowPicker"
+    type="file"
+    accept=".xls,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    style="display:none"
+  />
+  <input
+    id="attRowPicker"
+    type="file"
+    multiple
+    style="display:none"
+  />
+
+  <!-- TABLA -->
+  <table>
+    <thead>
+      <tr>
+        <th>Fecha carga</th>
+        <th>Factura</th>
+        <th>División</th>
+        <th>Transporte</th>
+        <th>Carpeta</th>
+        <th>DUA</th>
+        <th>Fecha estimada UY</th>
+        <th>Orden compra</th>
+
+        <th>Cierre carpeta</th>
+        <th>Condiciones</th>
+        <th>WIS</th>
+
+        <th>Fecha depósito</th>
+        <th>Confirmación de llegada</th>
+
+        <!-- ✅ RENOMBRADO -->
+        <th>Packing</th>
+
+        <th>Adjuntos</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+
+  <div class="footer"><b>INTERAGROVIAL S.A</b></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+    import {
+      getFirestore, collection, addDoc, doc, updateDoc, deleteDoc,
+      serverTimestamp, query, orderBy, onSnapshot
+    } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+    import {
+      getStorage, ref as sRef, uploadBytesResumable, getDownloadURL, deleteObject
+    } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDIGkNekvGn0XrqGvDAuutCBSglod03644",
+      authDomain: "carpetas-17846.firebaseapp.com",
+      projectId: "carpetas-17846",
+      storageBucket: "carpetas-17846.firebasestorage.app",
+      messagingSenderId: "513234224676",
+      appId: "1:513234224676:web:a61b7ab9685594d1b5bab1",
+      measurementId: "G-8Z18FTM0L6"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    const $ = (id) => document.getElementById(id);
+    const tbody = $("tbody");
+    const msgEl = $("msg");
+    const toastEl = $("toast");
+    const addBtn = $("addBtn");
+
+    let editingRowId = null;
+    let cache = [];
+    let view = [];
+
+    let pendingPackingRowId = null;
+    let pendingAttRowId = null;
+
+    function showToast(text, isError=false){
+      toastEl.textContent = text;
+      toastEl.classList.toggle("err", isError);
+      toastEl.style.display = "block";
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => toastEl.style.display = "none", 4500);
+    }
+
+    function escapeHtml(s){
+      return String(s ?? "")
+        .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+    }
+
+    function formatDateVal(v){
+      if (!v) return "";
+      if (v instanceof Date){
+        const dd = String(v.getDate()).padStart(2,'0');
+        const mm = String(v.getMonth()+1).padStart(2,'0');
+        const yyyy = v.getFullYear();
+        return `${dd}/${mm}/${yyyy}`;
+      }
+      // ISO yyyy-mm-dd
+      const m = String(v).match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (m) return `${m[3]}/${m[2]}/${m[1]}`;
+      const d = new Date(v);
+      if (!isNaN(d)){
+        return formatDateVal(d);
+      }
+      return String(v);
+    }
+
+    function errText(e){
+      const code = e?.code ? `[${e.code}] ` : "";
+      const msg = e?.message || String(e);
+      return code + msg;
+    }
+
+    function safeYesNo(v){ return (v === "NO") ? "NO" : "SI"; }
+    function uid(){ return (crypto?.randomUUID ? crypto.randomUUID() : `${Date.now()}_${Math.random().toString(16).slice(2)}`); }
+
+    function norm(s){ return (s ?? "").toString().trim().toLowerCase(); }
+
+    function isExcelFile(file){
+      if (!file) return false;
+      const name = (file.name || "").toLowerCase();
+      return name.endsWith(".xls") || name.endsWith(".xlsx");
+    }
+
+    function clearAddForm() {
+      $("factura").value = "";
+      $("division").value = "";
+      $("transporte").value = "";
+      $("carpeta").value = "";
+      $("dua").value = "";
+      $("fecha_estimada").value = "";
+      $("fecha_deposito").value = "";
+      $("oc").value = "";
+      $("cierre").value = "SI";
+      $("cond").value = "SI";
+      $("wis").value = "SI";
+      $("confirmacion_llegada").value = "NO";
+    }
+
+    function matchesText(row, q){
+      if (!q) return true;
+
+      const atts = (row.attachments || []).map(a => a?.name || "").join(" ");
+      const packingName = row.packingAttachment?.name || "";
+
+      const hay = [
+        row.factura, row.division, row.transporte, row.carpeta, row.dua,
+        row.fecha_estimada, row.fecha_deposito, row.confirmacion_llegada,
+        row.oc, row.cond, row.wis, row.cierre,
+        packingName, atts
+      ].map(norm).join(" | ");
+
+      return hay.includes(q);
+    }
+
+    function inDateRange(row, from, to){
+      const d = row.fecha_estimada || "";
+      if (!from && !to) return true;
+      if (!d) return false;
+      if (from && d < from) return false;
+      if (to && d > to) return false;
+      return true;
+    }
+
+    function applyFilters(){
+      const q = norm($("q").value);
+      const fDivision = $("fDivision").value;
+      const fCond = $("fCond").value;
+      const fWis = $("fWis").value;
+      const fCierre = $("fCierre").value;
+      const from = $("fDateFrom").value || "";
+      const to = $("fDateTo").value || "";
+
+      view = cache.filter(x => {
+        const r = x.data;
+        if (fDivision && (r.division || "") !== fDivision) return false;
+        if (fCond && (r.cond || "") !== fCond) return false;
+        if (fWis && (r.wis || "") !== fWis) return false;
+        if (fCierre && (r.cierre || "") !== fCierre) return false;
+        if (!matchesText(r, q)) return false;
+        if (!inDateRange(r, from, to)) return false;
+        return true;
+      });
+
+      draw();
+    }
+
+    function rebuildDivisionOptions(){
+      const sel = $("fDivision");
+      const current = sel.value;
+      const values = Array.from(new Set(cache.map(x => (x.data.division || "").trim()).filter(Boolean))).sort();
+      sel.innerHTML = `<option value="">(Todas)</option>` + values.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join("");
+      if (values.includes(current)) sel.value = current;
+    }
+
+    ["q","fDivision","fCond","fWis","fCierre","fDateFrom","fDateTo"].forEach(id=>{
+      $(id).addEventListener("input", applyFilters);
+      $(id).addEventListener("change", applyFilters);
+    });
+
+    $("clearFiltersBtn").addEventListener("click", ()=>{
+      $("q").value = "";
+      $("fDivision").value = "";
+      $("fCond").value = "";
+      $("fWis").value = "";
+      $("fCierre").value = "";
+      $("fDateFrom").value = "";
+      $("fDateTo").value = "";
+      applyFilters();
+    });
+
+    async function uploadFileTo(path, file, progressLabel){
+      const ref = sRef(storage, path);
+      const task = uploadBytesResumable(ref, file);
+
+      await new Promise((resolve, reject) => {
+        task.on("state_changed",
+          (snap) => {
+            const pct = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
+            msgEl.textContent = `${progressLabel}... ${pct}%`;
+          },
+          (err) => reject(err),
+          () => resolve()
+        );
+      });
+
+      const url = await getDownloadURL(ref);
+      return { name: file.name, path, url, size: file.size };
+    }
+
+    async function uploadAttachments(rowId, files){
+      const out = [];
+      for (const f of files){
+        const path = `rows/${rowId}/attachments/${uid()}_${f.name}`;
+        out.push(await uploadFileTo(path, f, "Subiendo adjuntos"));
+      }
+      return out;
+    }
+
+    async function uploadPacking(rowId, file){
+      const path = `rows/${rowId}/packing/${uid()}_${file.name}`;
+      return await uploadFileTo(path, file, "Subiendo packing");
+    }
+
+    function renderAttachmentsCell(id, r){
+      const atts = r.attachments || [];
+      const list = atts.length ? `
+        <div class="attLinks">
+          ${atts.map((a, idx) => `
+            <a href="${escapeHtml(a.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(a.name || "Adjunto")}</a>
+            <span class="pillX" title="Borrar adjunto" data-action="delatt" data-att-idx="${idx}">×</span>
+          `).join("")}
+        </div>
+      ` : `<span class="muted">—</span>`;
+
+      return `
+        ${list}
+        <div style="margin-top:6px">
+          <button class="small secondary" data-action="upatts" data-id="${id}">
+            ${atts.length ? "Agregar adjuntos" : "Subir adjuntos"}
+          </button>
+        </div>
+      `;
+    }
+
+    function renderPackingCell(id, r){
+      const p = r.packingAttachment;
+      if (!p?.url){
+        return `
+          <span class="muted">—</span>
+          <div style="margin-top:6px">
+            <button class="small secondary" data-action="uppacking" data-id="${id}">Subir packing</button>
+          </div>
+        `;
+      }
+      return `
+        <div class="attLinks">
+          <a href="${escapeHtml(p.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(p.name || "Packing")}</a>
+          <span class="pillX" title="Borrar packing" data-action="delpacking">×</span>
+        </div>
+        <div style="margin-top:6px">
+          <button class="small secondary" data-action="uppacking" data-id="${id}">Reemplazar</button>
+        </div>
+      `;
+    }
+
+    addBtn.addEventListener("click", async () => {
+      const data = {
+        factura: $("factura").value.trim(),
+        division: $("division").value.trim(),
+        transporte: $("transporte").value.trim(),
+        carpeta: $("carpeta").value.trim(),
+        dua: $("dua").value.trim(),
+        fecha_estimada: $("fecha_estimada").value || "",
+        fecha_deposito: $("fecha_deposito").value || "",
+        oc: $("oc").value.trim(),
+
+        cierre: safeYesNo($("cierre").value),
+        cond: safeYesNo($("cond").value),
+        wis: safeYesNo($("wis").value),
+        confirmacion_llegada: safeYesNo($("confirmacion_llegada").value),
+
+        // ✅ ahora se gestiona desde la tabla
+        packingAttachment: null,
+        attachments: [],
+
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      };
+
+      const empty =
+        !data.factura && !data.division && !data.transporte && !data.carpeta &&
+        !data.dua && !data.fecha_estimada && !data.fecha_deposito &&
+        !data.oc;
+
+      if (empty) { alert("Ingresá al menos un dato para agregar."); return; }
+
+      addBtn.disabled = true;
+      msgEl.textContent = "Guardando...";
+
+      try {
+        await addDoc(collection(db, "rows"), data);
+        clearAddForm();
+        showToast("Agregado con éxito");
+      } catch (e) {
+        console.error("ERROR:", e);
+        showToast(`Error: ${errText(e)}`, true);
+        alert(errText(e));
+      } finally {
+        addBtn.disabled = false;
+        msgEl.textContent = "";
+      }
+    });
+
+    function renderRow(id, r) {
+      const dt = r.createdAt?.toDate ? r.createdAt.toDate() : null;
+      const dtTxt = dt ? formatDateVal(dt) : "";
+      const isEditing = (editingRowId === id);
+
+      if (!isEditing) {
+        return `
+            <tr data-id="${id}">
+              <td><div class="cellInner">${escapeHtml(dtTxt)}</div></td>
+              <td><div class="cellInner">${escapeHtml(r.factura)}</div></td>
+              <td><div class="cellInner">${escapeHtml(r.division)}</div></td>
+              <td><div class="cellInner">${escapeHtml(r.transporte)}</div></td>
+              <td><div class="cellInner">${escapeHtml(r.carpeta)}</div></td>
+              <td><div class="cellInner">${escapeHtml(r.dua)}</div></td>
+              <td><div class="cellInner">${escapeHtml(formatDateVal(r.fecha_estimada))}</div></td>
+              <td><div class="cellInner">${escapeHtml(r.oc)}</div></td>
+
+              <td><div class="cellInner">${escapeHtml(r.cierre)}</div></td>
+              <td><div class="cellInner">${escapeHtml(r.cond)}</div></td>
+              <td><div class="cellInner">${escapeHtml(r.wis)}</div></td>
+
+              <td><div class="cellInner">${escapeHtml(formatDateVal(r.fecha_deposito))}</div></td>
+              <td><div class="cellInner">${escapeHtml(r.confirmacion_llegada)}</div></td>
+
+              <td><div class="cellInner">${renderPackingCell(id, r)}</div></td>
+              <td><div class="cellInner">${renderAttachmentsCell(id, r)}</div></td>
+
+              <td>
+                <div class="cellInner">
+                  <div class="actions">
+                    <button class="small secondary" data-action="edit">Editar</button>
+                    <button class="small danger" data-action="delete">Eliminar</button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          `;
+      }
+
+      const factura = escapeHtml(r.factura || "");
+      const division = escapeHtml(r.division || "");
+      const transporte = escapeHtml(r.transporte || "");
+      const carpeta = escapeHtml(r.carpeta || "");
+      const dua = escapeHtml(r.dua || "");
+      const fecha_estimada = escapeHtml(r.fecha_estimada || "");
+      const fecha_deposito = escapeHtml(r.fecha_deposito || "");
+      const oc = escapeHtml(r.oc || "");
+
+      const cierre = safeYesNo(r.cierre || "SI");
+      const cond = safeYesNo(r.cond || "SI");
+      const wis = safeYesNo(r.wis || "SI");
+      const confirmacion_llegada = safeYesNo(r.confirmacion_llegada || "NO");
+
+      return `
+        <tr data-id="${id}">
+          <td><div class="cellInner">${escapeHtml(dtTxt)}</div></td>
+          <td><div class="cellInner"><input class="cell-input w140" data-field="factura" value="${factura}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w200" data-field="division" value="${division}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w200" data-field="transporte" value="${transporte}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w140" data-field="carpeta" value="${carpeta}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w140" data-field="dua" value="${dua}"></div></td>
+
+          <td><div class="cellInner"><input class="cell-input w160" type="date" data-field="fecha_estimada" value="${fecha_estimada}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w140" data-field="oc" value="${oc}"></div></td>
+
+          <td><div class="cellInner">
+            <select class="cell-input w110" data-field="cierre">
+              <option value="SI" ${cierre==="SI" ? "selected" : ""}>SI</option>
+              <option value="NO" ${cierre==="NO" ? "selected" : ""}>NO</option>
+            </select>
+          </div></td>
+
+          <td><div class="cellInner">
+            <select class="cell-input w110" data-field="cond">
+              <option value="SI" ${cond==="SI" ? "selected" : ""}>SI</option>
+              <option value="NO" ${cond==="NO" ? "selected" : ""}>NO</option>
+            </select>
+          </div></td>
+
+          <td><div class="cellInner">
+            <select class="cell-input w110" data-field="wis">
+              <option value="SI" ${wis==="SI" ? "selected" : ""}>SI</option>
+              <option value="NO" ${wis==="NO" ? "selected" : ""}>NO</option>
+            </select>
+          </div></td>
+
+          <td><div class="cellInner"><input class="cell-input w160" type="date" data-field="fecha_deposito" value="${fecha_deposito}"></div></td>
+
+          <td><div class="cellInner">
+            <select class="cell-input w160" data-field="confirmacion_llegada">
+              <option value="SI" ${confirmacion_llegada==="SI" ? "selected" : ""}>SI</option>
+              <option value="NO" ${confirmacion_llegada==="NO" ? "selected" : ""}>NO</option>
+            </select>
+          </div></td>
+
+          <td><div class="cellInner">${renderPackingCell(id, r)}</div></td>
+          <td><div class="cellInner">${renderAttachmentsCell(id, r)}</div></td>
+
+          <td>
+            <div class="cellInner">
+              <div class="actions">
+                <button class="small primary" data-action="save">Guardar</button>
+                <button class="small" data-action="cancel">Cancelar</button>
+                <button class="small danger" data-action="delete">Eliminar</button>
+              </div>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+
+    function draw() {
+      const dataToDraw = (view.length ? view : cache);
+      tbody.innerHTML = dataToDraw.map(x => renderRow(x.id, x.data)).join("");
+    }
+
+    const qSnap = query(collection(db, "rows"), orderBy("createdAt", "desc"));
+    onSnapshot(qSnap, (snap) => {
+      cache = [];
+      snap.forEach(d => cache.push({ id: d.id, data: d.data() }));
+      rebuildDivisionOptions();
+      applyFilters();
+    }, (err) => {
+      console.error(err);
+      showToast("No se pudo leer Firestore", true);
+    });
+
+    // subir packing desde fila
+    $("packingRowPicker").addEventListener("change", async (e) => {
+      const f = (e.target.files || [])[0];
+      $("packingRowPicker").value = "";
+      if (!pendingPackingRowId) return;
+      if (!f) { pendingPackingRowId = null; return; }
+
+      if (!isExcelFile(f)){
+        alert("Solo se permite Excel (.xls o .xlsx).");
+        pendingPackingRowId = null;
+        return;
+      }
+
+      const rowId = pendingPackingRowId;
+      pendingPackingRowId = null;
+
+      const row = cache.find(x => x.id === rowId);
+      const prev = row?.data?.packingAttachment;
+
+      try{
+        msgEl.textContent = "Subiendo packing...";
+        if (prev?.path){
+          await deleteObject(sRef(storage, prev.path));
+        }
+        const uploaded = await uploadPacking(rowId, f);
+        await updateDoc(doc(db, "rows", rowId), { packingAttachment: uploaded, updatedAt: serverTimestamp() });
+        showToast("Packing actualizado");
+      } catch(err){
+        console.error(err);
+        showToast(`Error: ${errText(err)}`, true);
+        alert(errText(err));
+      } finally {
+        msgEl.textContent = "";
+      }
+    });
+
+    // subir adjuntos desde fila
+    $("attRowPicker").addEventListener("change", async (e) => {
+      const files = Array.from(e.target.files || []);
+      $("attRowPicker").value = "";
+      if (!pendingAttRowId) return;
+      if (!files.length) { pendingAttRowId = null; return; }
+
+      const rowId = pendingAttRowId;
+      pendingAttRowId = null;
+
+      const row = cache.find(x => x.id === rowId);
+      const current = row?.data?.attachments || [];
+
+      try{
+        msgEl.textContent = "Subiendo adjuntos...";
+        const uploaded = await uploadAttachments(rowId, files);
+        const next = current.concat(uploaded);
+        await updateDoc(doc(db, "rows", rowId), { attachments: next, updatedAt: serverTimestamp() });
+        showToast("Adjuntos actualizados");
+      } catch(err){
+        console.error(err);
+        showToast(`Error: ${errText(err)}`, true);
+        alert(errText(err));
+      } finally {
+        msgEl.textContent = "";
+      }
+    });
+
+    tbody.addEventListener("click", async (e) => {
+      const btn = e.target.closest("[data-action]");
+      if (!btn) return;
+
+      const tr = e.target.closest("tr[data-id]");
+      if (!tr) return;
+
+      const id = tr.dataset.id;
+      const action = btn.dataset.action;
+
+      if (action === "edit") { editingRowId = id; draw(); return; }
+      if (action === "cancel") { editingRowId = null; draw(); return; }
+
+      if (action === "uppacking"){
+        pendingPackingRowId = id;
+        $("packingRowPicker").click();
+        return;
+      }
+
+      if (action === "upatts"){
+        pendingAttRowId = id;
+        $("attRowPicker").click();
+        return;
+      }
+
+      if (action === "delpacking"){
+        const row = cache.find(x => x.id === id);
+        const p = row?.data?.packingAttachment;
+        if (!p?.path) return;
+        if (!confirm(`¿Borrar packing "${p.name}"?`)) return;
+        try{
+          btn.disabled = true;
+          await deleteObject(sRef(storage, p.path));
+          await updateDoc(doc(db, "rows", id), { packingAttachment: null, updatedAt: serverTimestamp() });
+          showToast("Packing borrado");
+        } catch(err){
+          console.error(err);
+          showToast(`Error: ${errText(err)}`, true);
+          alert(errText(err));
+        } finally {
+          btn.disabled = false;
+        }
+        return;
+      }
+
+      if (action === "delatt"){
+        const idx = Number(btn.dataset.attIdx);
+        const row = cache.find(x => x.id === id);
+        const atts = row?.data?.attachments || [];
+        const att = atts[idx];
+        if (!att?.path) return;
+
+        if (!confirm(`¿Borrar adjunto "${att.name}"?`)) return;
+
+        try{
+          btn.disabled = true;
+          await deleteObject(sRef(storage, att.path));
+          const next = atts.filter((_, i) => i !== idx);
+          await updateDoc(doc(db, "rows", id), { attachments: next, updatedAt: serverTimestamp() });
+          showToast("Adjunto borrado");
+        } catch(err){
+          console.error(err);
+          showToast(`Error: ${errText(err)}`, true);
+          alert(errText(err));
+        } finally {
+          btn.disabled = false;
+        }
+        return;
+      }
+
+      if (action === "save") {
+        const fields = tr.querySelectorAll("[data-field]");
+        const updated = {};
+        fields.forEach(el => updated[el.dataset.field] = (el.value ?? "").toString().trim());
+
+        updated.cond = safeYesNo(updated.cond);
+        updated.wis  = safeYesNo(updated.wis);
+        updated.cierre  = safeYesNo(updated.cierre);
+        updated.confirmacion_llegada = safeYesNo(updated.confirmacion_llegada);
+
+        try {
+          btn.disabled = true;
+          await updateDoc(doc(db, "rows", id), { ...updated, updatedAt: serverTimestamp() });
+          editingRowId = null;
+          showToast("Modificado con éxito");
+        } catch (err) {
+          console.error(err);
+          showToast(`Error: ${errText(err)}`, true);
+          alert(errText(err));
+        } finally {
+          btn.disabled = false;
+        }
+        return;
+      }
+
+      if (action === "delete") {
+        const row = cache.find(x => x.id === id);
+        const atts = row?.data?.attachments || [];
+        const p = row?.data?.packingAttachment;
+
+        if (!confirm("¿Seguro que querés eliminar esta fila? (Borra adjuntos y packing también)")) return;
+
+        try{
+          btn.disabled = true;
+
+          for (const a of atts) {
+            if (a?.path) await deleteObject(sRef(storage, a.path));
+          }
+
+          if (p?.path) await deleteObject(sRef(storage, p.path));
+
+          await deleteDoc(doc(db, "rows", id));
+          if (editingRowId === id) editingRowId = null;
+          showToast("Eliminado con éxito");
+        } catch(err){
+          console.error(err);
+          showToast(`Error: ${errText(err)}`, true);
+          alert(errText(err));
+        } finally {
+          btn.disabled = false;
+        }
+      }
+    });
+  </script>
+</body>
+</html>

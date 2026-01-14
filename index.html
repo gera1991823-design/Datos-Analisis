@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Interagrovial · Inicio</title>
+
+  <style>
+    :root{
+      --green:#367c2b;
+      --yellow:#ffde00;
+
+      --bg:#f6f7fb;
+      --text:#071218;
+      --muted:#56626b;
+
+      --card:#ffffff;
+      --border:#e6e9ef;
+      --shadow: 0 14px 34px rgba(15,23,32,.10);
+      --radius:18px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 650px at 10% 0%, rgba(54,124,43,.10), transparent 55%),
+        radial-gradient(1200px 650px at 90% 0%, rgba(255,222,0,.08), transparent 55%),
+        var(--bg);
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .wrap{
+      width:min(1100px, 92vw);
+      margin: 42px auto 0;
+      flex:1;
+    }
+
+    /* Header */
+    .top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+      flex-wrap:wrap;
+      margin-bottom:22px;
+    }
+
+    .brand{
+      display:flex; align-items:center; gap:12px;
+    }
+    .brandMark{
+      width:44px; height:44px; border-radius:14px;
+      background: linear-gradient(135deg, rgba(54,124,43,.95), rgba(54,124,43,.70));
+      position:relative;
+      box-shadow: 0 14px 26px rgba(54,124,43,.18);
+    }
+    .brandMark::after{
+      content:"";
+      position:absolute; inset:10px;
+      border-radius:10px;
+      border:3px solid rgba(255,222,0,.95);
+      opacity:.95;
+    }
+    .brand h1{
+      margin:0;
+      font-size:22px;
+      letter-spacing:.2px;
+      line-height:1.1;
+    }
+    .brand p{
+      margin:6px 0 0;
+      color:var(--muted);
+      font-size:13px;
+      max-width: 520px;
+    }
+
+    .hint{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 12px;
+      border:1px solid var(--border);
+      border-radius:999px;
+      background: rgba(255,255,255,.65);
+      box-shadow: 0 8px 18px rgba(15,23,32,.06);
+      color:var(--muted);
+      font-size:12px;
+      backdrop-filter: blur(6px);
+    }
+    .hint b{ color:var(--green); }
+
+    /* Cards grid */
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap:16px;
+      margin-top: 18px;
+    }
+
+    @media (max-width: 900px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,.92));
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding:18px;
+      position:relative;
+      overflow:hidden;
+      text-decoration:none;
+      color:inherit;
+      transition: transform .14s ease, box-shadow .14s ease, border-color .14s ease;
+      min-height: 150px;
+      display:flex;
+      gap:14px;
+      align-items:flex-start;
+    }
+
+    .card::before{
+      content:"";
+      position:absolute;
+      inset:-1px -1px auto -1px;
+      height:6px;
+      background: linear-gradient(90deg, var(--green), var(--yellow));
+      opacity:.9;
+    }
+
+    .card:hover{
+      transform: translateY(-2px);
+      border-color: rgba(54,124,43,.28);
+      box-shadow: 0 18px 46px rgba(15,23,32,.12);
+    }
+
+    .icon{
+      width:46px;height:46px;border-radius:14px;
+      border:1px solid rgba(54,124,43,.18);
+      background: rgba(54,124,43,.08);
+      display:grid; place-items:center;
+      flex: 0 0 auto;
+    }
+    .icon svg{ width:26px; height:26px; }
+
+    .content h2{
+      margin:2px 0 6px;
+      font-size:18px;
+      letter-spacing:.2px;
+    }
+    .content p{
+      margin:0;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.35;
+    }
+
+    .go{
+      margin-top:12px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      font-weight:800;
+      color: var(--green);
+      font-size:13px;
+    }
+
+    .go span{
+      display:inline-grid; place-items:center;
+      width:24px;height:24px;border-radius:10px;
+      background: rgba(54,124,43,.10);
+      border:1px solid rgba(54,124,43,.18);
+    }
+
+    /* Footer */
+    .footer{
+      position:fixed;
+      left:16px;
+      bottom:12px;
+      font-size:12px;
+      color:var(--text);
+      background: rgba(255,255,255,.95);
+      border:1px solid var(--border);
+      border-left:7px solid var(--green);
+      padding:9px 12px;
+      border-radius:14px;
+      box-shadow: 0 10px 22px rgba(15,23,32,.08);
+      backdrop-filter: blur(6px);
+    }
+    .footer b{ color: var(--green); }
+  </style>
+</head>
+
+<body>
+  <main class="wrap">
+    <div class="top">
+      <div class="brand">
+        <div class="brandMark" aria-hidden="true"></div>
+        <div>
+          <h1>Portal de aplicaciones</h1>
+          <p>Acceso rápido a las herramientas internas: Reservas, Carpetas y Reclamos.</p>
+        </div>
+      </div>
+
+      <div class="hint">Estilo <b>Interagrovial</b> · inicio sin sesión</div>
+    </div>
+
+    <section class="grid" aria-label="Accesos">
+      <!-- RESERVAS -->
+      <a class="card" href="reservas.html" aria-label="Ir a Reservas">
+        <div class="icon" aria-hidden="true">
+          <!-- Calendar icon -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="3"></rect>
+            <path d="M16 2v4M8 2v4M3 10h18"></path>
+            <path d="M8 14h3M8 18h6"></path>
+          </svg>
+        </div>
+        <div class="content">
+          <h2>Reservas</h2>
+          <p>Gestión de reservas de importaciones y estado de carga.</p>
+          <div class="go"><span>→</span> Entrar</div>
+        </div>
+      </a>
+
+      <!-- CARPETAS -->
+      <a class="card" href="carpetas.html" aria-label="Ir a Carpetas">
+        <div class="icon" aria-hidden="true">
+          <!-- Folder icon -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          </svg>
+        </div>
+        <div class="content">
+          <h2>Carpetas</h2>
+          <p>Carga y seguimiento de información de carpetas y documentación.</p>
+          <div class="go"><span>→</span> Entrar</div>
+        </div>
+      </a>
+
+      <!-- RECLAMOS -->
+      <a class="card" href="Reclamos.html" aria-label="Ir a Reclamos">
+        <div class="icon" aria-hidden="true">
+          <!-- Alert / ticket icon -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 9v4"></path>
+            <path d="M12 17h.01"></path>
+            <path d="M10.3 3.2h3.4l8.1 14.1a2 2 0 0 1-1.7 3H3.9a2 2 0 0 1-1.7-3z"></path>
+          </svg>
+        </div>
+        <div class="content">
+          <h2>Reclamos</h2>
+          <p>Registro, edición y exportación de reclamos y respuestas.</p>
+          <div class="go"><span>→</span> Entrar</div>
+        </div>
+      </a>
+    </section>
+  </main>
+
+  <div class="footer"><b>INTERAGROVIAL S.A</b></div>
+</body>
+</html>

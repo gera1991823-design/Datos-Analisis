@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Reclamos - Interagrovial</title>
+  <link rel="stylesheet" href="assets/carpetas.css">
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.19.3/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+  <div class="topbar">
+    <h1 class="title" style="font-size:28px;">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="margin-right:10px">
+        <rect x="1" y="3" width="22" height="18" rx="2" stroke="currentColor" stroke-width="1.2" fill="#fff" />
+        <path d="M6 8h6M6 12h12M6 16h6" stroke="#367c2b" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Reclamos
+    </h1>
+    <div class="subpill">Estilo <b>Interagrovial</b></div>
+  </div>
+
+  <div class="card">
+    <div class="cardHeader">
+      <h3>Filtros</h3>
+      <div class="row" style="gap:8px">
+        <button id="clearFiltersBtn" class="secondary" type="button">Limpiar filtros</button>
+        <button id="importBtn" class="secondary" type="button">Importar XLSX</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Buscar (cualquier campo)</label>
+        <input id="q" class="w220" placeholder="Ej: texto, factura, n° reclamo" />
+      </div>
+      <div>
+        <label>Fecha desde</label>
+        <input id="fDateFrom" type="date" />
+      </div>
+      <div>
+        <label>Fecha hasta</label>
+        <input id="fDateTo" type="date" />
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Agregar fila</h3>
+    <div class="row row-add">
+      <div>
+        <label>Material</label>
+        <input id="material" class="w200" placeholder="Ej: RE504836" />
+      </div>
+
+      <div>
+        <label>Cantidad</label>
+        <input id="cantidad" class="w140" inputmode="numeric" placeholder="Ej: 100" />
+      </div>
+
+      <div>
+        <label>OC</label>
+        <input id="oc" class="w140" placeholder="Ej: 12004566" />
+      </div>
+
+      <div>
+        <label>Caja</label>
+        <input id="caja" class="w140" placeholder="Ej: Caja A" />
+      </div>
+
+      <div>
+        <label>MONTO UNITARIO</label>
+        <input id="monto_unitario" class="w140" inputmode="decimal" placeholder="Ej 1" />
+      </div>
+
+      <div>
+        <label>MONTO TOTAL</label>
+        <input id="monto_total" class="w140" inputmode="decimal" placeholder="Ej 1" />
+      </div>
+
+      <div>
+        <label>FACTURA</label>
+        <input id="factura" class="w140" placeholder="Ej: 456222" />
+      </div>
+
+      <div>
+        <label>Nº de reclamo</label>
+        <input id="nro_reclamo" class="w140" placeholder="Ej: R-1234" />
+      </div>
+
+      <div>
+        <label>Fecha de reclamo</label>
+        <input id="fecha_reclamo" type="date" />
+      </div>
+
+      <div>
+        <label>Respuesta de fabrica</label>
+        <input id="respuesta_fabrica" class="w200" placeholder="Ej: Aprobado / Rechazado" />
+      </div>
+
+      <div>
+        <label>Fecha de respuesta</label>
+        <input id="fecha_respuesta" type="date" />
+      </div>
+
+      <div>
+        <label>Observacion</label>
+        <input id="observacion" class="w200" placeholder="Breve comentario" />
+      </div>
+
+      <div>
+        <label>UNIDAD</label>
+        <input id="unidad" class="w110" placeholder="AGRO / CONS / FORE" />
+      </div>
+
+      <button id="addBtn" class="primary" type="button">Agregar</button>
+    </div>
+
+    <div id="msg" class="muted"></div>
+    <div id="toast" class="toast"></div>
+  </div>
+
+  <!-- packing/adjuntos removed per request -->
+  <input id="importXls" type="file" accept=".xls,.xlsx" style="display:none" />
+
+  <table>
+    <thead>
+      <tr>
+        <th>Material</th>
+        <th>Cantidad</th>
+        <th>OC</th>
+        <th>Caja</th>
+        <th>MONTO UNITARIO</th>
+        <th>MONTO TOTAL</th>
+        <th>FACTURA</th>
+        <th>Nº de reclamo</th>
+        <th>Fecha de reclamo</th>
+        <th>Respuesta de fabrica</th>
+        <th>Fecha de respuesta</th>
+        <th>Observacion</th>
+        <th>UNIDAD</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+
+  <div class="footer"><b>INTERAGROVIAL S.A</b></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+    import {
+      getFirestore, collection, addDoc, doc, updateDoc, deleteDoc,
+      serverTimestamp, query, orderBy, onSnapshot
+    } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+    import {
+      getStorage, ref as sRef, uploadBytesResumable, getDownloadURL, deleteObject
+    } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDIGkNekvGn0XrqGvDAuutCBSglod03644",
+      authDomain: "carpetas-17846.firebaseapp.com",
+      projectId: "carpetas-17846",
+      storageBucket: "carpetas-17846.firebasestorage.app",
+      messagingSenderId: "513234224676",
+      appId: "1:513234224676:web:a61b7ab9685594d1b5bab1",
+      measurementId: "G-8Z18FTM0L6"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    const $ = (id) => document.getElementById(id);
+    const tbody = $("tbody");
+    const msgEl = $("msg");
+    const toastEl = $("toast");
+    const addBtn = $("addBtn");
+
+    let editingRowId = null;
+    let cache = [];
+    let view = [];
+
+    function showToast(text, isError=false){
+      toastEl.textContent = text;
+      toastEl.classList.toggle("err", isError);
+      toastEl.style.display = "block";
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => toastEl.style.display = "none", 4500);
+    }
+
+    function escapeHtml(s){
+      return String(s ?? "")
+        .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+        .replaceAll('"','&quot;').replaceAll("'","&#039;");
+    }
+
+    function formatDateVal(v){
+      if (!v) return "";
+      if (v instanceof Date){
+        const dd = String(v.getDate()).padStart(2,'0');
+        const mm = String(v.getMonth()+1).padStart(2,'0');
+        const yyyy = v.getFullYear();
+        return `${dd}/${mm}/${yyyy}`;
+      }
+      const m = String(v).match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (m) return `${m[3]}/${m[2]}/${m[1]}`;
+      const d = new Date(v);
+      if (!isNaN(d)) return formatDateVal(d);
+      return String(v);
+    }
+
+    function uid(){ return (crypto?.randomUUID ? crypto.randomUUID() : `${Date.now()}_${Math.random().toString(16).slice(2)}`); }
+
+    function clearAddForm(){
+      $("material").value = "";
+      $("cantidad").value = "";
+      $("oc").value = "";
+      $("caja").value = "";
+      $("monto_unitario").value = "";
+      $("monto_total").value = "";
+      $("factura").value = "";
+      $("nro_reclamo").value = "";
+      $("fecha_reclamo").value = "";
+      $("respuesta_fabrica").value = "";
+      $("fecha_respuesta").value = "";
+      $("observacion").value = "";
+      $("unidad").value = "";
+    }
+
+    function matchesText(row, q){
+      if(!q) return true;
+      const hay = [
+        row.material, row.cantidad, row.oc, row.caja, row.monto_unitario, row.monto_total,
+        row.factura, row.nro_reclamo, row.fecha_reclamo, row.respuesta_fabrica,
+        row.fecha_respuesta, row.observacion, row.unidad
+      ].map(s=> (s||"").toString().toLowerCase()).join(" |");
+
+      return hay.includes(q);
+    }
+
+    function inDateRange(row, from, to){
+      const d = row.fecha_reclamo || "";
+      if(!from && !to) return true;
+      if(!d) return false;
+      if(from && d < from) return false;
+      if(to && d > to) return false;
+      return true;
+    }
+
+    function applyFilters(){
+      const q = ($("q").value||"").toString().trim().toLowerCase();
+      const from = $("fDateFrom").value || "";
+      const to = $("fDateTo").value || "";
+
+      view = cache.filter(x => {
+        const r = x.data;
+        if(!matchesText(r,q)) return false;
+        if(!inDateRange(r, from, to)) return false;
+        return true;
+      });
+      draw();
+    }
+
+    $("q").addEventListener("input", applyFilters);
+    $("fDateFrom").addEventListener("change", applyFilters);
+    $("fDateTo").addEventListener("change", applyFilters);
+    $("clearFiltersBtn").addEventListener("click", ()=>{ $("q").value = ""; $("fDateFrom").value = ""; $("fDateTo").value = ""; applyFilters(); });
+
+    // XLSX import
+    const importBtn = $("importBtn");
+    const importInput = $("importXls");
+
+    // Ensure XLSX is available:
+    // 1) use global `window.XLSX` if present
+    // 2) try loading a local copy at `assets/xlsx.full.min.js` (recommended for offline)
+    // 3) fallback to dynamic ESM import from CDN
+    let XLSXlib = window.XLSX;
+    if (!XLSXlib) {
+      // Try local script first (user can place assets/xlsx.full.min.js)
+      try {
+        await new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = 'assets/xlsx.full.min.js';
+          script.onload = () => resolve();
+          script.onerror = () => reject(new Error('Local XLSX not found'));
+          document.head.appendChild(script);
+        });
+        XLSXlib = window.XLSX;
+      } catch (localErr) {
+        // If local not present, try dynamic ESM import from CDN
+        try {
+          const mod = await import('https://cdn.jsdelivr.net/npm/xlsx@0.19.3/dist/xlsx.mjs');
+          XLSXlib = (mod && mod.default) ? mod.default : mod;
+        } catch (cdnErr) {
+          console.warn('Could not load XLSX (local or CDN):', localErr, cdnErr);
+        }
+      }
+    }
+
+    // If a file named 'Pruba reclamos.xlsx' is present in assets/, offer to import it automatically
+    async function tryAutoImportFromAssets(){
+      const filename = 'Pruba reclamos.xlsx';
+      const path = `assets/${encodeURIComponent(filename)}`;
+      try{
+        const resp = await fetch(path);
+        if(!resp.ok) return; // not present
+        const arr = await resp.arrayBuffer();
+        const wb = XLSXlib.read(arr, {type:'array', cellDates:true});
+        const first = wb.SheetNames[0];
+        const ws = wb.Sheets[first];
+        const rows = XLSXlib.utils.sheet_to_json(ws, {defval:'', raw:false});
+        if(!rows.length) { showToast('Archivo encontrado pero no contiene filas'); return; }
+        if(!confirm(`Se encontró "${filename}" en assets/. Importar ${rows.length} filas a la base de datos?`)) return;
+
+        msgEl.textContent = `Importando ${rows.length} filas desde ${filename}...`;
+        let added = 0, failed = 0;
+        for(const raw of rows){
+          const mapped = mapRowObject(raw);
+          const docData = { ...mapped, createdAt: serverTimestamp(), updatedAt: serverTimestamp() };
+          try{ await addDoc(collection(db,'rows'), docData); added++; } catch(e){ console.error('add error', e); failed++; }
+        }
+        msgEl.textContent = '';
+        showToast(`Import desde archivo: ${added} agregadas, ${failed} fallidas`);
+      } catch(err){ console.warn('Auto import failed', err); }
+    }
+
+    // try automatic import if XLSX is available
+    tryAutoImportFromAssets().catch(()=>{});
+
+    function normalizeHeader(h){
+      return String(h||"").toLowerCase().trim()
+        .normalize('NFD').replace(/\p{Diacritic}/gu, '')
+        .replace(/\s+/g, '_').replace(/[^a-z0-9_]/g,'');
+    }
+
+    function mapRowObject(raw){
+      const map = {};
+      for(const k in raw){
+        const nk = normalizeHeader(k);
+        const v = raw[k];
+        if(!v && v !== 0) { map[nk] = ''; continue; }
+        // date handling
+        if(v instanceof Date){
+          const yyyy = v.getFullYear();
+          const mm = String(v.getMonth()+1).padStart(2,'0');
+          const dd = String(v.getDate()).padStart(2,'0');
+          map[nk] = `${yyyy}-${mm}-${dd}`;
+          continue;
+        }
+        // try parse ISO-like dates to yyyy-mm-dd
+        const s = String(v).trim();
+        const m = s.match(/^(\d{2})[\/\-](\d{2})[\/\-](\d{4})$/);
+        if(m){ // dd/mm/yyyy -> yyyy-mm-dd
+          map[nk] = `${m[3]}-${m[2]}-${m[1]}`;
+          continue;
+        }
+        map[nk] = s;
+      }
+      // normalize known keys to our DB names
+      return {
+        material: map.material || map['material'] || map['name'] || '',
+        cantidad: map.cantidad || map['cantidad'] || map['qty'] || '',
+        oc: map.oc || map['oc'] || '',
+        caja: map.caja || map['caja'] || '',
+        monto_unitario: map.monto_unitario || map['monto_unitario'] || map['monto_unitar'] || map['monto_unitar'] || '',
+        monto_total: map.monto_total || map['monto_total'] || map['monto_tot'] || map['monto_tot'] || '',
+        factura: map.factura || map['factura'] || '',
+        nro_reclamo: map.n_de_reclamo || map['n_de_reclamo'] || map['n_reclamo'] || map['n'] || map['nro_reclamo'] || '',
+        fecha_reclamo: map.fecha_de_reclamo || map['fecha_de_reclamo'] || map['fecha_reclamo'] || '',
+        respuesta_fabrica: map.respuesta_de_fabrica || map['respuesta_de_fabrica'] || map['respuesta_fabrica'] || '',
+        fecha_respuesta: map.fecha_de_respuesta || map['fecha_de_respuesta'] || map['fecha_respuesta'] || '',
+        observacion: map.observacion || map['observacion'] || map['observaciones'] || '',
+        unidad: map.unidad || map['unidad'] || ''
+      };
+    }
+
+    importBtn.addEventListener('click', ()=> importInput.click());
+    importInput.addEventListener('change', async (e)=>{
+      const f = (e.target.files||[])[0]; importInput.value = '';
+      if(!f) return;
+      if(!confirm(`Importar ${f.name} y agregar sus filas a la base de datos?`)) return;
+
+      try{
+        const arr = await f.arrayBuffer();
+        if(!XLSXlib){ alert('No se pudo cargar la librería XLSX. Verificá conexión a internet o probá el archivo en otro navegador.'); return; }
+        const wb = XLSXlib.read(arr, {type:'array', cellDates:true});
+        const first = wb.SheetNames[0];
+        const ws = wb.Sheets[first];
+        const rows = XLSXlib.utils.sheet_to_json(ws, {defval:'', raw:false});
+        if(!rows.length){ alert('El archivo no contiene filas.'); return; }
+        if(rows.length > 1000 && !confirm(`El archivo tiene ${rows.length} filas. Confirmás agregar todas?`)) return;
+
+        let added = 0; let failed = 0;
+        msgEl.textContent = `Importando ${rows.length} filas...`;
+        for(const raw of rows){
+          const mapped = mapRowObject(raw);
+          const docData = { ...mapped, createdAt: serverTimestamp(), updatedAt: serverTimestamp() };
+          try{
+            await addDoc(collection(db,'rows'), docData);
+            added++;
+          } catch(err){ console.error('add error', err); failed++; }
+        }
+        msgEl.textContent = '';
+        showToast(`Import completo: ${added} agregadas, ${failed} fallidas`);
+      } catch(err){ console.error(err); alert('Error leyendo XLSX: '+(err.message||err)); }
+    });
+
+    async function uploadFileTo(path, file, progressLabel){
+      const ref = sRef(storage, path);
+      const task = uploadBytesResumable(ref, file);
+      await new Promise((resolve,reject)=>{
+        task.on('state_changed', (snap)=>{
+          const pct = Math.round((snap.bytesTransferred/snap.totalBytes)*100);
+          msgEl.textContent = `${progressLabel}... ${pct}%`;
+        }, (err)=>reject(err), ()=>resolve());
+      });
+      const url = await getDownloadURL(ref);
+      return { name: file.name, path, url, size: file.size };
+    }
+
+    /* Packing/Attachments UI removed for Reclamos page */
+
+    addBtn.addEventListener("click", async () => {
+      const data = {
+        material: $("material").value.trim(),
+        cantidad: $("cantidad").value.trim(),
+        oc: $("oc").value.trim(),
+        caja: $("caja").value.trim(),
+        monto_unitario: $("monto_unitario").value.trim(),
+        monto_total: $("monto_total").value.trim(),
+        factura: $("factura").value.trim(),
+        nro_reclamo: $("nro_reclamo").value.trim(),
+        fecha_reclamo: $("fecha_reclamo").value || "",
+        respuesta_fabrica: $("respuesta_fabrica").value.trim(),
+        fecha_respuesta: $("fecha_respuesta").value || "",
+        observacion: $("observacion").value.trim(),
+        unidad: $("unidad").value.trim(),
+        packingAttachment: null,
+        attachments: [],
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      };
+
+      const empty = !data.material && !data.factura && !data.nro_reclamo && !data.oc;
+      if(empty){ alert('Ingresá al menos un dato para agregar.'); return; }
+
+      addBtn.disabled = true; msgEl.textContent = 'Guardando...';
+      try{
+        await addDoc(collection(db, 'rows'), data);
+        clearAddForm(); showToast('Agregado con éxito');
+      } catch(e){ console.error(e); showToast(`Error: ${e.message||e}`, true); alert(e.message||e); }
+      finally{ addBtn.disabled = false; msgEl.textContent = ''; }
+    });
+
+    function renderRow(id, r){
+      const isEditing = (editingRowId === id);
+      if(!isEditing){
+        return `
+          <tr data-id="${id}">
+            <td><div class="cellInner">${escapeHtml(r.material)}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.cantidad)}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.oc)}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.caja)}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.monto_unitario)}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.monto_total)}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.factura)}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.nro_reclamo)}</div></td>
+            <td><div class="cellInner">${escapeHtml(formatDateVal(r.fecha_reclamo))}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.respuesta_fabrica)}</div></td>
+            <td><div class="cellInner">${escapeHtml(formatDateVal(r.fecha_respuesta))}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.observacion)}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.unidad)}</div></td>
+            <td>
+              <div class="cellInner">
+                <div class="actions">
+                  <button class="small secondary" data-action="edit">Editar</button>
+                  <button class="small danger" data-action="delete">Eliminar</button>
+                </div>
+              </div>
+            </td>
+          </tr>
+        `;
+      }
+
+      const material = escapeHtml(r.material||'');
+      const cantidad = escapeHtml(r.cantidad||'');
+      const oc = escapeHtml(r.oc||'');
+      const caja = escapeHtml(r.caja||'');
+      const monto_unitario = escapeHtml(r.monto_unitario||'');
+      const monto_total = escapeHtml(r.monto_total||'');
+      const factura = escapeHtml(r.factura||'');
+      const nro_reclamo = escapeHtml(r.nro_reclamo||'');
+      const fecha_reclamo = escapeHtml(r.fecha_reclamo||'');
+      const respuesta_fabrica = escapeHtml(r.respuesta_fabrica||'');
+      const fecha_respuesta = escapeHtml(r.fecha_respuesta||'');
+      const observacion = escapeHtml(r.observacion||'');
+      const unidad = escapeHtml(r.unidad||'');
+
+      return `
+        <tr data-id="${id}">
+          <td><div class="cellInner"><input class="cell-input w200" data-field="material" value="${material}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w140" data-field="cantidad" value="${cantidad}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w140" data-field="oc" value="${oc}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w140" data-field="caja" value="${caja}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w140" data-field="monto_unitario" value="${monto_unitario}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w140" data-field="monto_total" value="${monto_total}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w140" data-field="factura" value="${factura}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w140" data-field="nro_reclamo" value="${nro_reclamo}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w160" type="date" data-field="fecha_reclamo" value="${fecha_reclamo}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w200" data-field="respuesta_fabrica" value="${respuesta_fabrica}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w160" type="date" data-field="fecha_respuesta" value="${fecha_respuesta}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w200" data-field="observacion" value="${observacion}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w110" data-field="unidad" value="${unidad}"></div></td>
+          <td>
+            <div class="cellInner">
+              <div class="actions">
+                <button class="small primary" data-action="save">Guardar</button>
+                <button class="small" data-action="cancel">Cancelar</button>
+                <button class="small danger" data-action="delete">Eliminar</button>
+              </div>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+
+    function draw(){
+      const dataToDraw = (view.length ? view : cache);
+      tbody.innerHTML = dataToDraw.map(x => renderRow(x.id, x.data)).join('');
+    }
+
+    const qSnap = query(collection(db, 'rows'), orderBy('createdAt','desc'));
+    onSnapshot(qSnap, (snap)=>{
+      cache = [];
+      snap.forEach(d => cache.push({ id: d.id, data: d.data() }));
+      applyFilters();
+    }, (err)=>{ console.error(err); showToast('No se pudo leer Firestore', true); });
+
+    // packing/attachments file input handlers removed
+
+    tbody.addEventListener('click', async (e)=>{
+      const btn = e.target.closest('[data-action]'); if(!btn) return;
+      const tr = e.target.closest('tr[data-id]'); if(!tr) return;
+      const id = tr.dataset.id; const action = btn.dataset.action;
+
+      if(action === 'edit'){ editingRowId = id; draw(); return; }
+      if(action === 'cancel'){ editingRowId = null; draw(); return; }
+
+      if(action === 'save'){
+        const fields = tr.querySelectorAll('[data-field]'); const updated = {};
+        fields.forEach(el => updated[el.dataset.field] = (el.value||'').toString().trim());
+        try{ btn.disabled = true; await updateDoc(doc(db,'rows',id), { ...updated, updatedAt: serverTimestamp() }); editingRowId = null; showToast('Modificado con éxito'); }
+        catch(err){ console.error(err); showToast(`Error: ${err.message||err}`, true); alert(err.message||err); } finally { btn.disabled = false; }
+        return;
+      }
+
+      if(action === 'delete'){
+        if(!confirm('¿Seguro que querés eliminar esta fila?')) return;
+        try{
+          btn.disabled = true;
+          await deleteDoc(doc(db,'rows',id));
+          if(editingRowId===id) editingRowId = null;
+          showToast('Eliminado con éxito');
+        } catch(err){ console.error(err); showToast(`Error: ${err.message||err}`, true); alert(err.message||err); } finally { btn.disabled = false; }
+      }
+    });
+  </script>
+</body>
+</html>
