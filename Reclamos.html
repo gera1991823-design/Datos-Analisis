@@ -4,7 +4,10 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Reclamos - Interagrovial</title>
-  <link rel="stylesheet" href="assets/carpetas.css">
+
+  <!-- ✅ CAMBIO: Ruta absoluta para que funcione bien en la web -->
+  <link rel="stylesheet" href="/assets/carpetas.css">
+
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.19.3/dist/xlsx.full.min.js"></script>
 </head>
 <body>
@@ -448,7 +451,7 @@
       try{
         await addDoc(collection(db, 'rows'), data);
         clearAddForm(); showToast('Agregado con éxito');
-      } catch(e){ console.error(e); showToast(`Error: ${e.message||e}`, true); alert(e.message||e); }
+      } catch(e){ console.error(e); seeToast(`Error: ${e.message||e}`, true); alert(e.message||e); }
       finally{ addBtn.disabled = false; msgEl.textContent = ''; }
     });
 
