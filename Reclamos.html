@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Reclamos - Interagrovial</title>
 
-  <!-- ✅ CAMBIO: Ruta absoluta para que funcione bien en la web -->
-  <link rel="stylesheet" href="/assets/carpetas.css">
+  <!-- ✅ GitHub Pages: usar rutas relativas -->
+  <link rel="stylesheet" href="./assets/carpetas.css">
 
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.19.3/dist/xlsx.full.min.js"></script>
 </head>
@@ -122,7 +122,6 @@
     <div id="toast" class="toast"></div>
   </div>
 
-  <!-- packing/adjuntos removed per request -->
   <input id="importXls" type="file" accept=".xls,.xlsx" style="display:none" />
 
   <table>
@@ -275,22 +274,20 @@
 
     // Ensure XLSX is available:
     // 1) use global `window.XLSX` if present
-    // 2) try loading a local copy at `assets/xlsx.full.min.js` (recommended for offline)
+    // 2) try loading a local copy at `./assets/xlsx.full.min.js` (recommended for offline)
     // 3) fallback to dynamic ESM import from CDN
     let XLSXlib = window.XLSX;
     if (!XLSXlib) {
-      // Try local script first (user can place assets/xlsx.full.min.js)
       try {
         await new Promise((resolve, reject) => {
           const script = document.createElement('script');
-          script.src = 'assets/xlsx.full.min.js';
+          script.src = './assets/xlsx.full.min.js';
           script.onload = () => resolve();
           script.onerror = () => reject(new Error('Local XLSX not found'));
           document.head.appendChild(script);
         });
         XLSXlib = window.XLSX;
       } catch (localErr) {
-        // If local not present, try dynamic ESM import from CDN
         try {
           const mod = await import('https://cdn.jsdelivr.net/npm/xlsx@0.19.3/dist/xlsx.mjs');
           XLSXlib = (mod && mod.default) ? mod.default : mod;
@@ -303,10 +300,10 @@
     // If a file named 'Pruba reclamos.xlsx' is present in assets/, offer to import it automatically
     async function tryAutoImportFromAssets(){
       const filename = 'Pruba reclamos.xlsx';
-      const path = `assets/${encodeURIComponent(filename)}`;
+      const path = `./assets/${encodeURIComponent(filename)}`;
       try{
         const resp = await fetch(path);
-        if(!resp.ok) return; // not present
+        if(!resp.ok) return;
         const arr = await resp.arrayBuffer();
         const wb = XLSXlib.read(arr, {type:'array', cellDates:true});
         const first = wb.SheetNames[0];
@@ -327,7 +324,6 @@
       } catch(err){ console.warn('Auto import failed', err); }
     }
 
-    // try automatic import if XLSX is available
     tryAutoImportFromAssets().catch(()=>{});
 
     function normalizeHeader(h){
@@ -342,7 +338,6 @@
         const nk = normalizeHeader(k);
         const v = raw[k];
         if(!v && v !== 0) { map[nk] = ''; continue; }
-        // date handling
         if(v instanceof Date){
           const yyyy = v.getFullYear();
           const mm = String(v.getMonth()+1).padStart(2,'0');
@@ -350,23 +345,21 @@
           map[nk] = `${yyyy}-${mm}-${dd}`;
           continue;
         }
-        // try parse ISO-like dates to yyyy-mm-dd
         const s = String(v).trim();
         const m = s.match(/^(\d{2})[\/\-](\d{2})[\/\-](\d{4})$/);
-        if(m){ // dd/mm/yyyy -> yyyy-mm-dd
+        if(m){
           map[nk] = `${m[3]}-${m[2]}-${m[1]}`;
           continue;
         }
         map[nk] = s;
       }
-      // normalize known keys to our DB names
       return {
         material: map.material || map['material'] || map['name'] || '',
         cantidad: map.cantidad || map['cantidad'] || map['qty'] || '',
         oc: map.oc || map['oc'] || '',
         caja: map.caja || map['caja'] || '',
-        monto_unitario: map.monto_unitario || map['monto_unitario'] || map['monto_unitar'] || map['monto_unitar'] || '',
-        monto_total: map.monto_total || map['monto_total'] || map['monto_tot'] || map['monto_tot'] || '',
+        monto_unitario: map.monto_unitario || map['monto_unitario'] || map['monto_unitar'] || '',
+        monto_total: map.monto_total || map['monto_total'] || map['monto_tot'] || '',
         factura: map.factura || map['factura'] || '',
         nro_reclamo: map.n_de_reclamo || map['n_de_reclamo'] || map['n_reclamo'] || map['n'] || map['nro_reclamo'] || '',
         fecha_reclamo: map.fecha_de_reclamo || map['fecha_de_reclamo'] || map['fecha_reclamo'] || '',
@@ -398,10 +391,7 @@
         for(const raw of rows){
           const mapped = mapRowObject(raw);
           const docData = { ...mapped, createdAt: serverTimestamp(), updatedAt: serverTimestamp() };
-          try{
-            await addDoc(collection(db,'rows'), docData);
-            added++;
-          } catch(err){ console.error('add error', err); failed++; }
+          try{ await addDoc(collection(db,'rows'), docData); added++; } catch(err){ console.error('add error', err); failed++; }
         }
         msgEl.textContent = '';
         showToast(`Import completo: ${added} agregadas, ${failed} fallidas`);
@@ -420,8 +410,6 @@
       const url = await getDownloadURL(ref);
       return { name: file.name, path, url, size: file.size };
     }
-
-    /* Packing/Attachments UI removed for Reclamos page */
 
     addBtn.addEventListener("click", async () => {
       const data = {
@@ -451,7 +439,7 @@
       try{
         await addDoc(collection(db, 'rows'), data);
         clearAddForm(); showToast('Agregado con éxito');
-      } catch(e){ console.error(e); seeToast(`Error: ${e.message||e}`, true); alert(e.message||e); }
+      } catch(e){ console.error(e); showToast(`Error: ${e.message||e}`, true); alert(e.message||e); }
       finally{ addBtn.disabled = false; msgEl.textContent = ''; }
     });
 
@@ -538,8 +526,6 @@
       snap.forEach(d => cache.push({ id: d.id, data: d.data() }));
       applyFilters();
     }, (err)=>{ console.error(err); showToast('No se pudo leer Firestore', true); });
-
-    // packing/attachments file input handlers removed
 
     tbody.addEventListener('click', async (e)=>{
       const btn = e.target.closest('[data-action]'); if(!btn) return;
