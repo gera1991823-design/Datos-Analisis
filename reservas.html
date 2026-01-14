@@ -1,20 +1,21 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Reclamos - Interagrovial</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Reservas de Importaciones</title>
 
-  <!-- XLSX (SheetJS) -->
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.19.3/dist/xlsx.full.min.js"></script>
+  <!-- XLSX (SheetJS) para exportar a Excel -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
+  <!-- ✅ ESTILO CLARO (el del "Reclamos") aplicado a Reservas -->
   <style>
     :root{
       /* Interagrovial / John Deere-ish accents */
       --green:#367C2B;
       --yellow:#FFDE00;
 
-      /* light ui like your screenshot (modern) */
+      /* light ui */
       --bg1:#eef2f5;
       --bg2:#e6edf2;
       --panel:#ffffff;
@@ -48,7 +49,7 @@
     /* Top bar */
     .topbar{
       display:flex;
-      align-items:center;
+      align-items:flex-end;
       justify-content:space-between;
       flex-wrap:wrap;
       gap:12px;
@@ -64,10 +65,21 @@
       align-items:center;
       gap:10px;
     }
+    .titleCol{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
     h1{
       margin:0;
       font-size:26px;
       letter-spacing:.2px;
+    }
+    .subtitle{
+      margin:0;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.2;
     }
     .subpill{
       font-size:12px;
@@ -76,6 +88,7 @@
       padding:6px 12px;
       color:var(--muted);
       background:rgba(255,255,255,.65);
+      white-space:nowrap;
     }
 
     /* Cards */
@@ -86,38 +99,49 @@
       box-shadow:var(--shadow);
       padding:14px;
       margin-bottom:14px;
-    }
-    .cardHeader{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      flex-wrap:wrap;
-      gap:10px;
-      margin-bottom:12px;
-    }
-    .cardHeader h3{
-      margin:0;
-      font-size:14px;
-      letter-spacing:.12em;
-      text-transform:uppercase;
-      color:#0b1a12;
+      overflow:hidden;
     }
 
-    /* Form controls */
-    label{
-      display:block;
-      font-size:12px;
-      color:var(--muted);
-      margin-bottom:6px;
+    /* Meta row (status) */
+    .meta{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      padding:12px 14px;
+      border-radius:14px;
+      background:linear-gradient(90deg, rgba(54,124,43,.10), rgba(255,255,255,.55));
+      border:1px solid rgba(10,40,20,.10);
+      margin-bottom:12px;
     }
-    .row{
+
+    .pill{
+      font-size:12px;
+      border:1px solid rgba(10,40,20,.12);
+      border-radius:999px;
+      padding:6px 12px;
+      color:var(--muted);
+      background:rgba(255,255,255,.70);
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      white-space:nowrap;
+    }
+
+    .dot{
+      width:8px; height:8px; border-radius:999px;
+      background:var(--yellow);
+      box-shadow:0 0 0 6px rgba(255,222,0,.14);
+    }
+
+    /* Controls */
+    .toolbar{
       display:flex;
       flex-wrap:wrap;
-      gap:12px;
-      align-items:flex-end;
-    }
-    .row-add{
-      align-items:flex-end;
+      gap:10px;
+      align-items:center;
+      justify-content:flex-end;
     }
 
     input, select{
@@ -137,19 +161,13 @@
       box-shadow:0 0 0 4px rgba(54,124,43,.12);
     }
 
-    .w110{ width:110px; }
-    .w140{ width:140px; }
-    .w160{ width:160px; }
-    .w200{ width:200px; }
-    .w220{ width:220px; }
-
-    /* Buttons */
     button{
       border:0;
       cursor:pointer;
       user-select:none;
       font-family:var(--sans);
     }
+
     .primary, .secondary, .danger{
       height:40px;
       border-radius:12px;
@@ -183,43 +201,21 @@
       transform:translateY(-1px);
       box-shadow: 0 12px 26px rgba(0,0,0,.12);
     }
-    .primary:disabled{ opacity:.65; cursor:not-allowed; transform:none; }
-
-    .muted{ color:var(--muted); font-size:12px; margin-top:8px; }
-    .toast{
-      display:none;
-      margin-top:10px;
-      padding:10px 12px;
-      border-radius:12px;
-      border:1px solid rgba(54,124,43,.22);
-      background:rgba(54,124,43,.10);
-      color:#0b1a12;
-      font-size:13px;
-    }
-    .toast.err{
-      border-color:rgba(180,40,40,.35);
-      background:rgba(180,40,40,.10);
-      color:#6b1414;
-    }
 
     /* Table */
-    .tableCard{
-      padding:0;
-      overflow:hidden;
-    }
     .tableWrap{
       width:100%;
       overflow:auto;
-      max-height: calc(100vh - 340px);
-      background:transparent;
+      max-height: calc(100vh - 280px);
     }
     table{
       width:100%;
-      min-width:1300px;
+      min-width:1500px;
       border-collapse:separate;
       border-spacing:0;
       font-size:13px;
     }
+
     thead th{
       position:sticky;
       top:0;
@@ -232,6 +228,7 @@
       font-weight:800;
       text-align:center;
     }
+
     tbody td{
       padding:10px 10px;
       border-bottom:1px solid rgba(10,40,20,.08);
@@ -243,53 +240,64 @@
     tbody tr:nth-child(even) td{ background:rgba(248,251,253,.92); }
     tbody tr:hover td{ background:rgba(54,124,43,.08); }
 
-    .cellInner{
-      width:100%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      min-height:22px;
+    tbody td[contenteditable="true"]:focus{
+      outline:2px solid rgba(54,124,43,.35);
+      border-radius:10px;
+      background: rgba(255,255,255,.98);
     }
 
-    .actions{
+    .col-small{ width: 120px; }
+    .col-xs{ width: 90px; }
+    .col-mid{ width: 160px; }
+    .col-wide{ width: 240px; }
+
+    .jd-select{
+      width:100%;
+      min-width:150px;
+      background:rgba(255,255,255,.92);
+      color:var(--text);
+      border:1px solid rgba(10,40,20,.14);
+      border-radius:10px;
+      padding:6px 10px;
+      outline:none;
+      text-align:center;
+    }
+    .jd-select:focus{
+      border-color:rgba(54,124,43,.40);
+      box-shadow:0 0 0 3px rgba(54,124,43,.12);
+    }
+
+    .row-actions{
       display:flex;
       gap:8px;
       align-items:center;
       justify-content:center;
     }
-    .small{
-      height:34px;
+    .icon-btn{
+      width:34px; height:34px;
       border-radius:10px;
-      padding:0 12px;
-      font-size:12px;
       border:1px solid rgba(10,40,20,.14);
-      box-shadow: 0 8px 16px rgba(0,0,0,.08);
       background:rgba(255,255,255,.92);
+      color:var(--text);
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      transition:.15s ease;
+      box-shadow: var(--shadow2);
     }
-    .small.primary{
-      background:linear-gradient(135deg, rgba(54,124,43,.92), rgba(54,124,43,.72));
-      color:#fff;
+    .icon-btn:hover{
       border-color:rgba(54,124,43,.35);
+      transform:translateY(-1px);
     }
-    .small.danger{
-      background:rgba(180,40,40,.10);
+    .icon-btn.danger{
       border-color:rgba(180,40,40,.30);
+      background:rgba(180,40,40,.10);
       color:#8a1d1d;
     }
 
-    .cell-input{
-      height:34px;
-      border-radius:10px;
-      padding:8px 10px;
-      width:100%;
-      border:1px solid rgba(10,40,20,.14);
-      background:rgba(255,255,255,.92);
-      font-size:12px;
-    }
-
     .footer{
-      margin-top:14px;
+      margin-top:12px;
       padding:12px 14px;
       border-radius:16px;
       border:1px solid rgba(10,40,20,.10);
@@ -301,522 +309,551 @@
       gap:10px;
       flex-wrap:wrap;
     }
+    .footer code{ font-family:var(--mono); color:var(--text); }
 
     @media (max-width: 900px){
-      .w110,.w140,.w160,.w200,.w220{ width:100%; }
-      .row > div{ width:100%; }
-      .primary, .secondary, .danger{ width:100%; }
-      table{ min-width:1200px; }
+      .toolbar{ justify-content:stretch; }
+      input, select, .primary, .secondary, .danger{ width:100%; }
+      table{ min-width: 1400px; }
     }
   </style>
 </head>
 
 <body>
   <div class="wrap">
+
+    <!-- ✅ HEADER estilo "Reclamos" -->
     <div class="topbar">
       <div class="titleRow">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <rect x="1" y="3" width="22" height="18" rx="2" stroke="currentColor" stroke-width="1.2" fill="#fff" />
-          <path d="M6 8h6M6 12h12M6 16h6" stroke="#367c2b" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
+             xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect x="1" y="3" width="22" height="18" rx="2"
+                stroke="currentColor" stroke-width="1.2" fill="#fff" />
+          <path d="M6 8h6M6 12h12M6 16h6"
+                stroke="#367c2b" stroke-width="1.4"
+                stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        <h1>Reclamos</h1>
-      </div>
-      <div class="subpill">Estilo <b>Interagrovial</b></div>
-    </div>
 
-    <div class="card">
-      <div class="cardHeader">
-        <h3>Filtros</h3>
-        <div class="row" style="gap:8px">
-          <button id="clearFiltersBtn" class="secondary" type="button">Limpiar filtros</button>
-          <button id="importBtn" class="secondary" type="button">Importar XLSX</button>
+        <div class="titleCol">
+          <h1>Reservas de Importaciones</h1>
+          <p class="subtitle">Tabla editable · buscador + filtro · exportación Excel (XLSX) · sincroniza en vivo (Firestore)</p>
         </div>
       </div>
 
-      <div class="row">
-        <div>
-          <label>Buscar (cualquier campo)</label>
-          <input id="q" class="w220" placeholder="Ej: texto, factura, n° reclamo" />
-        </div>
-        <div>
-          <label>Fecha desde</label>
-          <input id="fDateFrom" type="date" />
-        </div>
-        <div>
-          <label>Fecha hasta</label>
-          <input id="fDateTo" type="date" />
-        </div>
+      <div class="toolbar">
+        <input id="search" style="min-width:260px" placeholder="Buscar (caja, material, OC, descripción...)" />
+        <select id="filterCumplido">
+          <option value="all">Cumplido: Todos</option>
+          <option value="si">Cumplido: Sí</option>
+          <option value="no">Cumplido: No</option>
+          <option value="sin realizar">Cumplido: Sin realizar</option>
+        </select>
+
+        <button class="primary" id="addRow">＋ Agregar fila</button>
+        <button class="secondary" id="exportXlsx">⬇ Exportar XLSX</button>
+        <button class="danger" id="clearAll">🗑 Vaciar</button>
       </div>
     </div>
 
     <div class="card">
-      <div class="cardHeader">
-        <h3>Agregar fila</h3>
+      <div class="meta">
+        <div class="pill"><span class="dot"></span> Vista principal</div>
+        <div class="pill">Filas: <strong id="rowCount" style="color:var(--text)">0</strong></div>
+        <div class="pill">Estado: <strong id="syncStatus" style="color:var(--text)">Conectando…</strong></div>
       </div>
 
-      <div class="row row-add">
-        <div>
-          <label>Material</label>
-          <input id="material" class="w200" placeholder="Ej: RE504836" />
-        </div>
-
-        <div>
-          <label>Cantidad</label>
-          <input id="cantidad" class="w140" inputmode="numeric" placeholder="Ej: 100" />
-        </div>
-
-        <div>
-          <label>OC</label>
-          <input id="oc" class="w140" placeholder="Ej: 12004566" />
-        </div>
-
-        <div>
-          <label>Caja</label>
-          <input id="caja" class="w140" placeholder="Ej: Caja A" />
-        </div>
-
-        <div>
-          <label>MONTO UNITARIO</label>
-          <input id="monto_unitario" class="w140" inputmode="decimal" placeholder="Ej 1" />
-        </div>
-
-        <div>
-          <label>MONTO TOTAL</label>
-          <input id="monto_total" class="w140" inputmode="decimal" placeholder="Ej 1" />
-        </div>
-
-        <div>
-          <label>FACTURA</label>
-          <input id="factura" class="w140" placeholder="Ej: 456222" />
-        </div>
-
-        <div>
-          <label>Nº de reclamo</label>
-          <input id="nro_reclamo" class="w140" placeholder="Ej: R-1234" />
-        </div>
-
-        <div>
-          <label>Fecha de reclamo</label>
-          <input id="fecha_reclamo" type="date" />
-        </div>
-
-        <div>
-          <label>Respuesta de fabrica</label>
-          <input id="respuesta_fabrica" class="w200" placeholder="Ej: Aprobado / Rechazado" />
-        </div>
-
-        <div>
-          <label>Fecha de respuesta</label>
-          <input id="fecha_respuesta" type="date" />
-        </div>
-
-        <div>
-          <label>Observacion</label>
-          <input id="observacion" class="w200" placeholder="Breve comentario" />
-        </div>
-
-        <div>
-          <label>UNIDAD</label>
-          <input id="unidad" class="w110" placeholder="AGRO / CONS / FORE" />
-        </div>
-
-        <button id="addBtn" class="primary" type="button">Agregar</button>
-      </div>
-
-      <div id="msg" class="muted"></div>
-      <div id="toast" class="toast"></div>
-    </div>
-
-    <div class="card tableCard">
       <div class="tableWrap">
-        <table>
+        <table id="grid">
           <thead>
             <tr>
-              <th>Material</th>
-              <th>Cantidad</th>
-              <th>OC</th>
-              <th>Caja</th>
-              <th>MONTO UNITARIO</th>
-              <th>MONTO TOTAL</th>
-              <th>FACTURA</th>
-              <th>Nº de reclamo</th>
-              <th>Fecha de reclamo</th>
-              <th>Respuesta de fabrica</th>
-              <th>Fecha de respuesta</th>
-              <th>Observacion</th>
-              <th>UNIDAD</th>
-              <th>Acciones</th>
+              <th class="col-small">Caja</th>
+              <th class="col-small">Material</th>
+              <th class="col-xs">Cantidad pack</th>
+              <th class="col-xs">Cantid</th>
+              <th class="col-wide">Descripción</th>
+              <th class="col-wide">Comentario</th>
+              <th class="col-mid">O/C</th>
+              <th class="col-xs">Carpeta</th>
+              <th class="col-mid">Pedido Trasla</th>
+              <th class="col-xs">Sucurs</th>
+              <th class="col-mid">Fecha</th>
+              <th class="col-mid">Hora de carga</th>
+              <th class="col-small">Cumplido</th>
+              <th class="col-xs">Acción</th>
             </tr>
           </thead>
           <tbody id="tbody"></tbody>
         </table>
       </div>
-    </div>
 
-    <div class="footer">
-      <div><b>INTERAGROVIAL S.A</b></div>
-      <div>Back-end: <code style="font-family:var(--mono)">Firebase Firestore</code></div>
+      <div class="footer">
+        <div>Tip: click en una celda para editar. Enter confirma. Cambios se sincronizan para todas las PCs.</div>
+        <div>Back-end: <code>Firebase Firestore</code></div>
+      </div>
     </div>
   </div>
 
-  <input id="importXls" type="file" accept=".xls,.xlsx" style="display:none" />
-
+  <!-- IMPORTANTE:
+       Este script usa "type=module" (Firebase v9+). No lo abras con file://
+       Abrilo desde un servidor/hosting (GitHub Pages sirve). -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+    // =========================
+    // FIREBASE (Firestore realtime + Auth anónimo)
+    // =========================
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
     import {
-      getFirestore, collection, addDoc, doc, updateDoc, deleteDoc,
-      serverTimestamp, query, orderBy, onSnapshot
-    } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+      getFirestore,
+      collection,
+      doc,
+      addDoc,
+      updateDoc,
+      deleteDoc,
+      onSnapshot,
+      query,
+      orderBy,
+      serverTimestamp,
+      getDocs,
+      writeBatch,
+      limit
+    } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
+    // ==== TU firebaseConfig (tal cual lo pasaste) ====
     const firebaseConfig = {
-      apiKey: "AIzaSyDIGkNekvGn0XrqGvDAuutCBSglod03644",
-      authDomain: "carpetas-17846.firebaseapp.com",
-      projectId: "carpetas-17846",
-      storageBucket: "carpetas-17846.firebasestorage.app",
-      messagingSenderId: "513234224676",
-      appId: "1:513234224676:web:a61b7ab9685594d1b5bab1",
-      measurementId: "G-8Z18FTM0L6"
+      apiKey: "AIzaSyA0xgTpM2NjDoyBD5Eo5F2FN-Dxy6UgI9Y",
+      authDomain: "reservas-importaciones.firebaseapp.com",
+      projectId: "reservas-importaciones",
+      storageBucket: "reservas-importaciones.firebasestorage.app",
+      messagingSenderId: "404230429294",
+      appId: "1:404230429294:web:c11b2d0c15a43ce0f6247f",
+      measurementId: "G-S05S1H4XZ0"
     };
 
     const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
     const db = getFirestore(app);
 
-    const $ = (id) => document.getElementById(id);
-    const tbody = $("tbody");
-    const msgEl = $("msg");
-    const toastEl = $("toast");
-    const addBtn = $("addBtn");
+    // =========================
+    // TU APP (misma lógica)
+    // =========================
+    const columns = [
+      "caja","material","cantidadPack","cantid","descripcion","comentario",
+      "oc","carpeta","pedidoTrasla","sucurs","fecha","horaCarga","cumplido"
+    ];
 
-    let editingRowId = null;
-    let cache = [];
-    let view = [];
+    const tbody = document.getElementById("tbody");
+    const search = document.getElementById("search");
+    const filterCumplido = document.getElementById("filterCumplido");
+    const rowCount = document.getElementById("rowCount");
+    const syncStatus = document.getElementById("syncStatus");
 
-    function showToast(text, isError=false){
-      toastEl.textContent = text;
-      toastEl.classList.toggle("err", isError);
-      toastEl.style.display = "block";
-      clearTimeout(showToast._t);
-      showToast._t = setTimeout(() => toastEl.style.display = "none", 4500);
+    function pad2(n){ return String(n).padStart(2,"0"); }
+
+    function nowDateStr(){
+      const d = new Date();
+      return `${pad2(d.getDate())}/${pad2(d.getMonth()+1)}/${d.getFullYear()}`;
     }
 
-    function escapeHtml(s){
-      return String(s ?? "")
-        .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
-        .replaceAll('"','&quot;').replaceAll("'","&#039;");
+    function nowTimeStr(){
+      const d = new Date();
+      return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
     }
 
-    function formatDateVal(v){
-      if (!v) return "";
-      if (v instanceof Date){
-        const dd = String(v.getDate()).padStart(2,'0');
-        const mm = String(v.getMonth()+1).padStart(2,'0');
-        const yyyy = v.getFullYear();
-        return `${dd}/${mm}/${yyyy}`;
+    function seedData(){
+      return [{
+        caja:"SBKM5D",
+        material:"KK25029",
+        cantidadPack:"4",
+        cantid:"2",
+        descripcion:"APOYO",
+        comentario:"",
+        oc:"1200021702",
+        carpeta:"88789",
+        pedidoTrasla:"1601220470",
+        sucurs:"S002",
+        fecha:"27/11/2025",
+        horaCarga:"08:30",
+        cumplido:"SIN REALIZAR"
+      }];
+    }
+
+    // Datos en memoria (la fuente real es Firestore)
+    let data = [];
+
+    // Colección donde se guardan filas
+    const reservasCol = collection(db, "reservas");
+    const reservasQuery = query(reservasCol, orderBy("createdAt", "desc"));
+
+    function matchesFilters(row){
+      const q = search.value.trim().toLowerCase();
+      const f = filterCumplido.value;
+
+      const haystack = columns.map(k => (row[k] ?? "").toString().toLowerCase()).join(" | ");
+      const okSearch = !q || haystack.includes(q);
+
+      let okCumplido = true;
+      if(f !== "all"){
+        const v = (row.cumplido ?? "").toString().trim().toLowerCase();
+        const isYes = (v === "si" || v === "sí");
+        const isNo = (v === "no");
+        const isPending = (v === "sin realizar" || v === "");
+        if(f === "si") okCumplido = isYes;
+        if(f === "no") okCumplido = isNo;
+        if(f === "sin realizar") okCumplido = isPending;
       }
-      const m = String(v).match(/^(\d{4})-(\d{2})-(\d{2})/);
-      if (m) return `${m[3]}/${m[2]}/${m[1]}`;
-      const d = new Date(v);
-      if (!isNaN(d)) return formatDateVal(d);
-      return String(v);
+
+      return okSearch && okCumplido;
     }
 
-    function clearAddForm(){
-      $("material").value = "";
-      $("cantidad").value = "";
-      $("oc").value = "";
-      $("caja").value = "";
-      $("monto_unitario").value = "";
-      $("monto_total").value = "";
-      $("factura").value = "";
-      $("nro_reclamo").value = "";
-      $("fecha_reclamo").value = "";
-      $("respuesta_fabrica").value = "";
-      $("fecha_respuesta").value = "";
-      $("observacion").value = "";
-      $("unidad").value = "";
-    }
+    function render(){
+      tbody.innerHTML = "";
 
-    function matchesText(row, q){
-      if(!q) return true;
-      const hay = [
-        row.material, row.cantidad, row.oc, row.caja, row.monto_unitario, row.monto_total,
-        row.factura, row.nro_reclamo, row.fecha_reclamo, row.respuesta_fabrica,
-        row.fecha_respuesta, row.observacion, row.unidad
-      ].map(s=> (s||"").toString().toLowerCase()).join(" |");
-      return hay.includes(q);
-    }
+      const visible = data
+        .map((row, idx) => ({row, idx}))
+        .filter(({row}) => matchesFilters(row));
 
-    function inDateRange(row, from, to){
-      const d = row.fecha_reclamo || "";
-      if(!from && !to) return true;
-      if(!d) return false;
-      if(from && d < from) return false;
-      if(to && d > to) return false;
-      return true;
-    }
+      rowCount.textContent = visible.length;
 
-    function applyFilters(){
-      const q = ($("q").value||"").toString().trim().toLowerCase();
-      const from = $("fDateFrom").value || "";
-      const to = $("fDateTo").value || "";
+      for(const {row, idx} of visible){
+        const tr = document.createElement("tr");
 
-      view = cache.filter(x => {
-        const r = x.data;
-        if(!matchesText(r,q)) return false;
-        if(!inDateRange(r, from, to)) return false;
-        return true;
-      });
-      draw();
-    }
+        for(const key of columns){
+          const td = document.createElement("td");
+          td.setAttribute("data-key", key);
+          td.setAttribute("data-idx", idx);
 
-    $("q").addEventListener("input", applyFilters);
-    $("fDateFrom").addEventListener("change", applyFilters);
-    $("fDateTo").addEventListener("change", applyFilters);
-    $("clearFiltersBtn").addEventListener("click", ()=>{
-      $("q").value = ""; $("fDateFrom").value = ""; $("fDateTo").value = "";
-      applyFilters();
-    });
+          if(key === "cumplido"){
+            const current = (row[key] ?? "SIN REALIZAR").toString().trim().toUpperCase();
+            const normalized = (current === "" ? "SIN REALIZAR" : current);
 
-    // XLSX import
-    const importBtn = $("importBtn");
-    const importInput = $("importXls");
+            td.innerHTML = `
+              <select class="jd-select" data-idx="${idx}" data-key="cumplido" aria-label="Cumplido">
+                <option value="SIN REALIZAR" ${normalized === "SIN REALIZAR" ? "selected" : ""}>SIN REALIZAR</option>
+                <option value="SI" ${normalized === "SI" ? "selected" : ""}>SI</option>
+                <option value="NO" ${normalized === "NO" ? "selected" : ""}>NO</option>
+              </select>
+            `;
+          }else{
+            td.textContent = row[key] ?? "";
+            td.contentEditable = "true";
+          }
 
-    function normalizeHeader(h){
-      return String(h||"").toLowerCase().trim()
-        .normalize('NFD').replace(/\p{Diacritic}/gu, '')
-        .replace(/\s+/g, '_').replace(/[^a-z0-9_]/g,'');
-    }
-
-    function mapRowObject(raw){
-      const map = {};
-      for(const k in raw){
-        const nk = normalizeHeader(k);
-        const v = raw[k];
-        if(!v && v !== 0) { map[nk] = ''; continue; }
-        if(v instanceof Date){
-          const yyyy = v.getFullYear();
-          const mm = String(v.getMonth()+1).padStart(2,'0');
-          const dd = String(v.getDate()).padStart(2,'0');
-          map[nk] = `${yyyy}-${mm}-${dd}`;
-          continue;
+          tr.appendChild(td);
         }
-        const s = String(v).trim();
-        const m = s.match(/^(\d{2})[\/\-](\d{2})[\/\-](\d{4})$/);
-        if(m){
-          map[nk] = `${m[3]}-${m[2]}-${m[1]}`;
-          continue;
-        }
-        map[nk] = s;
-      }
-      return {
-        material: map.material || '',
-        cantidad: map.cantidad || '',
-        oc: map.oc || '',
-        caja: map.caja || '',
-        monto_unitario: map.monto_unitario || '',
-        monto_total: map.monto_total || '',
-        factura: map.factura || '',
-        nro_reclamo: map.nro_reclamo || map.n_de_reclamo || map.n_reclamo || '',
-        fecha_reclamo: map.fecha_reclamo || map.fecha_de_reclamo || '',
-        respuesta_fabrica: map.respuesta_fabrica || map.respuesta_de_fabrica || '',
-        fecha_respuesta: map.fecha_respuesta || map.fecha_de_respuesta || '',
-        observacion: map.observacion || '',
-        unidad: map.unidad || ''
-      };
-    }
 
-    importBtn.addEventListener('click', ()=> importInput.click());
-    importInput.addEventListener('change', async (e)=>{
-      const f = (e.target.files||[])[0]; importInput.value = '';
-      if(!f) return;
-      if(!confirm(`Importar ${f.name} y agregar sus filas a la base de datos?`)) return;
-
-      try{
-        const arr = await f.arrayBuffer();
-        const wb = XLSX.read(arr, {type:'array', cellDates:true});
-        const first = wb.SheetNames[0];
-        const ws = wb.Sheets[first];
-        const rows = XLSX.utils.sheet_to_json(ws, {defval:'', raw:false});
-        if(!rows.length){ alert('El archivo no contiene filas.'); return; }
-
-        let added = 0; let failed = 0;
-        msgEl.textContent = `Importando ${rows.length} filas...`;
-        for(const raw of rows){
-          const mapped = mapRowObject(raw);
-          const docData = { ...mapped, createdAt: serverTimestamp(), updatedAt: serverTimestamp() };
-          try{ await addDoc(collection(db,'rows'), docData); added++; }
-          catch(err){ console.error('add error', err); failed++; }
-        }
-        msgEl.textContent = '';
-        showToast(`Import completo: ${added} agregadas, ${failed} fallidas`, failed>0);
-      } catch(err){
-        console.error(err);
-        alert('Error leyendo XLSX: '+(err.message||err));
-      }
-    });
-
-    addBtn.addEventListener("click", async () => {
-      const data = {
-        material: $("material").value.trim(),
-        cantidad: $("cantidad").value.trim(),
-        oc: $("oc").value.trim(),
-        caja: $("caja").value.trim(),
-        monto_unitario: $("monto_unitario").value.trim(),
-        monto_total: $("monto_total").value.trim(),
-        factura: $("factura").value.trim(),
-        nro_reclamo: $("nro_reclamo").value.trim(),
-        fecha_reclamo: $("fecha_reclamo").value || "",
-        respuesta_fabrica: $("respuesta_fabrica").value.trim(),
-        fecha_respuesta: $("fecha_respuesta").value || "",
-        observacion: $("observacion").value.trim(),
-        unidad: $("unidad").value.trim(),
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
-      };
-
-      const empty = !data.material && !data.factura && !data.nro_reclamo && !data.oc;
-      if(empty){ alert('Ingresá al menos un dato para agregar.'); return; }
-
-      addBtn.disabled = true;
-      msgEl.textContent = 'Guardando...';
-      try{
-        await addDoc(collection(db, 'rows'), data);
-        clearAddForm();
-        showToast('Agregado con éxito');
-      } catch(e){
-        console.error(e);
-        showToast(`Error: ${e.message||e}`, true);
-        alert(e.message||e);
-      } finally{
-        addBtn.disabled = false;
-        msgEl.textContent = '';
-      }
-    });
-
-    function renderRow(id, r){
-      const isEditing = (editingRowId === id);
-
-      if(!isEditing){
-        return `
-          <tr data-id="${id}">
-            <td><div class="cellInner">${escapeHtml(r.material)}</div></td>
-            <td><div class="cellInner">${escapeHtml(r.cantidad)}</div></td>
-            <td><div class="cellInner">${escapeHtml(r.oc)}</div></td>
-            <td><div class="cellInner">${escapeHtml(r.caja)}</div></td>
-            <td><div class="cellInner">${escapeHtml(r.monto_unitario)}</div></td>
-            <td><div class="cellInner">${escapeHtml(r.monto_total)}</div></td>
-            <td><div class="cellInner">${escapeHtml(r.factura)}</div></td>
-            <td><div class="cellInner">${escapeHtml(r.nro_reclamo)}</div></td>
-            <td><div class="cellInner">${escapeHtml(formatDateVal(r.fecha_reclamo))}</div></td>
-            <td><div class="cellInner">${escapeHtml(r.respuesta_fabrica)}</div></td>
-            <td><div class="cellInner">${escapeHtml(formatDateVal(r.fecha_respuesta))}</div></td>
-            <td><div class="cellInner">${escapeHtml(r.observacion)}</div></td>
-            <td><div class="cellInner">${escapeHtml(r.unidad)}</div></td>
-            <td>
-              <div class="cellInner">
-                <div class="actions">
-                  <button class="small" data-action="edit">Editar</button>
-                  <button class="small danger" data-action="delete">Eliminar</button>
-                </div>
-              </div>
-            </td>
-          </tr>
+        const tdA = document.createElement("td");
+        tdA.className = "col-xs";
+        tdA.innerHTML = `
+          <div class="row-actions">
+            <button class="icon-btn" title="Duplicar" data-action="dup" data-idx="${idx}">⎘</button>
+            <button class="icon-btn danger" title="Eliminar" data-action="del" data-idx="${idx}">✕</button>
+          </div>
         `;
+        tr.appendChild(tdA);
+
+        tbody.appendChild(tr);
       }
-
-      const material = escapeHtml(r.material||'');
-      const cantidad = escapeHtml(r.cantidad||'');
-      const oc = escapeHtml(r.oc||'');
-      const caja = escapeHtml(r.caja||'');
-      const monto_unitario = escapeHtml(r.monto_unitario||'');
-      const monto_total = escapeHtml(r.monto_total||'');
-      const factura = escapeHtml(r.factura||'');
-      const nro_reclamo = escapeHtml(r.nro_reclamo||'');
-      const fecha_reclamo = escapeHtml(r.fecha_reclamo||'');
-      const respuesta_fabrica = escapeHtml(r.respuesta_fabrica||'');
-      const fecha_respuesta = escapeHtml(r.fecha_respuesta||'');
-      const observacion = escapeHtml(r.observacion||'');
-      const unidad = escapeHtml(r.unidad||'');
-
-      return `
-        <tr data-id="${id}">
-          <td><div class="cellInner"><input class="cell-input w200" data-field="material" value="${material}"></div></td>
-          <td><div class="cellInner"><input class="cell-input w140" data-field="cantidad" value="${cantidad}"></div></td>
-          <td><div class="cellInner"><input class="cell-input w140" data-field="oc" value="${oc}"></div></td>
-          <td><div class="cellInner"><input class="cell-input w140" data-field="caja" value="${caja}"></div></td>
-          <td><div class="cellInner"><input class="cell-input w140" data-field="monto_unitario" value="${monto_unitario}"></div></td>
-          <td><div class="cellInner"><input class="cell-input w140" data-field="monto_total" value="${monto_total}"></div></td>
-          <td><div class="cellInner"><input class="cell-input w140" data-field="factura" value="${factura}"></div></td>
-          <td><div class="cellInner"><input class="cell-input w140" data-field="nro_reclamo" value="${nro_reclamo}"></div></td>
-          <td><div class="cellInner"><input class="cell-input w160" type="date" data-field="fecha_reclamo" value="${fecha_reclamo}"></div></td>
-          <td><div class="cellInner"><input class="cell-input w200" data-field="respuesta_fabrica" value="${respuesta_fabrica}"></div></td>
-          <td><div class="cellInner"><input class="cell-input w160" type="date" data-field="fecha_respuesta" value="${fecha_respuesta}"></div></td>
-          <td><div class="cellInner"><input class="cell-input w200" data-field="observacion" value="${observacion}"></div></td>
-          <td><div class="cellInner"><input class="cell-input w110" data-field="unidad" value="${unidad}"></div></td>
-          <td>
-            <div class="cellInner">
-              <div class="actions">
-                <button class="small primary" data-action="save">Guardar</button>
-                <button class="small" data-action="cancel">Cancelar</button>
-                <button class="small danger" data-action="delete">Eliminar</button>
-              </div>
-            </div>
-          </td>
-        </tr>
-      `;
     }
 
-    function draw(){
-      const dataToDraw = (view.length ? view : cache);
-      tbody.innerHTML = dataToDraw.map(x => renderRow(x.id, x.data)).join('');
+    // =========================
+    // FIRESTORE: Seed inicial si está vacío
+    // =========================
+    async function ensureSeedIfEmpty(){
+      const q1 = query(reservasCol, limit(1));
+      const snap = await getDocs(q1);
+      if(snap.size > 0) return;
+
+      const seed = seedData();
+      for(const row of seed){
+        await addDoc(reservasCol, {
+          ...row,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
+        });
+      }
     }
 
-    const qSnap = query(collection(db, 'rows'), orderBy('createdAt','desc'));
-    onSnapshot(qSnap, (snap)=>{
-      cache = [];
-      snap.forEach(d => cache.push({ id: d.id, data: d.data() }));
-      applyFilters();
-    }, (err)=>{ console.error(err); showToast('No se pudo leer Firestore', true); });
+    // =========================
+    // FIRESTORE: realtime listener
+    // =========================
+    async function startRealtime(){
+      try{
+        syncStatus.textContent = "Autenticando…";
+        await signInAnonymously(auth);
 
-    tbody.addEventListener('click', async (e)=>{
-      const btn = e.target.closest('[data-action]'); if(!btn) return;
-      const tr = e.target.closest('tr[data-id]'); if(!tr) return;
-      const id = tr.dataset.id; const action = btn.dataset.action;
+        syncStatus.textContent = "Cargando…";
+        await ensureSeedIfEmpty();
 
-      if(action === 'edit'){ editingRowId = id; draw(); return; }
-      if(action === 'cancel'){ editingRowId = null; draw(); return; }
+        syncStatus.textContent = "En vivo ✅";
 
-      if(action === 'save'){
-        const fields = tr.querySelectorAll('[data-field]');
-        const updated = {};
-        fields.forEach(el => updated[el.dataset.field] = (el.value||'').toString().trim());
-        try{
-          btn.disabled = true;
-          await updateDoc(doc(db,'rows',id), { ...updated, updatedAt: serverTimestamp() });
-          editingRowId = null;
-          showToast('Modificado con éxito');
-        } catch(err){
+        onSnapshot(reservasQuery, (snap) => {
+          data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+          render();
+        }, (err) => {
           console.error(err);
-          showToast(`Error: ${err.message||err}`, true);
-          alert(err.message||err);
-        } finally { btn.disabled = false; }
-        return;
+          syncStatus.textContent = "Error 🔴";
+          alert("Error de sincronización. Revisá reglas de Firestore/credenciales.");
+        });
+
+      }catch(err){
+        console.error(err);
+        syncStatus.textContent = "Error 🔴";
+        alert("No se pudo conectar a Firebase. Revisá firebaseConfig y reglas.");
       }
+    }
 
-      if(action === 'delete'){
-        if(!confirm('¿Seguro que querés eliminar esta fila?')) return;
-        try{
-          btn.disabled = true;
-          await deleteDoc(doc(db,'rows',id));
-          if(editingRowId===id) editingRowId = null;
-          showToast('Eliminado con éxito');
-        } catch(err){
-          console.error(err);
-          showToast(`Error: ${err.message||err}`, true);
-          alert(err.message||err);
-        } finally { btn.disabled = false; }
+    // =========================
+    // EDITAR: updateDoc al salir de celda
+    // =========================
+    tbody.addEventListener("focusout", async (e) => {
+      const td = e.target.closest("td");
+      if(!td || !td.dataset.key) return;
+
+      const idx = Number(td.dataset.idx);
+      const key = td.dataset.key;
+
+      if(!Number.isFinite(idx) || !data[idx]) return;
+      if(key === "cumplido") return;
+
+      const rowId = data[idx].id;
+      const value = td.innerText.trim();
+
+      try{
+        await updateDoc(doc(db, "reservas", rowId), {
+          [key]: value,
+          updatedAt: serverTimestamp()
+        });
+      }catch(err){
+        console.error(err);
+        alert("No se pudo guardar el cambio (Firestore).");
       }
     });
+
+    // Enter: evitar saltos de línea
+    tbody.addEventListener("keydown", (e) => {
+      if(e.key === "Enter"){
+        e.preventDefault();
+        e.target.blur();
+      }
+    });
+
+    // Cumplido: guardar por cambio del select
+    tbody.addEventListener("change", async (e) => {
+      const sel = e.target.closest("select.jd-select");
+      if(!sel) return;
+
+      const idx = Number(sel.dataset.idx);
+      if(!Number.isFinite(idx) || !data[idx]) return;
+
+      const rowId = data[idx].id;
+
+      try{
+        await updateDoc(doc(db, "reservas", rowId), {
+          cumplido: sel.value,
+          updatedAt: serverTimestamp()
+        });
+      }catch(err){
+        console.error(err);
+        alert("No se pudo guardar 'Cumplido'.");
+      }
+    });
+
+    // Duplicar / Eliminar
+    tbody.addEventListener("click", async (e) => {
+      const btn = e.target.closest("button[data-action]");
+      if(!btn) return;
+
+      const action = btn.dataset.action;
+      const idx = Number(btn.dataset.idx);
+      if(!Number.isFinite(idx) || !data[idx]) return;
+
+      const row = data[idx];
+
+      if(action === "del"){
+        if(!confirm("¿Eliminar esta fila?")) return;
+        try{
+          await deleteDoc(doc(db, "reservas", row.id));
+        }catch(err){
+          console.error(err);
+          alert("No se pudo eliminar.");
+        }
+      }
+
+      if(action === "dup"){
+        const copy = structuredClone(row);
+        delete copy.id;
+        delete copy.createdAt;
+        delete copy.updatedAt;
+
+        try{
+          await addDoc(reservasCol, {
+            ...copy,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp()
+          });
+        }catch(err){
+          console.error(err);
+          alert("No se pudo duplicar.");
+        }
+      }
+    });
+
+    // Agregar fila
+    document.getElementById("addRow").addEventListener("click", async () => {
+      const empty = Object.fromEntries(columns.map(c => [c, ""]));
+      empty.cumplido = "SIN REALIZAR";
+      empty.fecha = nowDateStr();
+      empty.horaCarga = nowTimeStr();
+
+      try{
+        await addDoc(reservasCol, {
+          ...empty,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
+        });
+      }catch(err){
+        console.error(err);
+        alert("No se pudo agregar la fila.");
+      }
+    });
+
+    // Vaciar todo (borra todos los docs de la colección en lotes de 500)
+    document.getElementById("clearAll").addEventListener("click", async () => {
+      if(!confirm("¿Seguro que querés vaciar toda la tabla? (se borra para TODOS)")) return;
+
+      try{
+        syncStatus.textContent = "Vaciando…";
+
+        const snap = await getDocs(reservasCol);
+        const docs = snap.docs;
+
+        const CHUNK = 500;
+        for(let i=0; i<docs.length; i+=CHUNK){
+          const batch = writeBatch(db);
+          const chunk = docs.slice(i, i+CHUNK);
+          for(const d of chunk){
+            batch.delete(d.ref);
+          }
+          await batch.commit();
+        }
+
+        syncStatus.textContent = "En vivo ✅";
+      }catch(err){
+        console.error(err);
+        syncStatus.textContent = "Error 🔴";
+        alert("No se pudo vaciar. Revisá reglas/permisos.");
+      }
+    });
+
+    // Filtros UI
+    search.addEventListener("input", render);
+    filterCumplido.addEventListener("change", render);
+
+    /* =========================
+       EXPORTAR XLSX (tu mismo código)
+    ========================== */
+    function parseDateDMY(s){
+      const str = (s ?? "").toString().trim();
+      const m = str.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+      if(!m) return null;
+      const dd = Number(m[1]), mm = Number(m[2]), yyyy = Number(m[3]);
+      const d = new Date(yyyy, mm-1, dd);
+      return Number.isFinite(d.getTime()) ? d : null;
+    }
+
+    function parseTimeHMToExcel(s){
+      const str = (s ?? "").toString().trim();
+      const m = str.match(/^(\d{1,2}):(\d{2})$/);
+      if(!m) return null;
+      const hh = Number(m[1]), mi = Number(m[2]);
+      if(hh < 0 || hh > 23 || mi < 0 || mi > 59) return null;
+      return (hh * 3600 + mi * 60) / 86400;
+    }
+
+    function autoColsFromAOA(aoa){
+      const colCount = Math.max(...aoa.map(r => r.length));
+      const maxLen = new Array(colCount).fill(0);
+
+      for(const row of aoa){
+        for(let c=0; c<colCount; c++){
+          const v = row[c];
+          let len = 0;
+
+          if(v == null) len = 0;
+          else if(v instanceof Date) len = 10;
+          else if(typeof v === "number") len = 5;
+          else len = String(v).length;
+
+          if(len > maxLen[c]) maxLen[c] = len;
+        }
+      }
+
+      return maxLen.map(n => ({
+        wch: Math.min(40, Math.max(10, n + 2))
+      }));
+    }
+
+    document.getElementById("exportXlsx").addEventListener("click", () => {
+      const rows = data.filter(matchesFilters);
+
+      const header = [
+        "Caja","Material","Cantidad pack","Cantid","Descripción","Comentario",
+        "O/C","Carpeta","Pedido Trasla","Sucurs","Fecha","Hora de carga","Cumplido"
+      ];
+
+      const aoa = [
+        header,
+        ...rows.map(r => ([
+          r.caja ?? "",
+          r.material ?? "",
+          r.cantidadPack ?? "",
+          r.cantid ?? "",
+          r.descripcion ?? "",
+          r.comentario ?? "",
+          r.oc ?? "",
+          r.carpeta ?? "",
+          r.pedidoTrasla ?? "",
+          r.sucurs ?? "",
+          parseDateDMY(r.fecha) ?? "",
+          parseTimeHMToExcel(r.horaCarga) ?? "",
+          r.cumplido ?? ""
+        ]))
+      ];
+
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet(aoa, { cellDates: true });
+
+      const range = XLSX.utils.decode_range(ws["!ref"]);
+      for(let R = range.s.r + 1; R <= range.e.r; R++){
+        const dateCellAddr = XLSX.utils.encode_cell({ r:R, c:10 });
+        const timeCellAddr = XLSX.utils.encode_cell({ r:R, c:11 });
+
+        const dc = ws[dateCellAddr];
+        if(dc && dc.v instanceof Date){
+          dc.t = "d";
+          dc.z = "dd/mm/yyyy";
+        }
+
+        const tc = ws[timeCellAddr];
+        if(tc && typeof tc.v === "number"){
+          tc.t = "n";
+          tc.z = "hh:mm";
+        }
+      }
+
+      ws["!freeze"] = { xSplit: 0, ySplit: 1 };
+      ws["!autofilter"] = { ref: ws["!ref"] };
+      ws["!cols"] = autoColsFromAOA(aoa);
+
+      XLSX.utils.book_append_sheet(wb, ws, "Reservas");
+
+      const d = new Date();
+      const fileName = `reservas_importaciones_${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+    });
+
+    // Iniciar realtime
+    startRealtime();
   </script>
 </body>
 </html>
