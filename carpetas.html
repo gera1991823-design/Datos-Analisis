@@ -14,9 +14,9 @@
       --jd-yellow:#ffde00;
 
       --bg:#f6f7fb;
-      --text:#071218; /* texto principal */
-      --title-color:#000; /* títulos en negro */
-      --row-text:#3b4950; /* texto de las filas, más claro que el título */
+      --text:#071218;
+      --title-color:#000;
+      --row-text:#3b4950;
       --muted:#5b646d;
 
       --border:#e6e9ef;
@@ -84,7 +84,6 @@
       background: rgba(255,255,255,0.98);
       padding:8px 12px;border-radius:8px;border:1px solid var(--border);
     }
-
     .cardHeader{border-bottom:1px solid var(--border);padding-bottom:14px;margin-bottom:18px}
 
     .row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
@@ -231,7 +230,6 @@
       box-shadow: 0 6px 12px rgba(54,124,43,.04);
     }
     button.small.primary{box-shadow: 0 10px 18px rgba(54,124,43,.10)}
-
     .actions button{color:#000 !important; font-weight:700}
 
     .row-add{
@@ -266,7 +264,6 @@
       <h3>Filtros</h3>
       <div class="row" style="gap:8px">
         <button id="clearFiltersBtn" class="secondary" type="button">Limpiar filtros</button>
-        <!-- ✅ Export XLSX -->
         <button id="exportXlsxBtn" class="secondary" type="button">Descargar XLSX</button>
       </div>
     </div>
@@ -274,7 +271,13 @@
     <div class="row">
       <div>
         <label>Buscar (cualquier campo)</label>
-        <input id="q" class="w220" placeholder="Ej: 12004566 / AGRO / 88855"/>
+        <input id="q" class="w220" placeholder="Ej: 12004566 / AGRO / 88855 / VACIO"/>
+      </div>
+
+      <!-- ✅ NUEVO: filtro OC -->
+      <div>
+        <label>Orden de compra</label>
+        <input id="fOC" class="w160" placeholder="Ej: 12004566 o VACIO"/>
       </div>
 
       <div>
@@ -288,6 +291,7 @@
         <label>Condiciones</label>
         <select id="fCond">
           <option value="">(Todas)</option>
+          <option value="__EMPTY__">(Vacío)</option>
           <option value="SI">SI</option>
           <option value="NO">NO</option>
         </select>
@@ -297,6 +301,7 @@
         <label>WIS</label>
         <select id="fWis">
           <option value="">(Todas)</option>
+          <option value="__EMPTY__">(Vacío)</option>
           <option value="SI">SI</option>
           <option value="NO">NO</option>
         </select>
@@ -306,8 +311,19 @@
         <label>Cierre de carpeta</label>
         <select id="fCierre">
           <option value="">(Todas)</option>
+          <option value="__EMPTY__">(Vacío)</option>
           <option value="SI">SI</option>
           <option value="NO">NO</option>
+        </select>
+      </div>
+
+      <!-- ✅ NUEVO: modo para buscar fecha vacía -->
+      <div>
+        <label>Fecha estimada UY</label>
+        <select id="fFechaMode">
+          <option value="">(Todas)</option>
+          <option value="CON">Con fecha</option>
+          <option value="VACIO">Vacío</option>
         </select>
       </div>
 
@@ -322,7 +338,7 @@
       </div>
     </div>
 
-    <div class="muted">Los filtros se aplican automáticamente sobre la tabla.</div>
+    <div class="muted">Los filtros se aplican automáticamente sobre la tabla. Escribí <b>VACIO</b> para ver campos sin datos.</div>
   </div>
 
   <!-- FORMULARIO AGREGAR -->
@@ -410,7 +426,7 @@
     <div id="toast" class="toast"></div>
   </div>
 
-  <!-- pickers ocultos para subir desde la tabla -->
+  <!-- pickers ocultos -->
   <input
     id="packingRowPicker"
     type="file"
@@ -532,6 +548,7 @@
     function safeYesNo(v){ return (v === "NO") ? "NO" : "SI"; }
     function uid(){ return (crypto?.randomUUID ? crypto.randomUUID() : `${Date.now()}_${Math.random().toString(16).slice(2)}`); }
     function norm(s){ return (s ?? "").toString().trim().toLowerCase(); }
+    function isEmptyVal(v){ return v == null || String(v).trim() === ""; }
 
     function isExcelFile(file){
       if (!file) return false;
@@ -554,8 +571,17 @@
       $("confirmacion_llegada").value = "NO";
     }
 
+    // ✅ Buscar (cualquier campo) + soporte "VACIO"
     function matchesText(row, q){
       if (!q) return true;
+
+      if (q === "vacio"){
+        const fieldsToCheck = [
+          row.factura, row.division, row.transporte, row.carpeta, row.dua,
+          row.fecha_estimada, row.fecha_deposito, row.oc
+        ];
+        return fieldsToCheck.some(isEmptyVal);
+      }
 
       const atts = (row.attachments || []).map(a => a?.name || "").join(" ");
       const packingName = row.packingAttachment?.name || "";
@@ -570,8 +596,18 @@
       return hay.includes(q);
     }
 
-    function inDateRange(row, from, to){
+    // ✅ Fecha estimada con modo VACIO / CON / rango
+    function inDateRange(row, from, to, mode){
       const d = row.fecha_estimada || "";
+
+      if (mode === "VACIO"){
+        return isEmptyVal(d);
+      }
+      if (mode === "CON"){
+        if (isEmptyVal(d)) return false;
+        if (!from && !to) return true;
+      }
+
       if (!from && !to) return true;
       if (!d) return false;
       if (from && d < from) return false;
@@ -581,21 +617,57 @@
 
     function applyFilters(){
       const q = norm($("q").value);
+
       const fDivision = $("fDivision").value;
       const fCond = $("fCond").value;
       const fWis = $("fWis").value;
       const fCierre = $("fCierre").value;
+
+      const fOC = norm($("fOC").value);
+      const fechaMode = $("fFechaMode").value; // "" | "CON" | "VACIO"
+
       const from = $("fDateFrom").value || "";
       const to = $("fDateTo").value || "";
 
       view = cache.filter(x => {
         const r = x.data;
-        if (fDivision && (r.division || "") !== fDivision) return false;
-        if (fCond && (r.cond || "") !== fCond) return false;
-        if (fWis && (r.wis || "") !== fWis) return false;
-        if (fCierre && (r.cierre || "") !== fCierre) return false;
+
+        if (fDivision){
+          if (fDivision === "__EMPTY__"){
+            if (!isEmptyVal(r.division)) return false;
+          } else {
+            if ((r.division || "") !== fDivision) return false;
+          }
+        }
+
+        if (fCond){
+          if (fCond === "__EMPTY__"){ if (!isEmptyVal(r.cond)) return false; }
+          else { if ((r.cond || "") !== fCond) return false; }
+        }
+
+        if (fWis){
+          if (fWis === "__EMPTY__"){ if (!isEmptyVal(r.wis)) return false; }
+          else { if ((r.wis || "") !== fWis) return false; }
+        }
+
+        if (fCierre){
+          if (fCierre === "__EMPTY__"){ if (!isEmptyVal(r.cierre)) return false; }
+          else { if ((r.cierre || "") !== fCierre) return false; }
+        }
+
         if (!matchesText(r, q)) return false;
-        if (!inDateRange(r, from, to)) return false;
+
+        // ✅ filtro por OC + soporte VACIO
+        if (fOC){
+          if (fOC === "vacio"){
+            if (!isEmptyVal(r.oc)) return false;
+          } else {
+            if (!norm(r.oc).includes(fOC)) return false;
+          }
+        }
+
+        if (!inDateRange(r, from, to, fechaMode)) return false;
+
         return true;
       });
 
@@ -605,12 +677,20 @@
     function rebuildDivisionOptions(){
       const sel = $("fDivision");
       const current = sel.value;
+
       const values = Array.from(new Set(cache.map(x => (x.data.division || "").trim()).filter(Boolean))).sort();
-      sel.innerHTML = `<option value="">(Todas)</option>` + values.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join("");
-      if (values.includes(current)) sel.value = current;
+
+      sel.innerHTML =
+        `<option value="">(Todas)</option>` +
+        `<option value="__EMPTY__">(Vacío)</option>` +
+        values.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join("");
+
+      if (current === "__EMPTY__") sel.value = "__EMPTY__";
+      else if (values.includes(current)) sel.value = current;
+      else sel.value = "";
     }
 
-    ["q","fDivision","fCond","fWis","fCierre","fDateFrom","fDateTo"].forEach(id=>{
+    ["q","fDivision","fCond","fWis","fCierre","fOC","fFechaMode","fDateFrom","fDateTo"].forEach(id=>{
       $(id).addEventListener("input", applyFilters);
       $(id).addEventListener("change", applyFilters);
     });
@@ -621,6 +701,8 @@
       $("fCond").value = "";
       $("fWis").value = "";
       $("fCierre").value = "";
+      $("fOC").value = "";
+      $("fFechaMode").value = "";
       $("fDateFrom").value = "";
       $("fDateTo").value = "";
       applyFilters();
@@ -701,23 +783,18 @@
       `;
     }
 
-    /* ==========================
-       ✅ AUDITORÍA / HISTORIAL
-       Guarda logs en colección: rows_audit
-       ========================== */
+    // ✅ AUDITORÍA
     async function logAudit(action, rowId, beforeData, afterData){
       try{
         const auditId = `${rowId}_${Date.now()}_${uid()}`;
         await setDoc(doc(db, "rows_audit", auditId), {
           rowId,
-          action,                 // "create" | "update" | "delete"
+          action,
           before: beforeData || null,
           after: afterData || null,
           at: serverTimestamp()
-          // si luego usás Auth: userUid, userEmail, etc.
         });
       } catch (e) {
-        // No frenamos la app si falla el log, solo avisamos.
         console.warn("Audit log failed:", e);
       }
     }
@@ -757,8 +834,6 @@
 
       try {
         const docRef = await addDoc(collection(db, "rows"), data);
-
-        // ✅ auditoría CREATE (guardamos "after" sin timestamps de server, pero igual sirve)
         await logAudit("create", docRef.id, null, { ...data, createdAt: null, updatedAt: null });
 
         clearAddForm();
@@ -900,7 +975,60 @@
       showToast("No se pudo leer Firestore", true);
     });
 
-    // subir packing desde fila
+    // ✅ EXPORT XLSX
+    function rowsForExport(){
+      const dataToExport = (view.length ? view : cache);
+
+      return dataToExport.map(x => {
+        const r = x.data;
+        const created = r.createdAt?.toDate ? r.createdAt.toDate() : null;
+
+        const packing = r.packingAttachment?.name || "";
+        const attachments = (r.attachments || []).map(a => a?.name || "").join(" | ");
+
+        return {
+          "ID": x.id,
+          "Fecha carga": created ? formatDateVal(created) : "",
+          "Factura": r.factura || "",
+          "División": r.division || "",
+          "Transporte": r.transporte || "",
+          "Carpeta": r.carpeta || "",
+          "DUA": r.dua || "",
+          "Fecha estimada UY": formatDateVal(r.fecha_estimada || ""),
+          "Orden compra": r.oc || "",
+          "Cierre carpeta": r.cierre || "",
+          "Condiciones": r.cond || "",
+          "WIS": r.wis || "",
+          "Fecha depósito": formatDateVal(r.fecha_deposito || ""),
+          "Confirmación de llegada": r.confirmacion_llegada || "",
+          "Packing (nombre)": packing,
+          "Adjuntos (nombres)": attachments
+        };
+      });
+    }
+
+    function exportXlsx(){
+      const data = rowsForExport();
+      if (!data.length){
+        alert("No hay datos para exportar.");
+        return;
+      }
+
+      const ws = XLSX.utils.json_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Datos");
+
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth()+1).padStart(2,'0');
+      const dd = String(now.getDate()).padStart(2,'0');
+      const filename = `carga_datos_${yyyy}-${mm}-${dd}.xlsx`;
+
+      XLSX.writeFile(wb, filename);
+    }
+    $("exportXlsxBtn").addEventListener("click", exportXlsx);
+
+    // pickers
     $("packingRowPicker").addEventListener("change", async (e) => {
       const f = (e.target.files || [])[0];
       $("packingRowPicker").value = "";
@@ -926,7 +1054,6 @@
         }
         const uploaded = await uploadPacking(rowId, f);
 
-        // ✅ audit BEFORE/AFTER (packing)
         const beforeSnap = await getDoc(doc(db, "rows", rowId));
         const beforeData = beforeSnap.exists() ? beforeSnap.data() : null;
 
@@ -948,7 +1075,6 @@
       }
     });
 
-    // subir adjuntos desde fila
     $("attRowPicker").addEventListener("change", async (e) => {
       const files = Array.from(e.target.files || []);
       $("attRowPicker").value = "";
@@ -966,7 +1092,6 @@
         const uploaded = await uploadAttachments(rowId, files);
         const next = current.concat(uploaded);
 
-        // ✅ audit BEFORE/AFTER (attachments)
         const beforeSnap = await getDoc(doc(db, "rows", rowId));
         const beforeData = beforeSnap.exists() ? beforeSnap.data() : null;
 
@@ -1149,64 +1274,6 @@
         }
       }
     });
-
-    /* ==========================
-       ✅ EXPORT XLSX (lo visible/filtrado)
-       ========================== */
-    function rowsForExport(){
-      const dataToExport = (view.length ? view : cache);
-
-      return dataToExport.map(x => {
-        const r = x.data;
-        const created = r.createdAt?.toDate ? r.createdAt.toDate() : null;
-
-        const packing = r.packingAttachment?.name || "";
-        const attachments = (r.attachments || []).map(a => a?.name || "").join(" | ");
-
-        return {
-          "ID": x.id,
-          "Fecha carga": created ? formatDateVal(created) : "",
-          "Factura": r.factura || "",
-          "División": r.division || "",
-          "Transporte": r.transporte || "",
-          "Carpeta": r.carpeta || "",
-          "DUA": r.dua || "",
-          "Fecha estimada UY": formatDateVal(r.fecha_estimada || ""),
-          "Orden compra": r.oc || "",
-          "Cierre carpeta": r.cierre || "",
-          "Condiciones": r.cond || "",
-          "WIS": r.wis || "",
-          "Fecha depósito": formatDateVal(r.fecha_deposito || ""),
-          "Confirmación de llegada": r.confirmacion_llegada || "",
-          "Packing (nombre)": packing,
-          "Adjuntos (nombres)": attachments
-        };
-      });
-    }
-
-    function exportXlsx(){
-      const data = rowsForExport();
-      if (!data.length){
-        alert("No hay datos para exportar.");
-        return;
-      }
-
-      const ws = XLSX.utils.json_to_sheet(data);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Datos");
-
-      const now = new Date();
-      const yyyy = now.getFullYear();
-      const mm = String(now.getMonth()+1).padStart(2,'0');
-      const dd = String(now.getDate()).padStart(2,'0');
-      const filename = `carga_datos_${yyyy}-${mm}-${dd}.xlsx`;
-
-      XLSX.writeFile(wb, filename);
-    }
-
-    $("exportXlsxBtn").addEventListener("click", exportXlsx);
   </script>
 </body>
 </html>
-
-
