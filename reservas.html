@@ -8,7 +8,7 @@
   <!-- XLSX (SheetJS) para exportar a Excel -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
-  <!-- ✅ ESTILO CLARO (el del "Reclamos") aplicado a Reservas -->
+  <!-- ✅ ESTILO CLARO (igual al de Reclamos) -->
   <style>
     :root{
       /* Interagrovial / John Deere-ish accents */
@@ -80,15 +80,6 @@
       color:var(--muted);
       font-size:13px;
       line-height:1.2;
-    }
-    .subpill{
-      font-size:12px;
-      border:1px solid rgba(54,124,43,.22);
-      border-radius:999px;
-      padding:6px 12px;
-      color:var(--muted);
-      background:rgba(255,255,255,.65);
-      white-space:nowrap;
     }
 
     /* Cards */
@@ -322,7 +313,7 @@
 <body>
   <div class="wrap">
 
-    <!-- ✅ HEADER estilo "Reclamos" -->
+    <!-- ✅ Header visual como Reclamos -->
     <div class="topbar">
       <div class="titleRow">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
@@ -388,14 +379,11 @@
 
       <div class="footer">
         <div>Tip: click en una celda para editar. Enter confirma. Cambios se sincronizan para todas las PCs.</div>
-        <div>Back-end: <code>Firebase Firestore</code></div>
+        <div>Back-end: <code>Firebase Firestore</code> · (se quitó <code>localStorage</code>)</div>
       </div>
     </div>
   </div>
 
-  <!-- IMPORTANTE:
-       Este script usa "type=module" (Firebase v9+). No lo abras con file://
-       Abrilo desde un servidor/hosting (GitHub Pages sirve). -->
   <script type="module">
     // =========================
     // FIREBASE (Firestore realtime + Auth anónimo)
@@ -418,7 +406,6 @@
       limit
     } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
-    // ==== TU firebaseConfig (tal cual lo pasaste) ====
     const firebaseConfig = {
       apiKey: "AIzaSyA0xgTpM2NjDoyBD5Eo5F2FN-Dxy6UgI9Y",
       authDomain: "reservas-importaciones.firebaseapp.com",
@@ -433,9 +420,6 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // =========================
-    // TU APP (misma lógica)
-    // =========================
     const columns = [
       "caja","material","cantidadPack","cantid","descripcion","comentario",
       "oc","carpeta","pedidoTrasla","sucurs","fecha","horaCarga","cumplido"
@@ -477,10 +461,8 @@
       }];
     }
 
-    // Datos en memoria (la fuente real es Firestore)
     let data = [];
 
-    // Colección donde se guardan filas
     const reservasCol = collection(db, "reservas");
     const reservasQuery = query(reservasCol, orderBy("createdAt", "desc"));
 
@@ -555,9 +537,6 @@
       }
     }
 
-    // =========================
-    // FIRESTORE: Seed inicial si está vacío
-    // =========================
     async function ensureSeedIfEmpty(){
       const q1 = query(reservasCol, limit(1));
       const snap = await getDocs(q1);
@@ -573,9 +552,6 @@
       }
     }
 
-    // =========================
-    // FIRESTORE: realtime listener
-    // =========================
     async function startRealtime(){
       try{
         syncStatus.textContent = "Autenticando…";
@@ -602,9 +578,6 @@
       }
     }
 
-    // =========================
-    // EDITAR: updateDoc al salir de celda
-    // =========================
     tbody.addEventListener("focusout", async (e) => {
       const td = e.target.closest("td");
       if(!td || !td.dataset.key) return;
@@ -629,7 +602,6 @@
       }
     });
 
-    // Enter: evitar saltos de línea
     tbody.addEventListener("keydown", (e) => {
       if(e.key === "Enter"){
         e.preventDefault();
@@ -637,7 +609,6 @@
       }
     });
 
-    // Cumplido: guardar por cambio del select
     tbody.addEventListener("change", async (e) => {
       const sel = e.target.closest("select.jd-select");
       if(!sel) return;
@@ -658,7 +629,6 @@
       }
     });
 
-    // Duplicar / Eliminar
     tbody.addEventListener("click", async (e) => {
       const btn = e.target.closest("button[data-action]");
       if(!btn) return;
@@ -698,7 +668,6 @@
       }
     });
 
-    // Agregar fila
     document.getElementById("addRow").addEventListener("click", async () => {
       const empty = Object.fromEntries(columns.map(c => [c, ""]));
       empty.cumplido = "SIN REALIZAR";
@@ -717,7 +686,6 @@
       }
     });
 
-    // Vaciar todo (borra todos los docs de la colección en lotes de 500)
     document.getElementById("clearAll").addEventListener("click", async () => {
       if(!confirm("¿Seguro que querés vaciar toda la tabla? (se borra para TODOS)")) return;
 
@@ -745,13 +713,9 @@
       }
     });
 
-    // Filtros UI
     search.addEventListener("input", render);
     filterCumplido.addEventListener("change", render);
 
-    /* =========================
-       EXPORTAR XLSX (tu mismo código)
-    ========================== */
     function parseDateDMY(s){
       const str = (s ?? "").toString().trim();
       const m = str.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
@@ -848,11 +812,10 @@
       XLSX.utils.book_append_sheet(wb, ws, "Reservas");
 
       const d = new Date();
-      const fileName = `reservas_importaciones_${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}.xlsx`;
+      const fileName = `reservas_importaciones_${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}.xlsx`;
       XLSX.writeFile(wb, fileName);
     });
 
-    // Iniciar realtime
     startRealtime();
   </script>
 </body>
