@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Carga de datos - Interagrovial</title>
 
+  <!-- ✅ XLSX (SheetJS) para exportar a Excel -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
   <style>
     :root{
       --jd-green:#367c2b;
@@ -67,9 +70,7 @@
       margin-bottom: 14px;
       overflow:hidden;
     }
-    .accentBar{
-      display:none; /* oculto: usuario pidió sin la barra amarillo/verde */
-    }
+    .accentBar{display:none;}
     .cardHeader{
       display:flex;align-items:center;justify-content:space-between;
       gap:10px;flex-wrap:wrap;margin-bottom:10px;
@@ -139,7 +140,7 @@
     table{
       width:100%;
       border-collapse:separate;
-      border-spacing:0 14px; /* separacion vertical entre filas */
+      border-spacing:0 14px;
       background: transparent;
       border:1px solid var(--border);
       border-radius: var(--radius);
@@ -152,7 +153,6 @@
       text-align:center;
     }
     th,td{
-      /* td sin padding: lo maneja .cellInner */
       border-bottom: none;
       padding:0;font-size:14px;vertical-align:middle;
       white-space:nowrap;text-align:center;color:var(--text);
@@ -160,34 +160,31 @@
       background-clip: padding-box;
     }
 
-    /* Contenedor interno por celda que pinta el fondo y paddings */
     .cellInner{
       display:flex;align-items:center;justify-content:center;
       padding:14px 10px;border-radius:10px;min-height:48px;
       width:100%;box-sizing:border-box;
-      font-weight:600; /* filas menos pesadas que el título */
+      font-weight:600;
       color: var(--row-text);
       border:1px solid rgba(15,23,32,.04);
       box-shadow: 0 10px 18px rgba(15,23,32,.06);
     }
-    /* fondos más oscuros para distinguir claramente cada fila */
     tbody tr:nth-child(odd) .cellInner{background: #e3eaee}
     tbody tr:nth-child(even) .cellInner{background: #d3dde2}
     tbody tr:hover .cellInner{background: rgba(54,124,43,.12)}
     .cellInner .cell-input{width:100%;box-sizing:border-box;background:transparent;border:none;padding:0;}
+
     th{
       font-size:13px;letter-spacing:.06em;text-transform:uppercase;
       color:var(--muted);position:relative;padding:12px 8px;
     }
-    th::after{display:none} /* quitar la línea amarilla/verde debajo de los encabezados */
+    th::after{display:none}
+
     tbody tr:nth-child(odd){background: #f3f6f8}
     tbody tr:nth-child(even){background: #e9eef2}
     tbody tr{transition: background .12s ease}
     tbody tr:hover{background: rgba(54,124,43,.09)}
-
-    /* reforzar separacion: sombra sutil por fila */
     tbody tr{box-shadow: 0 8px 20px rgba(15,23,32,.06);border-radius:10px}
-    /* asegurar que las celdas no pinten sobre el fondo del <tr> */
     tbody tr td{background:transparent}
 
     .actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
@@ -216,7 +213,6 @@
     }
     .footer b{color:var(--jd-green)}
 
-    /* Adjuntos UI */
     .attLinks{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center}
     a{color:var(--jd-green);font-weight:700}
     .pillX{
@@ -228,7 +224,6 @@
       cursor:pointer;
     }
 
-    /* Botones pequeños: hacerlos más visibles sobre fondo claro */
     button.small.secondary{
       border-color: rgba(54,124,43,.55);
       color: var(--jd-green);
@@ -237,13 +232,11 @@
     }
     button.small.primary{box-shadow: 0 10px 18px rgba(54,124,43,.10)}
 
-    /* Acciones: texto negro para mejorar legibilidad */
     .actions button{color:#000 !important; font-weight:700}
 
-    /* ✅ FIX SUPERPOSICIÓN: el formulario ahora WRAPEA */
     .row-add{
       display:flex;
-      flex-wrap: wrap;   /* ← antes estaba nowrap, eso causaba superposición */
+      flex-wrap: wrap;
       gap:10px;
       align-items:flex-end;
     }
@@ -253,9 +246,8 @@
     .row-add .w140{min-width:120px}
     .row-add input[type="date"]{min-width:140px}
 
-    /* cuando el ancho es chico, no dejamos nada "apretado" */
     @media (max-width: 1200px){
-      .row-add > div{flex: 1 1 210px;}   /* cada campo ocupa su bloque y baja */
+      .row-add > div{flex: 1 1 210px;}
       .row-add button#addBtn{flex: 0 0 auto;}
     }
   </style>
@@ -274,6 +266,8 @@
       <h3>Filtros</h3>
       <div class="row" style="gap:8px">
         <button id="clearFiltersBtn" class="secondary" type="button">Limpiar filtros</button>
+        <!-- ✅ Export XLSX -->
+        <button id="exportXlsxBtn" class="secondary" type="button">Descargar XLSX</button>
       </div>
     </div>
 
@@ -331,7 +325,7 @@
     <div class="muted">Los filtros se aplican automáticamente sobre la tabla.</div>
   </div>
 
-  <!-- FORMULARIO AGREGAR (SIN EXCEL/ADJUNTOS) -->
+  <!-- FORMULARIO AGREGAR -->
   <div class="card">
     <div class="accentBar"></div>
     <h3>Agregar fila</h3>
@@ -450,9 +444,7 @@
         <th>Fecha depósito</th>
         <th>Confirmación de llegada</th>
 
-        <!-- ✅ RENOMBRADO -->
         <th>Packing</th>
-
         <th>Adjuntos</th>
         <th>Acciones</th>
       </tr>
@@ -466,7 +458,8 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
     import {
       getFirestore, collection, addDoc, doc, updateDoc, deleteDoc,
-      serverTimestamp, query, orderBy, onSnapshot
+      serverTimestamp, query, orderBy, onSnapshot,
+      getDoc, setDoc
     } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
     import {
       getStorage, ref as sRef, uploadBytesResumable, getDownloadURL, deleteObject
@@ -521,7 +514,6 @@
         const yyyy = v.getFullYear();
         return `${dd}/${mm}/${yyyy}`;
       }
-      // ISO yyyy-mm-dd
       const m = String(v).match(/^(\d{4})-(\d{2})-(\d{2})/);
       if (m) return `${m[3]}/${m[2]}/${m[1]}`;
       const d = new Date(v);
@@ -539,7 +531,6 @@
 
     function safeYesNo(v){ return (v === "NO") ? "NO" : "SI"; }
     function uid(){ return (crypto?.randomUUID ? crypto.randomUUID() : `${Date.now()}_${Math.random().toString(16).slice(2)}`); }
-
     function norm(s){ return (s ?? "").toString().trim().toLowerCase(); }
 
     function isExcelFile(file){
@@ -710,6 +701,27 @@
       `;
     }
 
+    /* ==========================
+       ✅ AUDITORÍA / HISTORIAL
+       Guarda logs en colección: rows_audit
+       ========================== */
+    async function logAudit(action, rowId, beforeData, afterData){
+      try{
+        const auditId = `${rowId}_${Date.now()}_${uid()}`;
+        await setDoc(doc(db, "rows_audit", auditId), {
+          rowId,
+          action,                 // "create" | "update" | "delete"
+          before: beforeData || null,
+          after: afterData || null,
+          at: serverTimestamp()
+          // si luego usás Auth: userUid, userEmail, etc.
+        });
+      } catch (e) {
+        // No frenamos la app si falla el log, solo avisamos.
+        console.warn("Audit log failed:", e);
+      }
+    }
+
     addBtn.addEventListener("click", async () => {
       const data = {
         factura: $("factura").value.trim(),
@@ -726,7 +738,6 @@
         wis: safeYesNo($("wis").value),
         confirmacion_llegada: safeYesNo($("confirmacion_llegada").value),
 
-        // ✅ ahora se gestiona desde la tabla
         packingAttachment: null,
         attachments: [],
 
@@ -745,7 +756,11 @@
       msgEl.textContent = "Guardando...";
 
       try {
-        await addDoc(collection(db, "rows"), data);
+        const docRef = await addDoc(collection(db, "rows"), data);
+
+        // ✅ auditoría CREATE (guardamos "after" sin timestamps de server, pero igual sirve)
+        await logAudit("create", docRef.id, null, { ...data, createdAt: null, updatedAt: null });
+
         clearAddForm();
         showToast("Agregado con éxito");
       } catch (e) {
@@ -910,7 +925,19 @@
           await deleteObject(sRef(storage, prev.path));
         }
         const uploaded = await uploadPacking(rowId, f);
+
+        // ✅ audit BEFORE/AFTER (packing)
+        const beforeSnap = await getDoc(doc(db, "rows", rowId));
+        const beforeData = beforeSnap.exists() ? beforeSnap.data() : null;
+
         await updateDoc(doc(db, "rows", rowId), { packingAttachment: uploaded, updatedAt: serverTimestamp() });
+
+        await logAudit("update", rowId, beforeData, {
+          ...(beforeData || {}),
+          packingAttachment: uploaded,
+          updatedAt: null
+        });
+
         showToast("Packing actualizado");
       } catch(err){
         console.error(err);
@@ -938,7 +965,19 @@
         msgEl.textContent = "Subiendo adjuntos...";
         const uploaded = await uploadAttachments(rowId, files);
         const next = current.concat(uploaded);
+
+        // ✅ audit BEFORE/AFTER (attachments)
+        const beforeSnap = await getDoc(doc(db, "rows", rowId));
+        const beforeData = beforeSnap.exists() ? beforeSnap.data() : null;
+
         await updateDoc(doc(db, "rows", rowId), { attachments: next, updatedAt: serverTimestamp() });
+
+        await logAudit("update", rowId, beforeData, {
+          ...(beforeData || {}),
+          attachments: next,
+          updatedAt: null
+        });
+
         showToast("Adjuntos actualizados");
       } catch(err){
         console.error(err);
@@ -981,8 +1020,19 @@
         if (!confirm(`¿Borrar packing "${p.name}"?`)) return;
         try{
           btn.disabled = true;
+
+          const beforeSnap = await getDoc(doc(db, "rows", id));
+          const beforeData = beforeSnap.exists() ? beforeSnap.data() : null;
+
           await deleteObject(sRef(storage, p.path));
           await updateDoc(doc(db, "rows", id), { packingAttachment: null, updatedAt: serverTimestamp() });
+
+          await logAudit("update", id, beforeData, {
+            ...(beforeData || {}),
+            packingAttachment: null,
+            updatedAt: null
+          });
+
           showToast("Packing borrado");
         } catch(err){
           console.error(err);
@@ -1005,9 +1055,20 @@
 
         try{
           btn.disabled = true;
+
+          const beforeSnap = await getDoc(doc(db, "rows", id));
+          const beforeData = beforeSnap.exists() ? beforeSnap.data() : null;
+
           await deleteObject(sRef(storage, att.path));
           const next = atts.filter((_, i) => i !== idx);
           await updateDoc(doc(db, "rows", id), { attachments: next, updatedAt: serverTimestamp() });
+
+          await logAudit("update", id, beforeData, {
+            ...(beforeData || {}),
+            attachments: next,
+            updatedAt: null
+          });
+
           showToast("Adjunto borrado");
         } catch(err){
           console.error(err);
@@ -1031,7 +1092,18 @@
 
         try {
           btn.disabled = true;
+
+          const beforeSnap = await getDoc(doc(db, "rows", id));
+          const beforeData = beforeSnap.exists() ? beforeSnap.data() : null;
+
           await updateDoc(doc(db, "rows", id), { ...updated, updatedAt: serverTimestamp() });
+
+          await logAudit("update", id, beforeData, {
+            ...(beforeData || {}),
+            ...updated,
+            updatedAt: null
+          });
+
           editingRowId = null;
           showToast("Modificado con éxito");
         } catch (err) {
@@ -1054,13 +1126,18 @@
         try{
           btn.disabled = true;
 
+          const beforeSnap = await getDoc(doc(db, "rows", id));
+          const beforeData = beforeSnap.exists() ? beforeSnap.data() : null;
+
           for (const a of atts) {
             if (a?.path) await deleteObject(sRef(storage, a.path));
           }
-
           if (p?.path) await deleteObject(sRef(storage, p.path));
 
           await deleteDoc(doc(db, "rows", id));
+
+          await logAudit("delete", id, beforeData, null);
+
           if (editingRowId === id) editingRowId = null;
           showToast("Eliminado con éxito");
         } catch(err){
@@ -1072,6 +1149,64 @@
         }
       }
     });
+
+    /* ==========================
+       ✅ EXPORT XLSX (lo visible/filtrado)
+       ========================== */
+    function rowsForExport(){
+      const dataToExport = (view.length ? view : cache);
+
+      return dataToExport.map(x => {
+        const r = x.data;
+        const created = r.createdAt?.toDate ? r.createdAt.toDate() : null;
+
+        const packing = r.packingAttachment?.name || "";
+        const attachments = (r.attachments || []).map(a => a?.name || "").join(" | ");
+
+        return {
+          "ID": x.id,
+          "Fecha carga": created ? formatDateVal(created) : "",
+          "Factura": r.factura || "",
+          "División": r.division || "",
+          "Transporte": r.transporte || "",
+          "Carpeta": r.carpeta || "",
+          "DUA": r.dua || "",
+          "Fecha estimada UY": formatDateVal(r.fecha_estimada || ""),
+          "Orden compra": r.oc || "",
+          "Cierre carpeta": r.cierre || "",
+          "Condiciones": r.cond || "",
+          "WIS": r.wis || "",
+          "Fecha depósito": formatDateVal(r.fecha_deposito || ""),
+          "Confirmación de llegada": r.confirmacion_llegada || "",
+          "Packing (nombre)": packing,
+          "Adjuntos (nombres)": attachments
+        };
+      });
+    }
+
+    function exportXlsx(){
+      const data = rowsForExport();
+      if (!data.length){
+        alert("No hay datos para exportar.");
+        return;
+      }
+
+      const ws = XLSX.utils.json_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Datos");
+
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth()+1).padStart(2,'0');
+      const dd = String(now.getDate()).padStart(2,'0');
+      const filename = `carga_datos_${yyyy}-${mm}-${dd}.xlsx`;
+
+      XLSX.writeFile(wb, filename);
+    }
+
+    $("exportXlsxBtn").addEventListener("click", exportXlsx);
   </script>
 </body>
 </html>
+
+
