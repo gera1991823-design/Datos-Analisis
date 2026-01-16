@@ -420,6 +420,12 @@
     .notifItem.unread{
       background: rgba(54,124,43,.06);
     }
+
+    /* ✅ Resaltado al ir a una fila desde notificaciones */
+    tr.rowHighlight .cellInner{
+      border: 2px solid var(--jd-yellow) !important;
+      box-shadow: 0 0 0 4px rgba(255,222,0,.35), 0 14px 22px rgba(15,23,32,.12) !important;
+    }
   </style>
 </head>
 
@@ -715,13 +721,6 @@
     const toastEl = $("toast");
     const addBtn = $("addBtn");
 
-    let editingRowId = null;
-    let cache = [];
-    let view = [];
-
-    let pendingPackingRowId = null;
-    let pendingAttRowId = null;
-
     // ✅ John Deere logo
     const JD_LOGO_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/John_Deere_logo.svg/320px-John_Deere_logo.svg.png";
 
@@ -734,7 +733,6 @@
     const arrivalLine3 = $("arrivalLine3");
     const arrivalCloseBtn = $("arrivalCloseBtn");
     const arrivalOkBtn = $("arrivalOkBtn");
-
     arrivalLogo.src = JD_LOGO_URL;
 
     // ✅ Centro de notificaciones UI
@@ -744,6 +742,13 @@
     const notifList = $("notifList");
     const notifCloseBtn = $("notifCloseBtn");
     const notifMarkReadBtn = $("notifMarkReadBtn");
+
+    let editingRowId = null;
+    let cache = [];
+    let view = [];
+
+    let pendingPackingRowId = null;
+    let pendingAttRowId = null;
 
     function showToast(text, isError=false){
       toastEl.textContent = text;
@@ -895,7 +900,7 @@
     });
 
     // =========================
-    // ✅ NOTIFICACIONES en Firestore
+    // ✅ NOTIFICACIONES en Firestore (campana)
     // Colección: notifications
     // =========================
     function fmtTS(ts){
@@ -907,7 +912,6 @@
     }
 
     async function createNotificationForArrival(rowId, rowData){
-      // Notificación global para que cualquier PC la vea
       try{
         const payload = {
           type: "ARRIBO",
@@ -940,7 +944,7 @@
       if (!wrap) notifPanel.style.display = "none";
     });
 
-    // Render notificaciones
+    // Cache + render
     let notificationsCache = []; // {id,data}
     function renderNotif(){
       const unread = notificationsCache.filter(n => n.data.read !== true).length;
@@ -968,6 +972,12 @@
               <div class="t">${escapeHtml(d.title || "Notificación")}</div>
               <div class="d"><b>${escapeHtml(detail)}</b></div>
               <div class="meta">${escapeHtml(meta)}</div>
+
+              <div style="margin-top:8px; display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap;">
+                <button class="small secondary" type="button" data-action="viewRow" data-rowid="${escapeHtml(d.rowId || "")}">
+                  Ver fila
+                </button>
+              </div>
             </div>
           </div>
         `;
@@ -1002,9 +1012,49 @@
       }
     });
 
-    // =========================
-    // ✅ Buscar + filtros (tu código)
-    // =========================
+    // ✅ Limpiar filtros + ir a la fila + resaltar
+    function clearAllFilters(){
+      $("q").value = "";
+      $("fDivision").value = "";
+      $("fCond").value = "";
+      $("fWis").value = "";
+      $("fCierre").value = "";
+      $("fOC").value = "";
+      $("fFechaMode").value = "";
+      $("fDateFrom").value = "";
+      $("fDateTo").value = "";
+      applyFilters();
+    }
+
+    function highlightAndScrollToRow(rowId){
+      clearAllFilters();
+
+      setTimeout(() => {
+        const rowEl = document.querySelector(`tr[data-id="${CSS.escape(rowId)}"]`);
+        if (!rowEl){
+          showToast("No se encontró la fila en pantalla (puede estar filtrada).", true);
+          return;
+        }
+        rowEl.scrollIntoView({ behavior: "smooth", block: "center" });
+        rowEl.classList.add("rowHighlight");
+        setTimeout(() => rowEl.classList.remove("rowHighlight"), 7000);
+      }, 60);
+    }
+
+    // Delegación de eventos: botón "Ver fila"
+    notifList.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-action]");
+      if (!btn) return;
+      if (btn.dataset.action !== "viewRow") return;
+
+      const rowId = btn.dataset.rowid || "";
+      if (!rowId) return;
+
+      notifPanel.style.display = "none";
+      highlightAndScrollToRow(rowId);
+    });
+
+    // ✅ Buscar (cualquier campo) + soporte "VACIO"
     function matchesText(row, q){
       if (!q) return true;
 
@@ -1029,6 +1079,7 @@
       return hay.includes(q);
     }
 
+    // ✅ Fecha estimada con modo VACIO / CON / rango
     function inDateRange(row, from, to, mode){
       const d = row.fecha_estimada || "";
 
@@ -1056,7 +1107,7 @@
       const fCierre = $("fCierre").value;
 
       const fOC = norm($("fOC").value);
-      const fechaMode = $("fFechaMode").value;
+      const fechaMode = $("fFechaMode").value; // "" | "CON" | "VACIO"
 
       const from = $("fDateFrom").value || "";
       const to = $("fDateTo").value || "";
@@ -1089,6 +1140,7 @@
 
         if (!matchesText(r, q)) return false;
 
+        // ✅ filtro por OC + soporte VACIO
         if (fOC){
           if (fOC === "vacio"){
             if (!isEmptyVal(r.oc)) return false;
@@ -1127,21 +1179,9 @@
     });
 
     $("clearFiltersBtn").addEventListener("click", ()=>{
-      $("q").value = "";
-      $("fDivision").value = "";
-      $("fCond").value = "";
-      $("fWis").value = "";
-      $("fCierre").value = "";
-      $("fOC").value = "";
-      $("fFechaMode").value = "";
-      $("fDateFrom").value = "";
-      $("fDateTo").value = "";
-      applyFilters();
+      clearAllFilters();
     });
 
-    // =========================
-    // ✅ Storage uploads
-    // =========================
     async function uploadFileTo(path, file, progressLabel){
       const ref = sRef(storage, path);
       const task = uploadBytesResumable(ref, file);
@@ -1217,7 +1257,7 @@
       `;
     }
 
-    // ✅ Auditoría
+    // ✅ AUDITORÍA
     async function logAudit(action, rowId, beforeData, afterData){
       try{
         const auditId = `${rowId}_${Date.now()}_${uid()}`;
@@ -1233,9 +1273,7 @@
       }
     }
 
-    // =========================
     // ✅ Agregar fila
-    // =========================
     addBtn.addEventListener("click", async () => {
       const data = {
         factura: $("factura").value.trim(),
@@ -1273,12 +1311,13 @@
         const docRef = await addDoc(collection(db, "rows"), data);
         await logAudit("create", docRef.id, null, { ...data, createdAt: null, updatedAt: null });
 
-        // ✅ Si se crea ya con SI, también notifico global + windows
-        if (data.confirmacion_llegada === "SI") {
+        // ✅ Si se crea ya con SI, también notifica
+        if ((data.confirmacion_llegada || "NO").toUpperCase() === "SI"){
           await createNotificationForArrival(docRef.id, data);
           beep();
-          browserNotifyArribo(data);
+          await browserNotifyArribo(data);
           if (!document.hidden) showArrivalNotice(data);
+          else { startTitleBlink(); showToast("🚜 ARRIBO/LLEGADA confirmada (ver pestaña)", false); }
         }
 
         clearAddForm();
@@ -1293,9 +1332,6 @@
       }
     });
 
-    // =========================
-    // ✅ Render tabla
-    // =========================
     function renderRow(id, r) {
       const dt = r.createdAt?.toDate ? r.createdAt.toDate() : null;
       const dtTxt = dt ? formatDateVal(dt) : "";
@@ -1303,36 +1339,36 @@
 
       if (!isEditing) {
         return `
-            <tr data-id="${id}">
-              <td><div class="cellInner">${escapeHtml(dtTxt)}</div></td>
-              <td><div class="cellInner">${escapeHtml(r.factura)}</div></td>
-              <td><div class="cellInner">${escapeHtml(r.division)}</div></td>
-              <td><div class="cellInner">${escapeHtml(r.transporte)}</div></td>
-              <td><div class="cellInner">${escapeHtml(r.carpeta)}</div></td>
-              <td><div class="cellInner">${escapeHtml(r.dua)}</div></td>
-              <td><div class="cellInner">${escapeHtml(formatDateVal(r.fecha_estimada))}</div></td>
-              <td><div class="cellInner">${escapeHtml(r.oc)}</div></td>
+          <tr data-id="${id}">
+            <td><div class="cellInner">${escapeHtml(dtTxt)}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.factura)}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.division)}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.transporte)}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.carpeta)}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.dua)}</div></td>
+            <td><div class="cellInner">${escapeHtml(formatDateVal(r.fecha_estimada))}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.oc)}</div></td>
 
-              <td><div class="cellInner">${escapeHtml(r.cierre)}</div></td>
-              <td><div class="cellInner">${escapeHtml(r.cond)}</div></td>
-              <td><div class="cellInner">${escapeHtml(r.wis)}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.cierre)}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.cond)}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.wis)}</div></td>
 
-              <td><div class="cellInner">${escapeHtml(formatDateVal(r.fecha_deposito))}</div></td>
-              <td><div class="cellInner">${escapeHtml(r.confirmacion_llegada)}</div></td>
+            <td><div class="cellInner">${escapeHtml(formatDateVal(r.fecha_deposito))}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.confirmacion_llegada)}</div></td>
 
-              <td><div class="cellInner">${renderPackingCell(id, r)}</div></td>
-              <td><div class="cellInner">${renderAttachmentsCell(id, r)}</div></td>
+            <td><div class="cellInner">${renderPackingCell(id, r)}</div></td>
+            <td><div class="cellInner">${renderAttachmentsCell(id, r)}</div></td>
 
-              <td>
-                <div class="cellInner">
-                  <div class="actions">
-                    <button class="small secondary" data-action="edit">Editar</button>
-                    <button class="small danger" data-action="delete">Eliminar</button>
-                  </div>
+            <td>
+              <div class="cellInner">
+                <div class="actions">
+                  <button class="small secondary" data-action="edit">Editar</button>
+                  <button class="small danger" data-action="delete">Eliminar</button>
                 </div>
-              </td>
-            </tr>
-          `;
+              </div>
+            </td>
+          </tr>
+        `;
       }
 
       const factura = escapeHtml(r.factura || "");
@@ -1412,9 +1448,6 @@
       tbody.innerHTML = dataToDraw.map(x => renderRow(x.id, x.data)).join("");
     }
 
-    // =========================
-    // ✅ Snapshot rows
-    // =========================
     const qSnap = query(collection(db, "rows"), orderBy("createdAt", "desc"));
     onSnapshot(qSnap, (snap) => {
       cache = [];
@@ -1426,9 +1459,7 @@
       showToast("No se pudo leer Firestore", true);
     });
 
-    // =========================
     // ✅ EXPORT XLSX
-    // =========================
     function rowsForExport(){
       const dataToExport = (view.length ? view : cache);
 
@@ -1481,9 +1512,7 @@
     }
     $("exportXlsxBtn").addEventListener("click", exportXlsx);
 
-    // =========================
-    // ✅ Pickers: packing + attachments
-    // =========================
+    // pickers
     $("packingRowPicker").addEventListener("change", async (e) => {
       const f = (e.target.files || [])[0];
       $("packingRowPicker").value = "";
@@ -1568,9 +1597,6 @@
       }
     });
 
-    // =========================
-    // ✅ Click acciones en tabla
-    // =========================
     tbody.addEventListener("click", async (e) => {
       const btn = e.target.closest("[data-action]");
       if (!btn) return;
@@ -1676,7 +1702,6 @@
         try {
           btn.disabled = true;
 
-          // ✅ leemos antes para detectar cambio NO -> SI
           const beforeSnap = await getDoc(doc(db, "rows", id));
           const beforeData = beforeSnap.exists() ? beforeSnap.data() : null;
           const beforeVal = (beforeData?.confirmacion_llegada || "NO").toString().trim().toUpperCase();
@@ -1692,13 +1717,14 @@
 
           // ✅ Si cambió de NO->SI: crear notificación global + windows + aviso grande
           if (beforeVal !== "SI" && afterVal === "SI") {
-            await createNotificationForArrival(id, { ...(beforeData || {}), ...updated });
+            const merged = { ...(beforeData || {}), ...updated };
+            await createNotificationForArrival(id, merged);
 
             beep();
-            browserNotifyArribo({ ...(beforeData || {}), ...updated });
+            await browserNotifyArribo(merged);
 
             if (!document.hidden) {
-              showArrivalNotice({ ...(beforeData || {}), ...updated });
+              showArrivalNotice(merged);
             } else {
               startTitleBlink();
               showToast("🚜 ARRIBO/LLEGADA confirmada (ver pestaña)", false);
