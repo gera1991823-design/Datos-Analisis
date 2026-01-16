@@ -133,8 +133,8 @@
     button[disabled]{opacity:.6;cursor:not-allowed;transform:none}
 
     .muted{color:var(--muted);font-size:12px;margin-top:8px}
-    .toast{margin-top:10px;font-size:13px;color:#9cf08a;display:none;font-weight:900}
-    .toast.err{color:#ff8b97}
+    .toast{margin-top:10px;font-size:13px;color:#2f7e2c;display:none;font-weight:900}
+    .toast.err{color:#ff2d2d}
 
     table{
       width:100%;
@@ -249,9 +249,9 @@
       .row-add button#addBtn{flex: 0 0 auto;}
     }
 
-    /* ============================================================
-      ✅ AVISO GRANDE ARRIBO / LLEGADA (NUEVO)
-    ============================================================ */
+    /* =========================
+       ✅ AVISO GRANDE ARRIBO
+    ========================= */
     .arrivalNotice{
       position: fixed;
       top: 16px;
@@ -266,12 +266,10 @@
       overflow: hidden;
       animation: popIn .18s ease-out;
     }
-
     @keyframes popIn{
       from{ transform: translateY(-6px); opacity: .7; }
       to{ transform: translateY(0px); opacity: 1; }
     }
-
     .arrivalHeader{
       display:flex;
       align-items:center;
@@ -283,7 +281,6 @@
       letter-spacing:.04em;
       text-transform:uppercase;
     }
-
     .arrivalHeader img{
       width:36px;height:36px;
       border-radius:12px;
@@ -291,37 +288,31 @@
       padding:4px;
       object-fit:contain;
     }
-
     .arrivalBody{
       padding:12px 14px 14px;
       border-top: 6px solid var(--jd-yellow);
       color: #071218;
     }
-
     .arrivalTitle{
       font-size:16px;
       font-weight:900;
       margin:0 0 8px;
     }
-
     .arrivalBody p{
       margin: 5px 0;
       font-size: 14px;
       line-height: 1.25;
     }
-
     .arrivalBody b{
       font-weight: 900;
       color: #000;
     }
-
     .arrivalActions{
       margin-top: 10px;
       display:flex;
       justify-content:flex-end;
       gap:8px;
     }
-
     .arrivalActions button{
       padding:8px 10px;
       border-radius:12px;
@@ -330,11 +321,104 @@
       font-weight:900;
       background: rgba(0,0,0,.04);
     }
-
     .arrivalActions button.primary{
       background: rgba(54,124,43,.92);
       border-color: rgba(54,124,43,.92);
       color: white;
+    }
+
+    /* =========================
+       ✅ CENTRO DE NOTIFICACIONES (campana)
+    ========================= */
+    .notifWrap{ position:relative; }
+    .notifBell{
+      position:relative;
+      min-width:auto;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid var(--border-strong);
+      background: rgba(0,0,0,.04);
+      font-weight:900;
+      box-shadow: var(--shadow2);
+      cursor:pointer;
+    }
+    .notifBadge{
+      position:absolute;
+      top:-6px;
+      right:-6px;
+      background: var(--jd-yellow);
+      color:#000;
+      border:2px solid var(--jd-green);
+      min-width:22px;
+      height:22px;
+      padding:0 6px;
+      border-radius:999px;
+      font-size:12px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:900;
+      box-shadow: var(--shadow2);
+    }
+    .notifPanel{
+      position:absolute;
+      top:52px;
+      right:0;
+      width:min(460px, calc(100vw - 32px));
+      max-height:70vh;
+      overflow:auto;
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:16px;
+      box-shadow: 0 18px 50px rgba(0,0,0,.18);
+      z-index: 9998;
+    }
+    .notifHeader{
+      position:sticky;
+      top:0;
+      background: rgba(255,255,255,.98);
+      border-bottom:1px solid var(--border);
+      padding:10px 12px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .notifActions{ display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+    .notifItem{
+      padding:10px 12px;
+      border-bottom:1px solid var(--border);
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+    }
+    .notifDot{
+      width:10px; height:10px; border-radius:999px;
+      background: var(--jd-green);
+      box-shadow: inset 0 0 0 3px var(--jd-yellow);
+      margin-top:6px;
+      flex:0 0 auto;
+    }
+    .notifMain{ flex:1 1 auto; min-width:0; }
+    .notifMain .t{
+      font-weight:900;
+      color:#000;
+      margin:0 0 4px;
+    }
+    .notifMain .d{
+      margin:0;
+      color: var(--row-text);
+      font-size:13px;
+      line-height:1.25;
+    }
+    .notifMain .meta{
+      margin-top:6px;
+      font-size:12px;
+      color: var(--muted);
+      font-weight:700;
+    }
+    .notifItem.unread{
+      background: rgba(54,124,43,.06);
     }
   </style>
 </head>
@@ -342,7 +426,32 @@
 <body>
   <div class="topbar">
     <h1 class="title"><span class="brandDot"></span> Carga de datos</h1>
-    <div class="subpill">Estilo <b>Interagrovial</b> · verde/amarillo</div>
+
+    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+      <div class="subpill">Estilo <b>Interagrovial</b> · verde/amarillo</div>
+
+      <!-- ✅ Campana notificaciones -->
+      <div class="notifWrap">
+        <button id="notifBell" class="notifBell" type="button" title="Notificaciones">
+          🔔
+          <span id="notifBadge" class="notifBadge" style="display:none;">0</span>
+        </button>
+
+        <div id="notifPanel" class="notifPanel" style="display:none;">
+          <div class="notifHeader">
+            <div><b>Notificaciones</b></div>
+            <div class="notifActions">
+              <button id="notifMarkReadBtn" class="small secondary" type="button">Marcar como leído</button>
+              <button id="notifCloseBtn" class="small" type="button">Cerrar</button>
+            </div>
+          </div>
+
+          <div id="notifList">
+            <div class="muted" style="padding:10px;">Sin notificaciones.</div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- ✅ AVISO GRANDE ARRIBO/LLEGADA -->
@@ -580,7 +689,7 @@
     import {
       getFirestore, collection, addDoc, doc, updateDoc, deleteDoc,
       serverTimestamp, query, orderBy, onSnapshot,
-      getDoc, setDoc
+      getDoc, setDoc, writeBatch, limit
     } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
     import {
       getStorage, ref as sRef, uploadBytesResumable, getDownloadURL, deleteObject
@@ -613,7 +722,10 @@
     let pendingPackingRowId = null;
     let pendingAttRowId = null;
 
-    // ✅ ARRIBO/LLEGADA UI
+    // ✅ John Deere logo
+    const JD_LOGO_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/John_Deere_logo.svg/320px-John_Deere_logo.svg.png";
+
+    // ✅ ARRIBO/LLEGADA UI (aviso grande)
     const arrivalNotice = $("arrivalNotice");
     const arrivalLogo = $("arrivalLogo");
     const arrivalTitle = $("arrivalTitle");
@@ -623,30 +735,15 @@
     const arrivalCloseBtn = $("arrivalCloseBtn");
     const arrivalOkBtn = $("arrivalOkBtn");
 
-    const JD_LOGO_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/John_Deere_logo.svg/320px-John_Deere_logo.svg.png";
     arrivalLogo.src = JD_LOGO_URL;
 
-    function showArrivalNotice(data){
-      const oc = data.oc || "";
-      const carpeta = data.carpeta || "";
-      const factura = data.factura || "";
-      const transporte = data.transporte || "";
-      const division = data.division || "";
-
-      arrivalTitle.textContent = "✅ ARRIBO / LLEGADA CONFIRMADA";
-      arrivalLine1.innerHTML = `<b>Orden de compra:</b> ${oc || "—"}  ·  <b>Carpeta:</b> ${carpeta || "—"}`;
-      arrivalLine2.innerHTML = `<b>Factura:</b> ${factura || "—"}  ·  <b>División:</b> ${division || "—"}`;
-      arrivalLine3.innerHTML = `<b>Transporte:</b> ${transporte || "—"}`;
-
-      arrivalNotice.style.display = "block";
-      clearTimeout(showArrivalNotice._t);
-      showArrivalNotice._t = setTimeout(() => {
-        arrivalNotice.style.display = "none";
-      }, 12000);
-    }
-
-    arrivalCloseBtn.addEventListener("click", ()=> arrivalNotice.style.display = "none");
-    arrivalOkBtn.addEventListener("click", ()=> arrivalNotice.style.display = "none");
+    // ✅ Centro de notificaciones UI
+    const notifBell = $("notifBell");
+    const notifBadge = $("notifBadge");
+    const notifPanel = $("notifPanel");
+    const notifList = $("notifList");
+    const notifCloseBtn = $("notifCloseBtn");
+    const notifMarkReadBtn = $("notifMarkReadBtn");
 
     function showToast(text, isError=false){
       toastEl.textContent = text;
@@ -711,6 +808,203 @@
       $("confirmacion_llegada").value = "NO";
     }
 
+    // =========================
+    // ✅ ARRIBO: aviso grande
+    // =========================
+    function showArrivalNotice(data){
+      const oc = data.oc || "";
+      const carpeta = data.carpeta || "";
+      const factura = data.factura || "";
+      const transporte = data.transporte || "";
+      const division = data.division || "";
+
+      arrivalTitle.textContent = "✅ ARRIBO / LLEGADA CONFIRMADA";
+      arrivalLine1.innerHTML = `<b>Orden de compra:</b> ${escapeHtml(oc || "—")}  ·  <b>Carpeta:</b> ${escapeHtml(carpeta || "—")}`;
+      arrivalLine2.innerHTML = `<b>Factura:</b> ${escapeHtml(factura || "—")}  ·  <b>División:</b> ${escapeHtml(division || "—")}`;
+      arrivalLine3.innerHTML = `<b>Transporte:</b> ${escapeHtml(transporte || "—")}`;
+
+      arrivalNotice.style.display = "block";
+      clearTimeout(showArrivalNotice._t);
+      showArrivalNotice._t = setTimeout(() => arrivalNotice.style.display = "none", 12000);
+    }
+    arrivalCloseBtn.addEventListener("click", ()=> arrivalNotice.style.display = "none");
+    arrivalOkBtn.addEventListener("click", ()=> arrivalNotice.style.display = "none");
+
+    // =========================
+    // ✅ Sonido + Notification API
+    // =========================
+    function beep(){
+      try{
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.frequency.value = 880;
+        g.gain.value = 0.05;
+        o.start();
+        setTimeout(()=>{ o.stop(); ctx.close(); }, 220);
+      } catch(_) {}
+    }
+
+    async function browserNotifyArribo(data){
+      try{
+        if (!("Notification" in window)) return;
+
+        if (Notification.permission === "default") {
+          await Notification.requestPermission();
+        }
+        if (Notification.permission !== "granted") return;
+
+        const oc = data.oc || "";
+        const carpeta = data.carpeta || "";
+        const factura = data.factura || "";
+
+        new Notification("🚜 ARRIBO / LLEGADA CONFIRMADA", {
+          body: `OC: ${oc} | Carpeta: ${carpeta} | Factura: ${factura}`,
+          icon: JD_LOGO_URL,
+          tag: "arribo-llegada",
+          requireInteraction: true
+        });
+      } catch(_) {}
+    }
+
+    // ✅ Parpadeo del título si estás fuera de la pestaña
+    let originalTitle = document.title;
+    let titleBlinkTimer = null;
+
+    function startTitleBlink(){
+      stopTitleBlink();
+      let on = false;
+      titleBlinkTimer = setInterval(() => {
+        document.title = on ? "🚜 ARRIBO CONFIRMADO" : originalTitle;
+        on = !on;
+      }, 900);
+      setTimeout(stopTitleBlink, 15000);
+    }
+
+    function stopTitleBlink(){
+      if (titleBlinkTimer){
+        clearInterval(titleBlinkTimer);
+        titleBlinkTimer = null;
+      }
+      document.title = originalTitle;
+    }
+
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) stopTitleBlink();
+    });
+
+    // =========================
+    // ✅ NOTIFICACIONES en Firestore
+    // Colección: notifications
+    // =========================
+    function fmtTS(ts){
+      try{
+        const d = ts?.toDate ? ts.toDate() : null;
+        if (!d) return "";
+        return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+      } catch { return ""; }
+    }
+
+    async function createNotificationForArrival(rowId, rowData){
+      // Notificación global para que cualquier PC la vea
+      try{
+        const payload = {
+          type: "ARRIBO",
+          title: "ARRIBO / LLEGADA CONFIRMADA",
+          rowId,
+          oc: rowData.oc || "",
+          carpeta: rowData.carpeta || "",
+          factura: rowData.factura || "",
+          division: rowData.division || "",
+          transporte: rowData.transporte || "",
+          read: false,
+          createdAt: serverTimestamp()
+        };
+        await addDoc(collection(db, "notifications"), payload);
+      } catch (e){
+        console.warn("No se pudo crear notificación global:", e);
+      }
+    }
+
+    // UI: abrir/cerrar panel
+    notifBell.addEventListener("click", ()=>{
+      notifPanel.style.display = (notifPanel.style.display === "none") ? "block" : "none";
+    });
+    notifCloseBtn.addEventListener("click", ()=> notifPanel.style.display = "none");
+
+    // Cerrar panel al click afuera
+    document.addEventListener("click", (e)=>{
+      if (!notifPanel || notifPanel.style.display === "none") return;
+      const wrap = e.target.closest(".notifWrap");
+      if (!wrap) notifPanel.style.display = "none";
+    });
+
+    // Render notificaciones
+    let notificationsCache = []; // {id,data}
+    function renderNotif(){
+      const unread = notificationsCache.filter(n => n.data.read !== true).length;
+      if (unread > 0){
+        notifBadge.style.display = "inline-flex";
+        notifBadge.textContent = String(unread);
+      } else {
+        notifBadge.style.display = "none";
+      }
+
+      if (!notificationsCache.length){
+        notifList.innerHTML = `<div class="muted" style="padding:10px;">Sin notificaciones.</div>`;
+        return;
+      }
+
+      notifList.innerHTML = notificationsCache.map(n=>{
+        const d = n.data || {};
+        const isUnread = d.read !== true;
+        const meta = fmtTS(d.createdAt);
+        const detail = `OC: ${d.oc || "—"} · Carpeta: ${d.carpeta || "—"} · Factura: ${d.factura || "—"}`;
+        return `
+          <div class="notifItem ${isUnread ? "unread" : ""}">
+            <div class="notifDot"></div>
+            <div class="notifMain">
+              <div class="t">${escapeHtml(d.title || "Notificación")}</div>
+              <div class="d"><b>${escapeHtml(detail)}</b></div>
+              <div class="meta">${escapeHtml(meta)}</div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    // Escuchar últimas 50 notificaciones
+    const notifQ = query(collection(db, "notifications"), orderBy("createdAt","desc"), limit(50));
+    onSnapshot(notifQ, (snap)=>{
+      notificationsCache = [];
+      snap.forEach(docu => notificationsCache.push({ id: docu.id, data: docu.data() }));
+      renderNotif();
+    }, (e)=>{
+      console.warn("No se pudieron leer notifications:", e);
+    });
+
+    // Marcar como leídas (todas las que estén en cache y sean unread)
+    notifMarkReadBtn.addEventListener("click", async ()=>{
+      try{
+        const unread = notificationsCache.filter(n => n.data.read !== true);
+        if (!unread.length) { notifPanel.style.display = "none"; return; }
+
+        const batch = writeBatch(db);
+        unread.forEach(n=>{
+          batch.update(doc(db, "notifications", n.id), { read: true, readAt: serverTimestamp() });
+        });
+        await batch.commit();
+        notifPanel.style.display = "none";
+      } catch(e){
+        console.error(e);
+        alert("No se pudo marcar como leído.");
+      }
+    });
+
+    // =========================
+    // ✅ Buscar + filtros (tu código)
+    // =========================
     function matchesText(row, q){
       if (!q) return true;
 
@@ -845,6 +1139,9 @@
       applyFilters();
     });
 
+    // =========================
+    // ✅ Storage uploads
+    // =========================
     async function uploadFileTo(path, file, progressLabel){
       const ref = sRef(storage, path);
       const task = uploadBytesResumable(ref, file);
@@ -920,6 +1217,7 @@
       `;
     }
 
+    // ✅ Auditoría
     async function logAudit(action, rowId, beforeData, afterData){
       try{
         const auditId = `${rowId}_${Date.now()}_${uid()}`;
@@ -935,6 +1233,9 @@
       }
     }
 
+    // =========================
+    // ✅ Agregar fila
+    // =========================
     addBtn.addEventListener("click", async () => {
       const data = {
         factura: $("factura").value.trim(),
@@ -972,6 +1273,14 @@
         const docRef = await addDoc(collection(db, "rows"), data);
         await logAudit("create", docRef.id, null, { ...data, createdAt: null, updatedAt: null });
 
+        // ✅ Si se crea ya con SI, también notifico global + windows
+        if (data.confirmacion_llegada === "SI") {
+          await createNotificationForArrival(docRef.id, data);
+          beep();
+          browserNotifyArribo(data);
+          if (!document.hidden) showArrivalNotice(data);
+        }
+
         clearAddForm();
         showToast("Agregado con éxito");
       } catch (e) {
@@ -984,6 +1293,9 @@
       }
     });
 
+    // =========================
+    // ✅ Render tabla
+    // =========================
     function renderRow(id, r) {
       const dt = r.createdAt?.toDate ? r.createdAt.toDate() : null;
       const dtTxt = dt ? formatDateVal(dt) : "";
@@ -1100,123 +1412,23 @@
       tbody.innerHTML = dataToDraw.map(x => renderRow(x.id, x.data)).join("");
     }
 
-    // ============================================================
-    // ✅ ARRIBO/LLEGADA: NOTIFICACIÓN + TITULO PARPADEANDO
-    // ============================================================
-    let originalTitle = document.title;
-    let titleBlinkTimer = null;
-
-    function startTitleBlink(){
-      stopTitleBlink();
-      let on = false;
-      titleBlinkTimer = setInterval(() => {
-        document.title = on ? "🚜 ARRIBO CONFIRMADO" : originalTitle;
-        on = !on;
-      }, 900);
-
-      setTimeout(stopTitleBlink, 15000);
-    }
-
-    function stopTitleBlink(){
-      if (titleBlinkTimer){
-        clearInterval(titleBlinkTimer);
-        titleBlinkTimer = null;
-      }
-      document.title = originalTitle;
-    }
-
-    document.addEventListener("visibilitychange", () => {
-      if (!document.hidden) stopTitleBlink();
-    });
-
-    function beep(){
-      try{
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.connect(g); g.connect(ctx.destination);
-        o.frequency.value = 880;
-        g.gain.value = 0.05;
-        o.start();
-        setTimeout(()=>{ o.stop(); ctx.close(); }, 220);
-      } catch(_) {}
-    }
-
-    async function browserNotifyArribo(data){
-      try{
-        if (!("Notification" in window)) return;
-
-        if (Notification.permission === "default") {
-          await Notification.requestPermission();
-        }
-        if (Notification.permission !== "granted") return;
-
-        const oc = data.oc || "";
-        const carpeta = data.carpeta || "";
-        const factura = data.factura || "";
-
-        new Notification("🚜 ARRIBO / LLEGADA CONFIRMADA", {
-          body: `OC: ${oc} | Carpeta: ${carpeta} | Factura: ${factura}`,
-          icon: JD_LOGO_URL,
-          tag: "arribo-llegada",
-          requireInteraction: true
-        });
-      } catch(_) {}
-    }
-    // ============================================================
-
+    // =========================
+    // ✅ Snapshot rows
+    // =========================
     const qSnap = query(collection(db, "rows"), orderBy("createdAt", "desc"));
-
-    // ✅ Mapa de confirmación previa por fila
-    let lastConfirmMap = new Map();
-    let notifiedThisSession = new Set();
-    let initialLoadDone = false;
-
     onSnapshot(qSnap, (snap) => {
-      const nextCache = [];
-      const nextMap = new Map();
-
-      snap.forEach(d => {
-        const rowId = d.id;
-        const data = d.data();
-        nextCache.push({ id: rowId, data });
-
-        const cur = (data.confirmacion_llegada || "").toString().trim().toUpperCase() === "SI" ? "SI" : "NO";
-        nextMap.set(rowId, cur);
-
-        const prev = lastConfirmMap.get(rowId);
-
-        // ✅ SOLO dispara cuando cambia de NO a SI (y después de la primera carga)
-        const changedToSI = (initialLoadDone && prev !== "SI" && cur === "SI");
-
-        if (changedToSI && !notifiedThisSession.has(rowId)) {
-          notifiedThisSession.add(rowId);
-
-          beep();
-          browserNotifyArribo(data);
-
-          if (!document.hidden) {
-            showArrivalNotice(data);
-          } else {
-            startTitleBlink();
-            showToast("🚜 ARRIBO/LLEGADA confirmada (ver pestaña)", false);
-          }
-        }
-      });
-
-      cache = nextCache;
-      lastConfirmMap = nextMap;
-
+      cache = [];
+      snap.forEach(d => cache.push({ id: d.id, data: d.data() }));
       rebuildDivisionOptions();
       applyFilters();
-
-      initialLoadDone = true;
     }, (err) => {
       console.error(err);
       showToast("No se pudo leer Firestore", true);
     });
 
+    // =========================
     // ✅ EXPORT XLSX
+    // =========================
     function rowsForExport(){
       const dataToExport = (view.length ? view : cache);
 
@@ -1269,7 +1481,9 @@
     }
     $("exportXlsxBtn").addEventListener("click", exportXlsx);
 
-    // pickers
+    // =========================
+    // ✅ Pickers: packing + attachments
+    // =========================
     $("packingRowPicker").addEventListener("change", async (e) => {
       const f = (e.target.files || [])[0];
       $("packingRowPicker").value = "";
@@ -1354,6 +1568,9 @@
       }
     });
 
+    // =========================
+    // ✅ Click acciones en tabla
+    // =========================
     tbody.addEventListener("click", async (e) => {
       const btn = e.target.closest("[data-action]");
       if (!btn) return;
@@ -1459,8 +1676,11 @@
         try {
           btn.disabled = true;
 
+          // ✅ leemos antes para detectar cambio NO -> SI
           const beforeSnap = await getDoc(doc(db, "rows", id));
           const beforeData = beforeSnap.exists() ? beforeSnap.data() : null;
+          const beforeVal = (beforeData?.confirmacion_llegada || "NO").toString().trim().toUpperCase();
+          const afterVal = (updated.confirmacion_llegada || "NO").toString().trim().toUpperCase();
 
           await updateDoc(doc(db, "rows", id), { ...updated, updatedAt: serverTimestamp() });
 
@@ -1469,6 +1689,21 @@
             ...updated,
             updatedAt: null
           });
+
+          // ✅ Si cambió de NO->SI: crear notificación global + windows + aviso grande
+          if (beforeVal !== "SI" && afterVal === "SI") {
+            await createNotificationForArrival(id, { ...(beforeData || {}), ...updated });
+
+            beep();
+            browserNotifyArribo({ ...(beforeData || {}), ...updated });
+
+            if (!document.hidden) {
+              showArrivalNotice({ ...(beforeData || {}), ...updated });
+            } else {
+              startTitleBlink();
+              showToast("🚜 ARRIBO/LLEGADA confirmada (ver pestaña)", false);
+            }
+          }
 
           editingRowId = null;
           showToast("Modificado con éxito");
