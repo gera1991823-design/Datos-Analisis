@@ -964,10 +964,74 @@
       tbody.innerHTML = dataToDraw.map(x => renderRow(x.id, x.data)).join("");
     }
 
+    // ============================================================
+    // ✅ OPCION C: NOTIFICACIÓN LOCAL (solo con la página abierta)
+    // - Detecta cambio confirmacion_llegada: NO -> SI
+    // - Muestra toast + beep + notificación del navegador (si hay permiso)
+    // ============================================================
+    let lastConfirmMap = new Map();       // rowId -> "SI"/"NO"
+    let notifiedThisSession = new Set();  // evita repetir en esta sesión
+
+    function beep(){
+      try{
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.frequency.value = 880;
+        g.gain.value = 0.04;
+        o.start();
+        setTimeout(()=>{ o.stop(); ctx.close(); }, 180);
+      } catch(_) {}
+    }
+
+    async function browserNotify(title, body){
+      try{
+        if (!("Notification" in window)) return;
+        if (Notification.permission === "default") {
+          await Notification.requestPermission();
+        }
+        if (Notification.permission === "granted") {
+          new Notification(title, { body });
+        }
+      } catch(_) {}
+    }
+    // ============================================================
+
     const qSnap = query(collection(db, "rows"), orderBy("createdAt", "desc"));
     onSnapshot(qSnap, (snap) => {
-      cache = [];
-      snap.forEach(d => cache.push({ id: d.id, data: d.data() }));
+      const nextCache = [];
+      const nextMap = new Map();
+
+      snap.forEach(d => {
+        const rowId = d.id;
+        const data = d.data();
+        nextCache.push({ id: rowId, data });
+
+        const cur = (data.confirmacion_llegada || "").toString().trim().toUpperCase() === "SI" ? "SI" : "NO";
+        nextMap.set(rowId, cur);
+
+        const prev = lastConfirmMap.get(rowId);
+
+        // Dispara SOLO si existía antes (prev != null) y cambió de NO/vacío a SI
+        const changedToSI = (prev != null && prev !== "SI" && cur === "SI");
+
+        if (changedToSI && !notifiedThisSession.has(rowId)) {
+          notifiedThisSession.add(rowId);
+
+          const oc = data.oc || "";
+          const carpeta = data.carpeta || "";
+          const factura = data.factura || "";
+
+          showToast(`🚚 Llegó: OC ${oc} | Carpeta ${carpeta} | Factura ${factura}`);
+          beep();
+          browserNotify("Confirmación de llegada = SI", `OC ${oc} | Carpeta ${carpeta} | Factura ${factura}`);
+        }
+      });
+
+      cache = nextCache;
+      lastConfirmMap = nextMap;
+
       rebuildDivisionOptions();
       applyFilters();
     }, (err) => {
