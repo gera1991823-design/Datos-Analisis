@@ -133,8 +133,96 @@
     button[disabled]{opacity:.6;cursor:not-allowed;transform:none}
 
     .muted{color:var(--muted);font-size:12px;margin-top:8px}
+
+    /* ✅ Toast normal (lo dejo pero lo vamos a reemplazar por el grande) */
     .toast{margin-top:10px;font-size:13px;color:#9cf08a;display:none;font-weight:900}
     .toast.err{color:#ff8b97}
+
+    /* ✅ NUEVO: AVISO GRANDE DE ARRIBO / LLEGADA */
+    .arrivalNotice{
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      z-index: 9999;
+      display: none;
+      max-width: 420px;
+      border-radius: 16px;
+      background: #ffffff;
+      border: 3px solid var(--jd-green);
+      box-shadow: 0 18px 50px rgba(0,0,0,.18);
+      overflow: hidden;
+      animation: popIn .18s ease-out;
+    }
+
+    @keyframes popIn{
+      from{ transform: translateY(-6px); opacity: .7; }
+      to{ transform: translateY(0px); opacity: 1; }
+    }
+
+    .arrivalHeader{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:12px 14px;
+      background: linear-gradient(90deg, rgba(54,124,43,.92), rgba(54,124,43,.80));
+      color:#fff;
+      font-weight:900;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+    }
+
+    .arrivalHeader img{
+      width:34px;height:34px;
+      border-radius:10px;
+      background:#fff;
+      padding:4px;
+      object-fit:contain;
+    }
+
+    .arrivalBody{
+      padding:12px 14px 14px;
+      border-top: 5px solid var(--jd-yellow);
+      color: #071218;
+    }
+
+    .arrivalTitle{
+      font-size:16px;
+      font-weight:900;
+      margin:0 0 6px;
+    }
+
+    .arrivalBody p{
+      margin: 4px 0;
+      font-size: 14px;
+      line-height: 1.25;
+    }
+
+    .arrivalBody b{
+      font-weight: 900;
+      color: #000;
+    }
+
+    .arrivalActions{
+      margin-top: 10px;
+      display:flex;
+      justify-content:flex-end;
+      gap:8px;
+    }
+
+    .arrivalActions button{
+      padding:8px 10px;
+      border-radius:12px;
+      border:1px solid var(--border-strong);
+      cursor:pointer;
+      font-weight:900;
+      background: rgba(0,0,0,.04);
+    }
+
+    .arrivalActions button.primary{
+      background: rgba(54,124,43,.90);
+      border-color: rgba(54,124,43,.90);
+      color: white;
+    }
 
     table{
       width:100%;
@@ -257,6 +345,25 @@
     <div class="subpill">Estilo <b>Interagrovial</b> · verde/amarillo</div>
   </div>
 
+  <!-- ✅ AVISO GRANDE ARRIBO/LLEGADA -->
+  <div id="arrivalNotice" class="arrivalNotice">
+    <div class="arrivalHeader">
+      <img id="arrivalLogo" alt="Logo John Deere">
+      <div>ARRIBO / LLEGADA</div>
+    </div>
+    <div class="arrivalBody">
+      <p class="arrivalTitle"><b id="arrivalTitle">ARRIBO CONFIRMADO</b></p>
+      <p id="arrivalLine1"></p>
+      <p id="arrivalLine2"></p>
+      <p id="arrivalLine3"></p>
+
+      <div class="arrivalActions">
+        <button id="arrivalCloseBtn">Cerrar</button>
+        <button id="arrivalOkBtn" class="primary">OK</button>
+      </div>
+    </div>
+  </div>
+
   <!-- FILTROS -->
   <div class="card">
     <div class="accentBar"></div>
@@ -274,7 +381,6 @@
         <input id="q" class="w220" placeholder="Ej: 12004566 / AGRO / 88855 / VACIO"/>
       </div>
 
-      <!-- ✅ NUEVO: filtro OC -->
       <div>
         <label>Orden de compra</label>
         <input id="fOC" class="w160" placeholder="Ej: 12004566 o VACIO"/>
@@ -317,7 +423,6 @@
         </select>
       </div>
 
-      <!-- ✅ NUEVO: modo para buscar fecha vacía -->
       <div>
         <label>Fecha estimada UY</label>
         <select id="fFechaMode">
@@ -501,6 +606,20 @@
     const toastEl = $("toast");
     const addBtn = $("addBtn");
 
+    // ✅ elementos del aviso grande
+    const arrivalNotice = $("arrivalNotice");
+    const arrivalLogo = $("arrivalLogo");
+    const arrivalTitle = $("arrivalTitle");
+    const arrivalLine1 = $("arrivalLine1");
+    const arrivalLine2 = $("arrivalLine2");
+    const arrivalLine3 = $("arrivalLine3");
+    const arrivalCloseBtn = $("arrivalCloseBtn");
+    const arrivalOkBtn = $("arrivalOkBtn");
+
+    // ✅ LOGO (podés cambiarlo por el tuyo)
+    const JD_LOGO_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/John_Deere_logo.svg/320px-John_Deere_logo.svg.png";
+    arrivalLogo.src = JD_LOGO_URL;
+
     let editingRowId = null;
     let cache = [];
     let view = [];
@@ -515,6 +634,31 @@
       clearTimeout(showToast._t);
       showToast._t = setTimeout(() => toastEl.style.display = "none", 4500);
     }
+
+    // ✅ AVISO GRANDE ARRIBO / LLEGADA (con negrita)
+    function showArrivalNotice(data){
+      const oc = data.oc || "";
+      const carpeta = data.carpeta || "";
+      const factura = data.factura || "";
+      const transporte = data.transporte || "";
+      const division = data.division || "";
+
+      arrivalTitle.textContent = "✅ ARRIBO / LLEGADA CONFIRMADA";
+
+      arrivalLine1.innerHTML = `<b>Orden de compra:</b> ${oc || "—"}  ·  <b>Carpeta:</b> ${carpeta || "—"}`;
+      arrivalLine2.innerHTML = `<b>Factura:</b> ${factura || "—"}  ·  <b>División:</b> ${division || "—"}`;
+      arrivalLine3.innerHTML = `<b>Transporte:</b> ${transporte || "—"}`;
+
+      arrivalNotice.style.display = "block";
+
+      clearTimeout(showArrivalNotice._t);
+      showArrivalNotice._t = setTimeout(() => {
+        arrivalNotice.style.display = "none";
+      }, 12000);
+    }
+
+    arrivalCloseBtn.addEventListener("click", ()=> arrivalNotice.style.display = "none");
+    arrivalOkBtn.addEventListener("click", ()=> arrivalNotice.style.display = "none");
 
     function escapeHtml(s){
       return String(s ?? "")
@@ -571,7 +715,6 @@
       $("confirmacion_llegada").value = "NO";
     }
 
-    // ✅ Buscar (cualquier campo) + soporte "VACIO"
     function matchesText(row, q){
       if (!q) return true;
 
@@ -596,7 +739,6 @@
       return hay.includes(q);
     }
 
-    // ✅ Fecha estimada con modo VACIO / CON / rango
     function inDateRange(row, from, to, mode){
       const d = row.fecha_estimada || "";
 
@@ -624,7 +766,7 @@
       const fCierre = $("fCierre").value;
 
       const fOC = norm($("fOC").value);
-      const fechaMode = $("fFechaMode").value; // "" | "CON" | "VACIO"
+      const fechaMode = $("fFechaMode").value;
 
       const from = $("fDateFrom").value || "";
       const to = $("fDateTo").value || "";
@@ -657,7 +799,6 @@
 
         if (!matchesText(r, q)) return false;
 
-        // ✅ filtro por OC + soporte VACIO
         if (fOC){
           if (fOC === "vacio"){
             if (!isEmptyVal(r.oc)) return false;
@@ -783,7 +924,6 @@
       `;
     }
 
-    // ✅ AUDITORÍA
     async function logAudit(action, rowId, beforeData, afterData){
       try{
         const auditId = `${rowId}_${Date.now()}_${uid()}`;
@@ -964,13 +1104,10 @@
       tbody.innerHTML = dataToDraw.map(x => renderRow(x.id, x.data)).join("");
     }
 
-    // ============================================================
-    // ✅ OPCION C: NOTIFICACIÓN LOCAL (solo con la página abierta)
-    // - Detecta cambio confirmacion_llegada: NO -> SI
-    // - Muestra toast + beep + notificación del navegador (si hay permiso)
-    // ============================================================
-    let lastConfirmMap = new Map();       // rowId -> "SI"/"NO"
-    let notifiedThisSession = new Set();  // evita repetir en esta sesión
+    // ✅ NOTIFICACIÓN LOCAL
+    let lastConfirmMap = new Map();
+    let notifiedThisSession = new Set();
+    let initialLoadDone = false;
 
     function beep(){
       try{
@@ -979,24 +1116,33 @@
         const g = ctx.createGain();
         o.connect(g); g.connect(ctx.destination);
         o.frequency.value = 880;
-        g.gain.value = 0.04;
+        g.gain.value = 0.05;
         o.start();
-        setTimeout(()=>{ o.stop(); ctx.close(); }, 180);
+        setTimeout(()=>{ o.stop(); ctx.close(); }, 220);
       } catch(_) {}
     }
 
-    async function browserNotify(title, body){
+    async function browserNotifyArribo(data){
       try{
         if (!("Notification" in window)) return;
+
         if (Notification.permission === "default") {
           await Notification.requestPermission();
         }
-        if (Notification.permission === "granted") {
-          new Notification(title, { body });
-        }
+        if (Notification.permission !== "granted") return;
+
+        const oc = data.oc || "";
+        const carpeta = data.carpeta || "";
+        const factura = data.factura || "";
+
+        new Notification("🚜 ARRIBO / LLEGADA CONFIRMADA", {
+          body: `OC: ${oc} | Carpeta: ${carpeta} | Factura: ${factura}`,
+          icon: JD_LOGO_URL,
+          tag: "arribo-llegada",
+          requireInteraction: true
+        });
       } catch(_) {}
     }
-    // ============================================================
 
     const qSnap = query(collection(db, "rows"), orderBy("createdAt", "desc"));
     onSnapshot(qSnap, (snap) => {
@@ -1013,19 +1159,16 @@
 
         const prev = lastConfirmMap.get(rowId);
 
-        // Dispara SOLO si existía antes (prev != null) y cambió de NO/vacío a SI
-        const changedToSI = (prev != null && prev !== "SI" && cur === "SI");
+        // ✅ Solo notificar después de la primera carga
+        const changedToSI = (initialLoadDone && prev !== "SI" && cur === "SI");
 
         if (changedToSI && !notifiedThisSession.has(rowId)) {
           notifiedThisSession.add(rowId);
 
-          const oc = data.oc || "";
-          const carpeta = data.carpeta || "";
-          const factura = data.factura || "";
-
-          showToast(`🚚 Llegó: OC ${oc} | Carpeta ${carpeta} | Factura ${factura}`);
+          // ✅ Aviso grande + sonido + notificación del sistema
+          showArrivalNotice(data);
           beep();
-          browserNotify("Confirmación de llegada = SI", `OC ${oc} | Carpeta ${carpeta} | Factura ${factura}`);
+          browserNotifyArribo(data);
         }
       });
 
@@ -1034,6 +1177,10 @@
 
       rebuildDivisionOptions();
       applyFilters();
+
+      // ✅ Primera carga lista
+      initialLoadDone = true;
+
     }, (err) => {
       console.error(err);
       showToast("No se pudo leer Firestore", true);
@@ -1092,7 +1239,7 @@
     }
     $("exportXlsxBtn").addEventListener("click", exportXlsx);
 
-    // pickers
+    // pickers + acciones (tu código original)
     $("packingRowPicker").addEventListener("change", async (e) => {
       const f = (e.target.files || [])[0];
       $("packingRowPicker").value = "";
