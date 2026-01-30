@@ -1,30 +1,35 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="es">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Carga de datos - Interagrovial</title>
+  <title>Carpetas - Interagrovial</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
   <!-- ✅ XLSX (SheetJS) para exportar a Excel -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <style>
     :root{
-      --jd-green:#367c2b;
+      --jd-green:#184f13; /* John Deere deep green */
+      --jd-green-dark:#0f3a0f;
+      --jd-green-light:#3aa14a;
       --jd-yellow:#ffde00;
 
-      --bg:#f6f7fb;
-      --text:#071218;
-      --title-color:#000;
-      --row-text:#3b4950;
-      --muted:#5b646d;
+      --bg:#f4faf4; /* subtle greenish background */
+      --text:#071217;
+      --title-color:var(--jd-green-dark);
+      --row-text:#274939;
+      --muted:#5f6b67;
 
-      --border:#e6e9ef;
-      --border-strong:#c9d2d9;
+      --border:#e8f2e8;
+      --border-strong:#d7e9d7;
 
-      --shadow:0 12px 30px rgba(15,23,32,.06);
-      --shadow2:0 6px 14px rgba(15,23,32,.04);
-      --radius:16px;
+      --shadow:0 16px 36px rgba(15,23,32,.08);
+      --shadow2:0 10px 22px rgba(15,23,32,.06);
+      --radius:14px;
+
+      --accent-gradient: linear-gradient(90deg, var(--jd-green), var(--jd-green-dark));
     }
 
     *{box-sizing:border-box}
@@ -32,27 +37,46 @@
       scrollbar-gutter: stable;
     }
     body{
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
       margin: 22px;
-      background: radial-gradient(1200px 600px at 15% 0%, rgba(54,124,43,.06), transparent 55%),
-                  radial-gradient(1200px 600px at 85% 0%, rgba(255,222,0,.03), transparent 55%),
+      background: radial-gradient(1200px 600px at 15% 0%, rgba(46,125,50,.04), transparent 55%),
+                  radial-gradient(1200px 600px at 85% 0%, rgba(255,222,0,.02), transparent 55%),
                   var(--bg);
       color: var(--text);
+      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
     }
 
+    /* Topbar: lavado verde John Deere */
     .topbar{
       display:flex;align-items:center;justify-content:space-between;
-      gap:14px;flex-wrap:wrap;margin-bottom:14px;
+      gap:14px;flex-wrap:wrap;margin-bottom:18px;padding:12px 14px;
+      background: linear-gradient(90deg, rgba(24,79,19,0.06), rgba(255,222,0,0.02));
+      border:1px solid rgba(15,64,18,.06);
+      border-radius:12px;box-shadow: 0 8px 22px rgba(24,79,19,.03);
+      position: relative;
     }
+
+    /* Título principal en 'pill' centrado visualmente (John Deere) */
     .title{
-      display:flex;align-items:center;gap:12px;margin:0;
-      font-size:22px;font-weight:900;letter-spacing:.2px;
-      color: #000000 !important;
+      display:flex;align-items:center;gap:10px;margin:0;
+      font-size:20px;font-weight:800;letter-spacing:.02em;
+      color: var(--jd-yellow) !important;
+      position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+      background: linear-gradient(90deg, var(--jd-green), var(--jd-green-dark));
+      padding:10px 16px;border-radius:999px;
+      box-shadow: 0 14px 34px rgba(24,79,19,.12);z-index:3;pointer-events:none;
+      border:1px solid rgba(255,222,0,.12);
+    }
+
+    @media (max-width: 720px){
+      .title{position:static;transform:none;margin:0 auto;pointer-events:auto;font-size:18px;padding:8px 12px}
+      .topbar{padding:10px 10px}
     }
     .brandDot{
       width:14px;height:14px;border-radius:999px;
-      background: var(--jd-green);
-      box-shadow: inset 0 0 0 3px var(--jd-yellow);
+      background: var(--jd-yellow);
+      border:3px solid var(--jd-green-dark);
+      box-shadow: 0 6px 14px rgba(24,79,19,.12), inset 0 1px 0 rgba(255,255,255,.6);
     }
     .subpill{
       display:inline-flex;align-items:center;gap:8px;
@@ -65,27 +89,52 @@
     .subpill b{color:var(--jd-green)}
 
     .card{
-      background: linear-gradient(180deg, rgba(0,0,0,.03), rgba(0,0,0,.01));
+      background: linear-gradient(180deg, #fff, #fbfffb);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 16px;
+      padding: 18px 20px;
       box-shadow: var(--shadow);
       margin-bottom: 14px;
       overflow:hidden;
+      position:relative;
+      padding-left: 20px;
     }
-    .accentBar{display:none;}
+    .accentBar{
+      position:absolute;left:0;top:0;height:100%;width:10px;
+      background: var(--jd-green);
+      border-top-left-radius:var(--radius);border-bottom-left-radius:var(--radius);
+      box-shadow: 0 8px 20px rgba(24,79,19,.06);
+      display:block;
+    }
+    /* Cabecera de card: centro visual para el h3 y acciones a la derecha */
     .cardHeader{
-      display:flex;align-items:center;justify-content:space-between;
-      gap:10px;flex-wrap:wrap;margin-bottom:10px;
+      display:flex;align-items:center;justify-content:flex-start;
+      gap:10px;margin-bottom:12px;position:relative;min-height:56px;padding-right:12px;
     }
-    .card h3{
-      margin:6px 0 12px;font-size:20px;
-      text-transform:uppercase;letter-spacing:.08em;
-      color:#000000 !important;
-      font-weight:900 !important;
-      display:inline-block;
-      background: rgba(255,255,255,0.98);
-      padding:8px 12px;border-radius:8px;border:1px solid var(--border);
+    .cardHeader .row{ margin-left:auto; display:flex; gap:8px; align-items:center }
+
+    @media (max-width:840px){
+      .cardHeader{min-height:64px}
+    }
+    /* h3 centrado en card header: pill corporativo */
+    .cardHeader h3{
+      position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+      font-size:13px;padding:10px 18px;border-radius:12px;background: linear-gradient(90deg, rgba(255,222,0,.08), rgba(46,125,50,.04));
+      color:var(--jd-green-dark);font-weight:900;text-transform:uppercase;letter-spacing:.12em;
+      border:1px solid rgba(46,125,50,.10);box-shadow: 0 8px 20px rgba(24,79,19,.04);z-index:2;
+    }
+
+    /* h3 directo dentro de .card (ej. Agregar fila) con estilo consistente, centrado naturalmente */
+    .card > h3{
+      margin:6px auto 12px;font-size:14px;padding:10px 18px;border-radius:12px;background: linear-gradient(90deg, rgba(255,222,0,.04), rgba(255,222,0,.02));
+      color:var(--jd-green-dark);font-weight:900;text-transform:uppercase;letter-spacing:.08em;
+      border:1px solid rgba(46,125,50,.06);box-shadow: 0 8px 20px rgba(24,79,19,.04);
+      text-align:center;display:block;
+    }
+
+    @media (max-width:720px){
+      .cardHeader h3{position:static;transform:none;margin:0 auto 10px}
+      .card > h3{margin:6px 12px 12px}
     }
     .cardHeader{border-bottom:1px solid var(--border);padding-bottom:14px;margin-bottom:18px}
 
@@ -108,9 +157,26 @@
     }
     input::placeholder{color:var(--muted)}
     input:focus,select:focus{
-      border-color: rgba(54,124,43,.85);
-      box-shadow: 0 0 0 4px rgba(54,124,43,.20);
+      border-color: var(--jd-green-dark);
+      box-shadow: 0 0 0 6px rgba(24,79,19,.12);
     }
+
+    /* Celda y bordes más acordes a JD */
+    .cellInner{
+      display:flex;align-items:center;justify-content:center;
+      padding:14px 10px;border-radius:10px;
+      height:48px;
+      width:100%;box-sizing:border-box;
+      font-weight:600;
+      color: var(--row-text);
+      border:1px solid rgba(24,79,19,.06);
+      box-shadow: 0 10px 18px rgba(24,79,19,.04);
+      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(245,253,244,0.9));
+    }
+
+    tbody tr:nth-child(odd) .cellInner{background: #f2f8f2}
+    tbody tr:nth-child(even) .cellInner{background: #eef6ef}
+    tbody tr:hover .cellInner{background: rgba(24,79,19,.06)}
     input[type="date"]{min-width:170px;color-scheme:dark}
 
     button{
@@ -122,16 +188,20 @@
     }
     button:hover{transform: translateY(-1px)}
     button.primary{
-      background: rgba(54,124,43,.85);
-      border-color: rgba(54,124,43,.85);
+      background: linear-gradient(135deg, var(--jd-green), var(--jd-green-dark));
+      border-color: rgba(15,64,18,.95);
       color:#fff;
-      box-shadow: 0 12px 22px rgba(54,124,43,.18);
+      box-shadow: 0 16px 34px rgba(24,79,19,.22);
     }
+    button.primary:hover{ transform: translateY(-2px); filter:brightness(.98) }
     button.secondary{
-      border-color: rgba(54,124,43,.55);
-      color:#d9f1d3;
-      background: rgba(54,124,43,.12);
+      background: linear-gradient(135deg, var(--jd-yellow), #ffd600);
+      border-color: rgba(24,79,19,.06);
+      color: var(--jd-green-dark);
+      box-shadow:none;
+      font-weight:800;
     }
+    button.secondary:hover{ filter:brightness(.98) }
     button.danger{
       color:#ffd7dc;border-color:#5a2731;background: rgba(176,0,32,.16);
     }
@@ -200,23 +270,26 @@
     .cellInner .cell-input{
       width:100%;
       box-sizing:border-box;
-      background:transparent;
-      border:none;
-      padding:0 7px;
-      height: 100%;
-      max-height: 48px;
+      background:#fff;
+      border:1px solid rgba(46,125,50,.14);
+      padding:6px 10px;
+      height: 36px;
+      max-height: 36px;
       font-size: 14px;
       font-weight: 600;
       font-family: inherit;
       margin: 0;
+      border-radius:10px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 6px 14px rgba(15,23,32,.04);
+      transition: border-color .12s ease, box-shadow .12s ease, transform .06s ease;
     }
-    
-    .cellInner input.cell-input,
-    .cellInner select.cell-input {
-      padding: 4px 7px;
-      height: 48px;
-      max-height: 48px;
-      line-height: 1.4;
+
+    .cellInner input.cell-input:focus,
+    .cellInner select.cell-input:focus {
+      border-color: rgba(46,125,50,.9);
+      box-shadow: 0 8px 20px rgba(46,125,50,.12);
+      outline: none;
+      transform: translateY(-1px);
     }
 
     th{
@@ -405,7 +478,7 @@
     /* =========================
        ✅ CENTRO DE NOTIFICACIONES (campana)
     ========================= */
-    .notifWrap{ position:relative; }
+    .notifWrap{ position:relative; overflow: visible; }
     .notifBell{
       position:relative;
       min-width:auto;
@@ -436,11 +509,15 @@
       box-shadow: var(--shadow2);
     }
     .notifPanel{
+      /* Center under the bell and avoid clipping */
       position:absolute;
-      top:52px;
-      right:0;
-      width:min(420px, calc(100vw - 32px));
-      max-height:70vh;
+      top: calc(100% + 10px);
+      left: 50%;
+      transform: translateX(-50%);
+      right: auto;
+      width: min(420px, calc(100vw - 44px));
+      max-width: calc(100vw - 44px);
+      max-height: 70vh;
       overflow:auto;
       background:#fff;
       border:2px solid var(--jd-green);
@@ -448,6 +525,36 @@
       box-shadow: 0 18px 50px rgba(0,0,0,.18);
       z-index: 9998;
     }
+
+    /* Mobile: make the panel fixed and full-width with safe margins */
+    @media (max-width: 600px){
+      .notifPanel{
+        position:fixed;
+        top:64px;
+        left:16px;
+        right:16px;
+        transform:none;
+        width:auto;
+        max-width: calc(100vw - 32px);
+        max-height: calc(100vh - 120px);
+      }
+    }
+
+    /* Desktop: fix panel so it doesn't get clipped and stays visible. JS will set exact left/right to match the bell side */
+    @media (min-width: 601px){
+      .notifPanel{
+        position: fixed; /* ensure it's not clipped by any parent */
+        top: 64px;
+        left: auto; /* will be computed dynamically */
+        right: auto;
+        transform: none;
+        width: min(420px, calc(100vw - 56px));
+        max-height: calc(100vh - 120px);
+        overflow:auto;
+        z-index: 10001;
+      }
+    }
+
     .notifHeader{
       position:sticky;
       top:0;
@@ -584,10 +691,10 @@
 
 <body>
   <div class="topbar">
-    <h1 class="title"><span class="brandDot"></span> Carga de datos</h1>
+    <h1 class="title"><span class="brandDot"></span> Carpetas</h1>
 
     <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-      <div class="subpill">Estilo <b>Interagrovial</b> · verde/amarillo</div>
+      <div class="subpill"><b>Notificaciones</b></div>
 
       <!-- ✅ Campana notificaciones -->
       <div class="notifWrap">
@@ -1112,10 +1219,40 @@
     }
 
     // UI: abrir/cerrar panel
+    function positionNotifPanel(){
+      if (!notifPanel || !notifBell) return;
+      // mobile handled by CSS
+      if (window.innerWidth <= 600) return;
+
+      const bellRect = notifBell.getBoundingClientRect();
+      const vw = window.innerWidth;
+      const maxWidth = Math.min(420, vw - 56);
+
+      notifPanel.style.width = maxWidth + "px";
+      // Prefer opening from the bell's left (same side as bell)
+      let leftPos = Math.round(bellRect.left);
+      // If it would overflow to the right, try aligning to the bell's right edge (so it opens to the left)
+      if (leftPos + maxWidth > vw - 16){
+        const rightPos = Math.max(16, Math.round(vw - bellRect.right));
+        notifPanel.style.right = rightPos + "px";
+        notifPanel.style.left = "auto";
+      } else {
+        if (leftPos < 16) leftPos = 16;
+        notifPanel.style.left = leftPos + "px";
+        notifPanel.style.right = "auto";
+      }
+    }
+
     notifBell.addEventListener("click", ()=>{
-      notifPanel.style.display = (notifPanel.style.display === "none") ? "block" : "none";
+      if (notifPanel.style.display === "block") { notifPanel.style.display = "none"; return; }
+      notifPanel.style.display = "block";
+      positionNotifPanel();
     });
     notifCloseBtn.addEventListener("click", ()=> notifPanel.style.display = "none");
+
+    // Reposition when resizing/scrolling while panel is open
+    window.addEventListener('resize', () => { if (notifPanel.style.display === 'block') positionNotifPanel(); });
+    window.addEventListener('scroll', () => { if (notifPanel.style.display === 'block') positionNotifPanel(); });
 
     // Filtrar por notificaciones no leídas
     notifFilterUnread.addEventListener("click", () => {
