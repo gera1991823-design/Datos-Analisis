@@ -56,28 +56,31 @@
       position: relative;
     }
 
-    /* Título principal en 'pill' centrado visualmente (John Deere) */
+    /* Título principal: estilo empresarial, limpio y sobrio (ajustes corporativos) */
     .title{
-      display:flex;align-items:center;gap:10px;margin:0;
-      font-size:20px;font-weight:800;letter-spacing:.02em;
-      color: var(--jd-yellow) !important;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin:0;
+      font-size:22px;
+      font-weight:800;
+      letter-spacing:.025em;
+      color: var(--jd-green-dark);
       position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-      background: linear-gradient(90deg, var(--jd-green), var(--jd-green-dark));
-      padding:10px 16px;border-radius:999px;
-      box-shadow: 0 14px 34px rgba(24,79,19,.12);z-index:3;pointer-events:none;
-      border:1px solid rgba(255,222,0,.12);
+      background: #ffffff;
+      padding:10px 18px;border-radius:10px;
+      box-shadow: 0 8px 26px rgba(15,23,32,.06);
+      z-index:3;pointer-events:auto;
+      border:1px solid rgba(15,23,32,.06);
+      text-transform:none;
     }
 
     @media (max-width: 720px){
-      .title{position:static;transform:none;margin:0 auto;pointer-events:auto;font-size:18px;padding:8px 12px}
+      .title{position:static;transform:none;margin:0 auto;font-size:20px;padding:8px 14px;pointer-events:auto}
       .topbar{padding:10px 10px}
     }
-    .brandDot{
-      width:14px;height:14px;border-radius:999px;
-      background: var(--jd-yellow);
-      border:3px solid var(--jd-green-dark);
-      box-shadow: 0 6px 14px rgba(24,79,19,.12), inset 0 1px 0 rgba(255,255,255,.6);
-    }
+    /* Ocultamos el punto de la marca para un look más sobrio */
+    .brandDot{ display:none; }
     .subpill{
       display:inline-flex;align-items:center;gap:8px;
       border:1px solid var(--border);
@@ -139,7 +142,17 @@
     .cardHeader{border-bottom:1px solid var(--border);padding-bottom:14px;margin-bottom:18px}
 
     .row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
-    label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px;font-weight:800}
+    /* Etiquetas centradas para filtros y formulario "Agregar" */
+    label{font-size:12px;color:var(--muted);display:block;margin-bottom:8px;font-weight:800;text-align:center}
+
+    /* Alinear verticalmente cada bloque de filtro para centrar label + control */
+    .card .row > div,
+    .card .row-add > div{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      min-width:0;
+    }
 
     input,select{
       padding:10px 12px;
@@ -691,7 +704,7 @@
 
 <body>
   <div class="topbar">
-    <h1 class="title"><span class="brandDot"></span> Carpetas</h1>
+    <h1 class="title">Carpetas</h1>
 
     <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
       <div class="subpill"><b>Notificaciones</b></div>
@@ -754,12 +767,12 @@
     <div class="row">
       <div>
         <label>Buscar (cualquier campo)</label>
-        <input id="q" class="w220" placeholder="Ej: 12004566 / AGRO / 88855 / VACIO"/>
+        <input id="q" class="w220" />
       </div>
 
       <div>
         <label>Orden de compra</label>
-        <input id="fOC" class="w160" placeholder="Ej: 12004566 o VACIO"/>
+        <input id="fOC" class="w160" />
       </div>
 
       <div>
@@ -840,27 +853,27 @@
     <div class="row row-add">
       <div>
         <label>Factura</label>
-        <input id="factura" class="w140" inputmode="numeric" placeholder="Ej: 456222"/>
+        <input id="factura" class="w140" inputmode="numeric" />
       </div>
 
       <div>
         <label>División</label>
-        <input id="division" class="w200" placeholder="Ej: AGRO"/>
+        <input id="division" class="w200" />
       </div>
 
       <div>
         <label>Transporte</label>
-        <input id="transporte" class="w200" placeholder="Ej: Barco / Avión"/>
+        <input id="transporte" class="w200" />
       </div>
 
       <div>
         <label>Carpeta</label>
-        <input id="carpeta" class="w140" placeholder="Ej: 88855"/>
+        <input id="carpeta" class="w140" />
       </div>
 
       <div>
         <label>DUA</label>
-        <input id="dua" class="w140" placeholder="Ej: 123456"/>
+        <input id="dua" class="w140" />
       </div>
 
       <div>
@@ -875,7 +888,7 @@
 
       <div>
         <label>Orden de compra</label>
-        <input id="oc" class="w140" inputmode="numeric" placeholder="Ej: 12004566"/>
+        <input id="oc" class="w140" inputmode="numeric" />
       </div>
 
       <div>
@@ -1663,7 +1676,7 @@
       const list = atts.length ? `
         <div class="attLinks">
           ${atts.map((a, idx) => `
-            <a href="${escapeHtml(a.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(a.name || "Adjunto")}</a>
+            <a href="${escapeHtml(a.url)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(a.name || 'Adjunto')}">DUA</a>
             <span class="pillX" title="Borrar adjunto" data-action="delatt" data-att-idx="${idx}">×</span>
           `).join("")}
         </div>
