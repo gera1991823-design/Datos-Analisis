@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="es">
 <head>
   <meta charset="utf-8"/>
@@ -28,6 +28,9 @@
     }
 
     *{box-sizing:border-box}
+    html {
+      scrollbar-gutter: stable;
+    }
     body{
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       margin: 22px;
@@ -94,11 +97,14 @@
       border:1px solid var(--border-strong);
       border-radius:14px;
       font-size:14px;
+      font-family: inherit;
       min-width:160px;
       background: rgba(0,0,0,.04);
       color: var(--text);
       outline:none;
       box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
+      height: auto;
+      line-height: 1.4;
     }
     input::placeholder{color:var(--muted)}
     input:focus,select:focus{
@@ -129,7 +135,17 @@
     button.danger{
       color:#ffd7dc;border-color:#5a2731;background: rgba(176,0,32,.16);
     }
-    button.small{padding:7px 10px;border-radius:12px;font-size:12px;box-shadow:none;font-weight:900}
+    button.small{
+      padding:6px 10px;
+      border-radius:8px;
+      font-size:11px;
+      box-shadow:none;
+      font-weight:700;
+      flex: 1 1 auto;
+      white-space:nowrap;
+      min-width: auto;
+      max-width: none;
+    }
     button[disabled]{opacity:.6;cursor:not-allowed;transform:none}
 
     .muted{color:var(--muted);font-size:12px;margin-top:8px}
@@ -161,17 +177,47 @@
 
     .cellInner{
       display:flex;align-items:center;justify-content:center;
-      padding:14px 10px;border-radius:10px;min-height:48px;
+      padding:14px 10px;border-radius:10px;
+      height:48px;
       width:100%;box-sizing:border-box;
       font-weight:600;
       color: var(--row-text);
       border:1px solid rgba(15,23,32,.04);
       box-shadow: 0 10px 18px rgba(15,23,32,.06);
     }
+    
+    /* Celda de acciones mantiene altura fija */
+    td:last-child .cellInner {
+      height: 48px;
+      flex-wrap: wrap;
+      align-content: center;
+      padding: 4px 2px;
+      overflow: hidden;
+    }
     tbody tr:nth-child(odd) .cellInner{background: #e3eaee}
     tbody tr:nth-child(even) .cellInner{background: #d3dde2}
     tbody tr:hover .cellInner{background: rgba(54,124,43,.12)}
-    .cellInner .cell-input{width:100%;box-sizing:border-box;background:transparent;border:none;padding:0;}
+    .cellInner .cell-input{
+      width:100%;
+      box-sizing:border-box;
+      background:transparent;
+      border:none;
+      padding:0 7px;
+      height: 100%;
+      max-height: 48px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: inherit;
+      margin: 0;
+    }
+    
+    .cellInner input.cell-input,
+    .cellInner select.cell-input {
+      padding: 4px 7px;
+      height: 48px;
+      max-height: 48px;
+      line-height: 1.4;
+    }
 
     th{
       font-size:13px;letter-spacing:.06em;text-transform:uppercase;
@@ -186,13 +232,37 @@
     tbody tr{box-shadow: 0 8px 20px rgba(15,23,32,.06);border-radius:10px}
     tbody tr td{background:transparent}
 
-    .actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+    .actions{
+      display:flex;
+      gap:4px;
+      flex-wrap:nowrap;
+      justify-content:center;
+      width: 100%;
+    }
+    
+    /* Columna de acciones con ancho moderado */
+    td:last-child {
+      min-width: 120px;
+    }
+    
+    td:last-child .cellInner {
+      padding: 4px 2px;
+      justify-content:center;
+    }
+    
     .cell-input{
-      min-width:120px;padding:7px 10px;border-radius:12px;
+      min-width:120px;
+      padding:7px 10px;
+      border-radius:12px;
       border:1px solid var(--border-strong);
       background: rgba(255,255,255,.03);
       color: var(--text);
       text-align:center;
+      height: auto;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: inherit;
+      line-height: 1.4;
     }
 
     .w220{min-width:220px}
@@ -224,10 +294,15 @@
     }
 
     button.small.secondary{
-      border-color: rgba(54,124,43,.55);
-      color: var(--jd-green);
-      background: rgba(54,124,43,.12);
-      box-shadow: 0 6px 12px rgba(54,124,43,.04);
+      border-color: rgba(54,124,43,.85);
+      color: #fff;
+      background: rgba(54,124,43,.75);
+      box-shadow: 0 6px 12px rgba(54,124,43,.15);
+      font-weight: 700;
+      padding: 6px 12px;
+    }
+    button.small.secondary:hover{
+      background: rgba(54,124,43,.90);
     }
     button.small.primary{box-shadow: 0 10px 18px rgba(54,124,43,.10)}
     .actions button{color:#000 !important; font-weight:700}
@@ -364,11 +439,11 @@
       position:absolute;
       top:52px;
       right:0;
-      width:min(460px, calc(100vw - 32px));
+      width:min(420px, calc(100vw - 32px));
       max-height:70vh;
       overflow:auto;
       background:#fff;
-      border:1px solid var(--border);
+      border:2px solid var(--jd-green);
       border-radius:16px;
       box-shadow: 0 18px 50px rgba(0,0,0,.18);
       z-index: 9998;
@@ -376,49 +451,127 @@
     .notifHeader{
       position:sticky;
       top:0;
-      background: rgba(255,255,255,.98);
-      border-bottom:1px solid var(--border);
-      padding:10px 12px;
+      background: linear-gradient(90deg, rgba(54,124,43,.95), rgba(54,124,43,.85));
+      border-bottom:2px solid var(--jd-green);
+      padding:14px 16px;
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:10px;
+      color: #fff;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      font-size: 13px;
     }
     .notifActions{ display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
     .notifItem{
-      padding:10px 12px;
+      padding:14px 16px;
       border-bottom:1px solid var(--border);
       display:flex;
-      gap:10px;
+      gap:12px;
       align-items:flex-start;
+      transition: all .12s ease;
+      position: relative;
+    }
+    .notifItem:last-child{
+      border-bottom: none;
     }
     .notifDot{
-      width:10px; height:10px; border-radius:999px;
+      width:12px; height:12px; border-radius:999px;
       background: var(--jd-green);
-      box-shadow: inset 0 0 0 3px var(--jd-yellow);
-      margin-top:6px;
+      box-shadow: 0 0 0 4px var(--jd-yellow);
+      margin-top:4px;
       flex:0 0 auto;
     }
     .notifMain{ flex:1 1 auto; min-width:0; }
     .notifMain .t{
       font-weight:900;
       color:#000;
-      margin:0 0 4px;
+      margin:0 0 6px;
+      font-size: 14px;
+      letter-spacing: .02em;
     }
     .notifMain .d{
       margin:0;
       color: var(--row-text);
       font-size:13px;
-      line-height:1.25;
+      line-height:1.4;
+      font-weight: 600;
     }
     .notifMain .meta{
-      margin-top:6px;
+      margin-top:8px;
       font-size:12px;
       color: var(--muted);
       font-weight:700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
     .notifItem.unread{
-      background: rgba(54,124,43,.06);
+      background: linear-gradient(90deg, rgba(54,124,43,.15) 0%, rgba(54,124,43,.06) 100%);
+      border-left: 5px solid var(--jd-green);
+      padding-left: 11px;
+    }
+    .notifItem.unread .notifDot{
+      animation: pulse 2s ease-in-out infinite;
+    }
+    .notifItem.read{
+      background: rgba(0,0,0,.02);
+      opacity: 0.85;
+    }
+    .notifCheckmark{
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--jd-green);
+      color: #fff;
+      font-weight: 900;
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    
+    /* Botones específicos del panel de notificaciones */
+    #notifMarkReadBtn{
+      border-color: #22a14c !important;
+      background: linear-gradient(135deg, #2ecc71, #27ae60) !important;
+      color: #fff !important;
+      font-weight: 900 !important;
+      box-shadow: 0 6px 16px rgba(46,204,113,.25) !important;
+    }
+    #notifMarkReadBtn:hover{
+      background: linear-gradient(135deg, #27ae60, #229954) !important;
+    }
+    
+    #notifMarkUnreadBtn{
+      border-color: #e74c3c !important;
+      background: linear-gradient(135deg, #e67e22, #d35400) !important;
+      color: #fff !important;
+      font-weight: 900 !important;
+      box-shadow: 0 6px 16px rgba(230,126,34,.25) !important;
+    }
+    #notifMarkUnreadBtn:hover{
+      background: linear-gradient(135deg, #d35400, #ba4a00) !important;
+    }
+    
+    #notifCloseBtn{
+      border-color: #95a5a6 !important;
+      background: linear-gradient(135deg, #bdc3c7, #95a5a6) !important;
+      color: #fff !important;
+      font-weight: 900 !important;
+      box-shadow: 0 6px 16px rgba(149,165,166,.15) !important;
+    }
+    #notifCloseBtn:hover{
+      background: linear-gradient(135deg, #95a5a6, #7f8c8d) !important;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
     }
 
     /* ✅ Resaltado al ir a una fila desde notificaciones */
@@ -447,13 +600,14 @@
           <div class="notifHeader">
             <div><b>Notificaciones</b></div>
             <div class="notifActions">
-              <button id="notifMarkReadBtn" class="small secondary" type="button">Marcar como leído</button>
+              <button id="notifFilterUnread" class="small secondary" type="button" style="background: linear-gradient(135deg, #e67e22, #d35400) !important;">No leídas</button>
+              <button id="notifFilterRead" class="small secondary" type="button">Leídas</button>
               <button id="notifCloseBtn" class="small" type="button">Cerrar</button>
             </div>
           </div>
 
           <div id="notifList">
-            <div class="muted" style="padding:10px;">Sin notificaciones.</div>
+            <div class="muted" style="padding:16px; text-align:center; font-size:14px;">Sin notificaciones por el momento</div>
           </div>
         </div>
       </div>
@@ -531,6 +685,16 @@
       <div>
         <label>Cierre de carpeta</label>
         <select id="fCierre">
+          <option value="">(Todas)</option>
+          <option value="__EMPTY__">(Vacío)</option>
+          <option value="SI">SI</option>
+          <option value="NO">NO</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Confirmación de llegada</label>
+        <select id="fConfirmacionLlegada">
           <option value="">(Todas)</option>
           <option value="__EMPTY__">(Vacío)</option>
           <option value="SI">SI</option>
@@ -741,7 +905,10 @@
     const notifPanel = $("notifPanel");
     const notifList = $("notifList");
     const notifCloseBtn = $("notifCloseBtn");
-    const notifMarkReadBtn = $("notifMarkReadBtn");
+    const notifFilterUnread = $("notifFilterUnread");
+    const notifFilterRead = $("notifFilterRead");
+    
+    let notifFilterMode = "unread"; // "unread" o "read"
 
     let editingRowId = null;
     let cache = [];
@@ -913,12 +1080,25 @@
 
     async function createNotificationForArrival(rowId, rowData){
       try{
+        // Solo crear notificación por carpeta, no por fila individual
+        const carpeta = (rowData.carpeta || "").toString().trim();
+        if (!carpeta) return; // No notificar si no hay carpeta
+        
+        // Verificar si ya existe una notificación no leída para esta carpeta
+        const existingForCarpeta = notificationsCache.find(n => 
+          (n.data.carpeta || "").toString().trim() === carpeta &&
+          n.data.read !== true
+        );
+        
+        // Si ya existe una notificación no leída para esta carpeta, no crear otra
+        if (existingForCarpeta) return;
+        
         const payload = {
           type: "ARRIBO",
-          title: "ARRIBO / LLEGADA CONFIRMADA",
+          title: `ARRIBO / LLEGADA CONFIRMADA - Carpeta ${carpeta}`,
           rowId,
+          carpeta: carpeta,
           oc: rowData.oc || "",
-          carpeta: rowData.carpeta || "",
           factura: rowData.factura || "",
           division: rowData.division || "",
           transporte: rowData.transporte || "",
@@ -936,6 +1116,26 @@
       notifPanel.style.display = (notifPanel.style.display === "none") ? "block" : "none";
     });
     notifCloseBtn.addEventListener("click", ()=> notifPanel.style.display = "none");
+
+    // Filtrar por notificaciones no leídas
+    notifFilterUnread.addEventListener("click", () => {
+      notifFilterMode = "unread";
+      notifFilterUnread.style.background = "linear-gradient(135deg, #e67e22, #d35400) !important";
+      notifFilterUnread.style.color = "#fff";
+      notifFilterRead.style.background = "rgba(54,124,43,.75)";
+      notifFilterRead.style.color = "#fff";
+      renderNotif();
+    });
+
+    // Filtrar por notificaciones leídas
+    notifFilterRead.addEventListener("click", () => {
+      notifFilterMode = "read";
+      notifFilterRead.style.background = "linear-gradient(135deg, #2ecc71, #27ae60) !important";
+      notifFilterRead.style.color = "#fff";
+      notifFilterUnread.style.background = "rgba(54,124,43,.75)";
+      notifFilterUnread.style.color = "#fff";
+      renderNotif();
+    });
 
     // Cerrar panel al click afuera
     document.addEventListener("click", (e)=>{
@@ -955,33 +1155,82 @@
         notifBadge.style.display = "none";
       }
 
-      if (!notificationsCache.length){
-        notifList.innerHTML = `<div class="muted" style="padding:10px;">Sin notificaciones.</div>`;
+      // Filtrar según el modo seleccionado
+      let toDisplay = notificationsCache;
+      if (notifFilterMode === "unread") {
+        toDisplay = notificationsCache.filter(n => n.data.read !== true);
+      } else if (notifFilterMode === "read") {
+        toDisplay = notificationsCache.filter(n => n.data.read === true);
+      }
+
+      if (!toDisplay.length){
+        const msg = notifFilterMode === "unread" ? 
+          "Sin notificaciones no leídas" : 
+          "Sin notificaciones leídas";
+        notifList.innerHTML = `<div class="muted" style="padding:16px; text-align:center; font-size:14px;">${msg}</div>`;
         return;
       }
 
-      notifList.innerHTML = notificationsCache.map(n=>{
-        const d = n.data || {};
+      // Agrupar por carpeta
+      const grouped = {};
+      toDisplay.forEach(n => {
+        const carpeta = (n.data.carpeta || "sin-carpeta").toString().trim();
+        if (!grouped[carpeta]) {
+          grouped[carpeta] = [];
+        }
+        grouped[carpeta].push(n);
+      });
+
+      // Ordenar grupos por fecha más reciente (descendente)
+      const sortedGroups = Object.entries(grouped).sort((a, b) => {
+        const latestA = a[1][0]?.data?.createdAt;
+        const latestB = b[1][0]?.data?.createdAt;
+        
+        // Convertir timestamps de Firestore a milisegundos para comparar
+        const timeA = latestA?.toMillis ? latestA.toMillis() : 0;
+        const timeB = latestB?.toMillis ? latestB.toMillis() : 0;
+        
+        return timeB - timeA; // Más recientes primero
+      });
+
+      // Renderizar notificaciones agrupadas
+      const notifsByGroup = sortedGroups.map(([carpeta, items]) => {
+        // Tomar la notificación más reciente del grupo
+        const latest = items[0]; // Ya están ordenadas por createdAt desc
+        const d = latest.data || {};
         const isUnread = d.read !== true;
         const meta = fmtTS(d.createdAt);
-        const detail = `OC: ${d.oc || "—"} · Carpeta: ${d.carpeta || "—"} · Factura: ${d.factura || "—"}`;
+        const count = items.length > 1 ? ` (${items.length} filas)` : "";
+        const checkmark = isUnread ? "🔔" : "✓";
+        
         return `
-          <div class="notifItem ${isUnread ? "unread" : ""}">
+          <div class="notifItem ${isUnread ? "unread" : "read"}" data-carpeta="${escapeHtml(carpeta)}">
             <div class="notifDot"></div>
             <div class="notifMain">
-              <div class="t">${escapeHtml(d.title || "Notificación")}</div>
-              <div class="d"><b>${escapeHtml(detail)}</b></div>
-              <div class="meta">${escapeHtml(meta)}</div>
+              <div class="t">📦 Carpeta ${escapeHtml(carpeta)}${count}</div>
+              <div class="d">
+                <span>🏭 OC: <b>${escapeHtml(d.oc || "—")}</b></span><br>
+                <span>📄 Factura: <b>${escapeHtml(d.factura || "—")}</b></span><br>
+                <span>🏢 División: <b>${escapeHtml(d.division || "—")}</b></span>
+              </div>
+              <div class="meta">
+                <span>${escapeHtml(meta)}</span>
+                <span style="margin-left: auto; display: flex; align-items: center; gap: 4px;">
+                  ${isUnread ? '<span class="notifCheckmark">!</span>' : '<span class="notifCheckmark">✓</span>'}
+                </span>
+              </div>
 
-              <div style="margin-top:8px; display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap;">
-                <button class="small secondary" type="button" data-action="viewRow" data-rowid="${escapeHtml(d.rowId || "")}">
-                  Ver fila
+              <div style="margin-top:10px; display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap;">
+                <button class="small secondary" type="button" data-action="viewCarpeta" data-carpeta="${escapeHtml(carpeta)}">
+                  Ver todas las filas
                 </button>
               </div>
             </div>
           </div>
         `;
-      }).join("");
+      });
+
+      notifList.innerHTML = notifsByGroup.join("");
     }
 
     // Escuchar últimas 50 notificaciones
@@ -994,24 +1243,6 @@
       console.warn("No se pudieron leer notifications:", e);
     });
 
-    // Marcar como leídas (todas las que estén en cache y sean unread)
-    notifMarkReadBtn.addEventListener("click", async ()=>{
-      try{
-        const unread = notificationsCache.filter(n => n.data.read !== true);
-        if (!unread.length) { notifPanel.style.display = "none"; return; }
-
-        const batch = writeBatch(db);
-        unread.forEach(n=>{
-          batch.update(doc(db, "notifications", n.id), { read: true, readAt: serverTimestamp() });
-        });
-        await batch.commit();
-        notifPanel.style.display = "none";
-      } catch(e){
-        console.error(e);
-        alert("No se pudo marcar como leído.");
-      }
-    });
-
     // ✅ Limpiar filtros + ir a la fila + resaltar
     function clearAllFilters(){
       $("q").value = "";
@@ -1019,6 +1250,7 @@
       $("fCond").value = "";
       $("fWis").value = "";
       $("fCierre").value = "";
+      $("fConfirmacionLlegada").value = "";
       $("fOC").value = "";
       $("fFechaMode").value = "";
       $("fDateFrom").value = "";
@@ -1041,17 +1273,85 @@
       }, 60);
     }
 
-    // Delegación de eventos: botón "Ver fila"
-    notifList.addEventListener("click", (e) => {
+    function filterByCarpeta(carpeta){
+      clearAllFilters();
+      // Usar el campo de búsqueda para filtrar por carpeta
+      $("q").value = carpeta;
+      applyFilters();
+
+      setTimeout(() => {
+        // Scroll a la primera fila visible
+        const firstRow = document.querySelector("tbody tr");
+        if (firstRow){
+          firstRow.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }, 60);
+    }
+
+    // Delegación de eventos: botones de notificación
+    notifList.addEventListener("click", async (e) => {
       const btn = e.target.closest("[data-action]");
       if (!btn) return;
-      if (btn.dataset.action !== "viewRow") return;
 
-      const rowId = btn.dataset.rowid || "";
-      if (!rowId) return;
+      if (btn.dataset.action === "viewCarpeta") {
+        const carpeta = btn.dataset.carpeta || "";
+        if (!carpeta) return;
+        
+        // Marcar la notificación de esta carpeta como leída
+        const notifForCarpeta = notificationsCache.find(n => 
+          (n.data.carpeta || "").toString().trim() === carpeta
+        );
+        
+        if (notifForCarpeta && notifForCarpeta.data.read !== true) {
+          try {
+            await updateDoc(doc(db, "notifications", notifForCarpeta.id), { 
+              read: true, 
+              readAt: serverTimestamp() 
+            });
+          } catch (err) {
+            console.warn("Error marcando notificación como leída:", err);
+          }
+        }
+        
+        notifPanel.style.display = "none";
+        filterByCarpeta(carpeta);
+        return;
+      }
 
-      notifPanel.style.display = "none";
-      highlightAndScrollToRow(rowId);
+      if (btn.dataset.action === "viewRow") {
+        const rowId = btn.dataset.rowid || "";
+        if (!rowId) return;
+        notifPanel.style.display = "none";
+        highlightAndScrollToRow(rowId);
+        return;
+      }
+    });
+
+    // Marcar como leída al hacer click en el item de notificación
+    notifList.addEventListener("click", async (e) => {
+      const notifItem = e.target.closest(".notifItem");
+      if (!notifItem) return;
+      
+      const carpeta = notifItem.dataset.carpeta;
+      if (!carpeta) return;
+      
+      // Si es unread y se hace click en el item (pero no en el botón)
+      if (e.target.closest("[data-action]")) return; // Si fue en un botón, ignorar
+      
+      const notifForCarpeta = notificationsCache.find(n => 
+        (n.data.carpeta || "").toString().trim() === carpeta
+      );
+      
+      if (notifForCarpeta && notifForCarpeta.data.read !== true) {
+        try {
+          await updateDoc(doc(db, "notifications", notifForCarpeta.id), { 
+            read: true, 
+            readAt: serverTimestamp() 
+          });
+        } catch (err) {
+          console.warn("Error marcando notificación como leída:", err);
+        }
+      }
     });
 
     // ✅ Buscar (cualquier campo) + soporte "VACIO"
@@ -1105,6 +1405,7 @@
       const fCond = $("fCond").value;
       const fWis = $("fWis").value;
       const fCierre = $("fCierre").value;
+      const fConfirmacionLlegada = $("fConfirmacionLlegada").value;
 
       const fOC = norm($("fOC").value);
       const fechaMode = $("fFechaMode").value; // "" | "CON" | "VACIO"
@@ -1136,6 +1437,11 @@
         if (fCierre){
           if (fCierre === "__EMPTY__"){ if (!isEmptyVal(r.cierre)) return false; }
           else { if ((r.cierre || "") !== fCierre) return false; }
+        }
+
+        if (fConfirmacionLlegada){
+          if (fConfirmacionLlegada === "__EMPTY__"){ if (!isEmptyVal(r.confirmacion_llegada)) return false; }
+          else { if ((r.confirmacion_llegada || "") !== fConfirmacionLlegada) return false; }
         }
 
         if (!matchesText(r, q)) return false;
@@ -1173,7 +1479,7 @@
       else sel.value = "";
     }
 
-    ["q","fDivision","fCond","fWis","fCierre","fOC","fFechaMode","fDateFrom","fDateTo"].forEach(id=>{
+    ["q","fDivision","fCond","fWis","fCierre","fConfirmacionLlegada","fOC","fFechaMode","fDateFrom","fDateTo"].forEach(id=>{
       $(id).addEventListener("input", applyFilters);
       $(id).addEventListener("change", applyFilters);
     });
@@ -1248,7 +1554,7 @@
       }
       return `
         <div class="attLinks">
-          <a href="${escapeHtml(p.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(p.name || "Packing")}</a>
+          <a href="${escapeHtml(p.url)}" target="_blank" rel="noopener noreferrer">XLSX</a>
           <span class="pillX" title="Borrar packing" data-action="delpacking">×</span>
         </div>
         <div style="margin-top:6px">
@@ -1362,8 +1668,7 @@
             <td>
               <div class="cellInner">
                 <div class="actions">
-                  <button class="small secondary" data-action="edit">Editar</button>
-                  <button class="small danger" data-action="delete">Eliminar</button>
+                  <button class="small secondary" data-action="edit" title="Editar">✏️</button>
                 </div>
               </div>
             </td>
