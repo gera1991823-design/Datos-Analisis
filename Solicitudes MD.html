@@ -1,0 +1,1120 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Solicitudes - Interagrovial</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <style>
+    :root{
+      --jd-green:#184f13;
+      --jd-green-dark:#0f3a0f;
+      --jd-yellow:#ffde00;
+
+      --bg:#f4faf4;
+      --text:#071217;
+      --row-text:#274939;
+      --muted:#5f6b67;
+
+      --border:#e8f2e8;
+      --border-strong:#d7e9d7;
+
+      --shadow:0 16px 36px rgba(15,23,32,.08);
+      --shadow2:0 10px 22px rgba(15,23,32,.06);
+      --radius:14px;
+    }
+
+    *{box-sizing:border-box}
+    html{scrollbar-gutter: stable;}
+    body{
+      font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      margin: 22px;
+      background: radial-gradient(1200px 600px at 15% 0%, rgba(46,125,50,.04), transparent 55%),
+                  radial-gradient(1200px 600px at 85% 0%, rgba(255,222,0,.02), transparent 55%),
+                  var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+    }
+
+    .topbar{
+      display:flex;align-items:center;justify-content:space-between;
+      gap:14px;flex-wrap:wrap;margin-bottom:18px;padding:12px 14px;
+      background: linear-gradient(90deg, rgba(24,79,19,0.06), rgba(255,222,0,0.02));
+      border:1px solid rgba(15,64,18,.06);
+      border-radius:12px;box-shadow: 0 8px 22px rgba(24,79,19,.03);
+      position: relative;
+    }
+    .title{
+      display:flex;align-items:center;gap:12px;margin:0;
+      font-size:22px;font-weight:800;letter-spacing:.025em;
+      color: var(--jd-green-dark);
+      position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+      background:#fff;padding:10px 18px;border-radius:10px;
+      box-shadow: 0 8px 26px rgba(15,23,32,.06);
+      z-index:3;border:1px solid rgba(15,23,32,.06);
+    }
+    @media (max-width: 720px){
+      .title{position:static;transform:none;margin:0 auto;font-size:20px;padding:8px 14px}
+      .topbar{padding:10px 10px}
+    }
+    .subpill{
+      display:inline-flex;align-items:center;gap:8px;
+      border:1px solid var(--border);
+      padding:8px 12px;border-radius:999px;
+      background: rgba(0,0,0,.03);
+      font-size:12px;color:var(--muted);
+      box-shadow: var(--shadow2);
+    }
+    .subpill b{color:var(--jd-green)}
+
+    .card{
+      background: linear-gradient(180deg, #fff, #fbfffb);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      box-shadow: var(--shadow);
+      margin-bottom: 14px;
+      overflow:hidden;
+      position:relative;
+      padding-left: 20px;
+    }
+    .accentBar{
+      position:absolute;left:0;top:0;height:100%;width:10px;
+      background: var(--jd-green);
+      border-top-left-radius:var(--radius);border-bottom-left-radius:var(--radius);
+      box-shadow: 0 8px 20px rgba(24,79,19,.06);
+    }
+    .cardHeader{
+      display:flex;align-items:center;justify-content:flex-start;
+      gap:10px;margin-bottom:12px;position:relative;min-height:56px;padding-right:12px;
+      border-bottom:1px solid var(--border);padding-bottom:14px;margin-bottom:18px;
+    }
+    .cardHeader .row{ margin-left:auto; display:flex; gap:8px; align-items:center }
+    .cardHeader h3{
+      position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+      font-size:13px;padding:10px 18px;border-radius:12px;
+      background: linear-gradient(90deg, rgba(255,222,0,.08), rgba(46,125,50,.04));
+      color:var(--jd-green-dark);font-weight:900;text-transform:uppercase;letter-spacing:.12em;
+      border:1px solid rgba(46,125,50,.10);box-shadow: 0 8px 20px rgba(24,79,19,.04);
+    }
+    .card > h3{
+      margin:6px auto 12px;font-size:14px;padding:10px 18px;border-radius:12px;
+      background: linear-gradient(90deg, rgba(255,222,0,.04), rgba(255,222,0,.02));
+      color:var(--jd-green-dark);font-weight:900;text-transform:uppercase;letter-spacing:.08em;
+      border:1px solid rgba(46,125,50,.06);box-shadow: 0 8px 20px rgba(24,79,19,.04);
+      text-align:center;display:block;
+    }
+    @media (max-width:720px){
+      .cardHeader h3{position:static;transform:none;margin:0 auto 10px}
+      .card > h3{margin:6px 12px 12px}
+    }
+
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+    label{font-size:12px;color:var(--muted);display:block;margin-bottom:8px;font-weight:800;text-align:center}
+    .card .row > div, .card .row-add > div{display:flex;flex-direction:column;align-items:center;min-width:0}
+
+    input,select{
+      padding:10px 12px;
+      border:1px solid var(--border-strong);
+      border-radius:14px;
+      font-size:14px;
+      font-family: inherit;
+      min-width:160px;
+      background: rgba(0,0,0,.04);
+      color: var(--text);
+      outline:none;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
+      line-height: 1.4;
+    }
+    input::placeholder{color:var(--muted)}
+    input:focus,select:focus{border-color: var(--jd-green-dark);box-shadow: 0 0 0 6px rgba(24,79,19,.12);}
+
+    button{
+      padding:10px 12px;border:1px solid var(--border-strong);
+      background: rgba(0,0,0,.04);
+      border-radius:14px;cursor:pointer;
+      transition:.12s ease;font-weight:900;color:var(--text);
+      box-shadow: var(--shadow2);
+    }
+    button:hover{transform: translateY(-1px)}
+    button.primary{
+      background: linear-gradient(135deg, var(--jd-green), var(--jd-green-dark));
+      border-color: rgba(15,64,18,.95);
+      color:#fff;
+      box-shadow: 0 16px 34px rgba(24,79,19,.22);
+    }
+    button.secondary{
+      background: linear-gradient(135deg, var(--jd-yellow), #ffd600);
+      border-color: rgba(24,79,19,.06);
+      color: var(--jd-green-dark);
+      box-shadow:none;
+      font-weight:800;
+    }
+    button.danger{color:#ffd7dc;border-color:#5a2731;background: rgba(176,0,32,.16);}
+    button.small{padding:6px 10px;border-radius:8px;font-size:11px;box-shadow:none;font-weight:700;white-space:nowrap;min-width:auto;}
+    button[disabled]{opacity:.6;cursor:not-allowed;transform:none}
+
+    .toast{margin-top:10px;font-size:13px;color:#2f7e2c;display:none;font-weight:900}
+    .toast.err{color:#ff2d2d}
+
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0 14px;
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    thead th{
+      background: rgba(0,0,0,.03);
+      position:sticky;top:0;z-index:2;
+      text-align:center;
+    }
+    th,td{
+      padding:0;font-size:14px;vertical-align:middle;white-space:nowrap;text-align:center;color:var(--text);font-weight:600;
+    }
+    th{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:12px 8px;}
+
+    .cellInner{
+      display:flex;align-items:center;justify-content:center;
+      padding:14px 10px;border-radius:10px;height:48px;width:100%;
+      font-weight:600;color: var(--row-text);
+      border:1px solid rgba(15,23,32,.04);
+      box-shadow: 0 10px 18px rgba(15,23,32,.06);
+      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(245,253,244,0.9));
+    }
+    tbody tr:nth-child(odd) .cellInner{background:#eef6ef}
+    tbody tr:nth-child(even) .cellInner{background:#e3eaee}
+    tbody tr:hover .cellInner{background: rgba(54,124,43,.12)}
+
+    .cellInner .cell-input{
+      width:100%;
+      background:#fff;
+      border:1px solid rgba(46,125,50,.14);
+      padding:6px 10px;height:36px;
+      font-size:14px;font-weight:600;font-family:inherit;
+      border-radius:10px;text-align:center;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 6px 14px rgba(15,23,32,.04);
+    }
+
+    td:last-child{min-width:160px}
+    td:last-child .cellInner{padding:6px}
+    .actions{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+
+    .w220{min-width:220px}
+    .w200{min-width:200px}
+    .w160{min-width:160px}
+    .w140{min-width:140px}
+
+    .footer{
+      position:fixed;left:16px;bottom:12px;font-size:12px;
+      color:var(--text);background: rgba(255,255,255,.98);
+      border:1px solid var(--border);
+      border-left:7px solid var(--jd-green);
+      padding:9px 12px;border-radius:14px;
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(6px);
+    }
+    .footer b{color:var(--jd-green)}
+  </style>
+</head>
+
+<body>
+  <div class="topbar">
+    <h1 class="title">Solicitudes</h1>
+    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+      <div class="subpill"><b>Tabla</b> · Materiales</div>
+    </div>
+  </div>
+
+  <!-- FILTROS -->
+  <div class="card">
+    <div class="accentBar"></div>
+    <div class="cardHeader">
+      <h3>Filtros</h3>
+      <div class="row" style="gap:8px">
+        <button id="clearFiltersBtn" class="secondary" type="button">Limpiar</button>
+        <button id="exportXlsxBtn" class="secondary" type="button">Descargar XLSX</button>
+        <button id="importXlsxBtn" class="secondary" type="button">Importar XLSX</button>
+        <input id="importFile" type="file" accept=".xlsx,.xls" style="display:none">
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Buscar (cualquier campo)</label>
+        <input id="q" class="w220" placeholder="Ej: RE504836 / S001 / Solicitar..." />
+      </div>
+
+      <div>
+        <label>Sucursal</label>
+        <select id="fSucursal" class="w160">
+          <option value="">(Todas)</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Comentario</label>
+        <select id="fComentario" class="w200">
+          <option value="">(Todos)</option>
+          <option value="Solicitar cotizacion">Solicitar cotizacion</option>
+          <option value="Stock en la red">Stock en la red</option>
+          <option value="Ticket reserva">Ticket reserva</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Respuesta</label>
+        <select id="fRespuesta" class="w160">
+          <option value="">(Todas)</option>
+          <option value="Solicitar">Solicitar</option>
+          <option value="No solicitar">No solicitar</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- AGREGAR -->
+  <div class="card">
+    <div class="accentBar"></div>
+    <h3>Agregar fila</h3>
+
+    <div class="row row-add">
+      <div><label>Material</label><input id="a_material" class="w160" placeholder="RE504836"></div>
+      <div><label>Cantidad</label><input id="a_cantidad" class="w140" type="number" min="0" step="1" value="1"></div>
+      <div><label>Solicitud</label><input id="a_solicitud" class="w160"></div>
+      <div><label>Necesidad</label><input id="a_necesidad" class="w160"></div>
+
+      <!-- ✅ Sucursal dropdown -->
+      <div>
+        <label>Sucursal</label>
+        <select id="a_sucursal" class="w160"></select>
+      </div>
+
+      <!-- Centro select removed per request -->
+
+      <div>
+        <label>Sucursal Nombre</label>
+        <select id="a_sucursal_nombre" class="w160"></select>
+      </div>
+
+      <!-- Puesto removed from form -->
+
+      <div>
+        <label>Nombre</label>
+        <select id="a_nombre" class="w200"></select>
+      </div>
+
+      <div><label>Responsable</label><input id="a_responsable" class="w160"></div>
+
+      <div>
+        <label>Comentario</label>
+        <select id="a_comentario" class="w200">
+          <option value="" selected>(Elegir)</option>
+          <option value="Solicitar cotizacion">Solicitar cotizacion</option>
+          <option value="Stock en la red">Stock en la red</option>
+          <option value="Ticket reserva">Ticket reserva</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Respuesta</label>
+        <select id="a_respuesta" class="w160">
+          <option value="" selected>(Elegir)</option>
+          <option value="Solicitar">Solicitar</option>
+          <option value="No solicitar">No solicitar</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Fecha de respuesta</label>
+        <input id="a_fecha_respuesta" class="w160" type="date">
+      </div>
+
+      <button id="addBtn" class="primary" type="button">Agregar</button>
+    </div>
+
+    <div id="toast" class="toast"></div>
+  </div>
+
+  <!-- TABLA -->
+  <table>
+    <thead>
+      <tr>
+        <th>Material</th>
+        <th>Cantidad</th>
+        <th>Solicitud</th>
+        <th>Necesidad</th>
+        <th>Sucursal</th>
+        <th>Nombre</th>
+        <th>Comentario</th>
+        <th>Respuesta</th>
+        <th>Fecha de respuesta</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+
+  <div class="footer"><b>INTERAGROVIAL S.A</b></div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    const SUCURSAL_OPTS = [
+      "S001","S002","S003","S004","S005","S006","S007","S008","S009",
+      "S010","S011","S012","S014","S015","S016","S017","S018","S019"
+    ];
+    const COMENTARIO_OPTS = ["Solicitar cotizacion","Stock en la red","Ticket reserva"];
+    const RESPUESTA_OPTS  = ["Solicitar","No solicitar"];
+    let CENTRO_OPTS = [
+      "S001","S002","S003","S004","S005","S006","S007","S008","S009",
+      "S010","S011","S012","S014","S015","S016","S017","S018","S019"
+    ];
+    let SUCURSAL_NOMBRE_OPTS = [
+      "MONTEVIDEO AGRO","MVDEO/SAN JOSE","MONTEVIDEO CONS","MERCEDES","YOUNG",
+      "PAYSANDU","PAYSANDU FORESTAL","RIO BRANCO","GOMENSORO","GOMENSORO/SALTO",
+      "FLORIDA","FLORIDA/DURAZNO","OMBUES","TACUAREMBO","SAN CARLOS",
+      "S.CARLOS/LASCANO","LASCANO","SALTO","SAN JOSE","VALDENSE","DURAZNO","TARARIRAS"
+    ];
+    let PUESTO_OPTS = [
+      "Vendedor","Admin Taller","Admin Tlr","Jefe Rep.","Jefe Tallr","Gerente",
+      "Responsable","Analista","Aux. Admin","Administr.","Jefe Tllr","Admin Tllr","Aux Admin",
+      "Gte Suc","Analista","Aux -Vendedor","Administr.","Adm Tll","Gte Suc"
+    ];
+    // mapping centro -> array of people {nombre, apellido, puesto, sucursalNombre}
+    let CENTRO_TO_PEOPLE = {};
+
+    // ✅ poblar combos de Sucursal (Agregar + Filtro)
+    function fillSucursalSelect(sel, includeAll=false){
+      const base = includeAll ? [`<option value="">(Todas)</option>`] : [`<option value="" selected>(Elegir)</option>`];
+      sel.innerHTML = base.concat(SUCURSAL_OPTS.map(s => `<option value="${s}">${s}</option>`)).join("");
+    }
+    function fillDynamicSelect(sel, arr, includeAll=false){
+      const base = includeAll ? [`<option value="">(Todas)</option>`] : [`<option value="" selected>(Elegir)</option>`];
+      sel.innerHTML = base.concat((arr||[]).map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`)).join("");
+    }
+    fillSucursalSelect($("a_sucursal"), false);
+    fillSucursalSelect($("fSucursal"), true);
+    // init dynamic selects (empty until import or manual options)
+    // a_centro removed; populate a_sucursal with centro codes if available
+    fillDynamicSelect($("a_sucursal"), CENTRO_OPTS, false);
+    fillDynamicSelect($("a_sucursal_nombre"), SUCURSAL_NOMBRE_OPTS, false);
+
+    function allFullNamesList(){
+      const tmp = [];
+      Object.values(CENTRO_TO_PEOPLE).forEach(list=> list.forEach(p=>{ const full = [p.nombre,p.apellido].filter(Boolean).join(' '); if(full) tmp.push(full); }));
+      return Array.from(new Set(tmp));
+    }
+    function allPuestosList(){
+      const tmp = [];
+      Object.values(CENTRO_TO_PEOPLE).forEach(list=> list.forEach(p=>{ if(p.puesto) tmp.push(p.puesto); }));
+      return Array.from(new Set(tmp));
+    }
+
+    // Try to load pre-generated JSON mapping (assets/people.json) if present
+    fetch('assets/people.json').then(r=>{
+      if(!r.ok) throw new Error('no json');
+      return r.json();
+    }).then(j=>{
+      CENTRO_OPTS = j.CENTRO_OPTS || CENTRO_OPTS || [];
+      SUCURSAL_NOMBRE_OPTS = j.SUCURSAL_NOMBRE_OPTS || SUCURSAL_NOMBRE_OPTS || [];
+      PUESTO_OPTS = j.PUESTO_OPTS || PUESTO_OPTS || [];
+      CENTRO_TO_PEOPLE = j.CENTRO_TO_PEOPLE || CENTRO_TO_PEOPLE || {};
+      // refresh selects
+      fillDynamicSelect($("a_sucursal"), CENTRO_OPTS, false);
+      // keep fSucursal filled from fixed SUCURSAL_OPTS
+      fillSucursalSelect($("fSucursal"), true);
+      fillDynamicSelect($("a_sucursal_nombre"), SUCURSAL_NOMBRE_OPTS, false);
+    }).catch(()=>{
+      // no preloaded JSON — user can still import via button
+    });
+    // initial people mapping (empty) - if you want, you can prefill CENTRO_TO_PEOPLE here
+    // panel to show people for selected centro
+    const peoplePanel = document.createElement('div');
+    peoplePanel.id = 'peoplePanel';
+    peoplePanel.style.marginTop = '12px';
+    peoplePanel.style.padding = '10px';
+    peoplePanel.style.border = '1px dashed var(--border)';
+    peoplePanel.style.borderRadius = '10px';
+    peoplePanel.style.background = 'rgba(255,255,255,0.9)';
+    document.querySelector('.card').appendChild(peoplePanel);
+    function renderPeoplePanel(centro){
+      const el = document.getElementById('peoplePanel');
+      if(!centro){ el.innerHTML = '<small>Selecciona un centro para ver personas relacionadas.</small>'; return; }
+      const people = CENTRO_TO_PEOPLE[centro] || [];
+      if(!people.length){ el.innerHTML = `<small>No hay personas asociadas a ${escapeHtml(centro)}.</small>`; return; }
+      const rows = people.map(p=>`<div style="padding:6px 8px;border-bottom:1px solid rgba(0,0,0,.04)"><b>${escapeHtml(p.nombre)} ${escapeHtml(p.apellido)}</b> ${p.puesto?('<span style="color:var(--muted)"> - '+escapeHtml(p.puesto)+'</span>'):''} <span style="color:var(--muted)">(${escapeHtml(p.sucursalNombre)})</span></div>`).join('');
+      el.innerHTML = `<div style="font-weight:900;margin-bottom:6px">Personas en ${escapeHtml(centro)}</div>${rows}`;
+    }
+
+    function renderPeoplePanelWithSelected(centro, selectedFullName){
+      const el = document.getElementById('peoplePanel');
+      if(!centro){ el.innerHTML = '<small>Selecciona un centro para ver personas relacionadas.</small>'; return; }
+      const people = CENTRO_TO_PEOPLE[centro] || [];
+      if(!people.length){ el.innerHTML = `<small>No hay personas asociadas a ${escapeHtml(centro)}.</small>`; return; }
+      const selected = people.filter(p=> ([p.nombre,p.apellido].filter(Boolean).join(' ')) === selectedFullName);
+      const responsables = people.filter(p=> /jefe|responsable|gerente|encargado/i.test(p.puesto || ''));
+      // unique list: selected first, then responsables, then others
+      const seen = new Set();
+      const order = [];
+      selected.forEach(p=>{ const k = p.nombre+'|'+p.apellido; if(!seen.has(k)){ seen.add(k); order.push({p,tag:'Seleccionado'}); }});
+      responsables.forEach(p=>{ const k = p.nombre+'|'+p.apellido; if(!seen.has(k)){ seen.add(k); order.push({p,tag:'Responsable'}); }});
+      people.forEach(p=>{ const k = p.nombre+'|'+p.apellido; if(!seen.has(k)){ seen.add(k); order.push({p,tag:''}); }});
+      const rows = order.map(item=>{
+        const p = item.p;
+        return `<div style="padding:6px 8px;border-bottom:1px solid rgba(0,0,0,.04)"><b>${escapeHtml(p.nombre)} ${escapeHtml(p.apellido)}</b> ${p.puesto?('<span style="color:var(--muted)"> - '+escapeHtml(p.puesto)+'</span>'):''} ${item.tag?('<span style="color:var(--jd-green);font-weight:900;margin-left:8px">['+item.tag+']</span>'):''} <span style="color:var(--muted)">(${escapeHtml(p.sucursalNombre)})</span></div>`;
+      }).join('');
+      el.innerHTML = `<div style="font-weight:900;margin-bottom:6px">Personas en ${escapeHtml(centro)}</div>${rows}`;
+    }
+
+    let DATA = [
+      {
+        id: crypto.randomUUID(),
+        material: "RE504836",
+        cantidad: 1,
+        solicitud: "",
+        necesidad: "",
+        sucursal: "S001",
+        // centro field removed (use `sucursal`)
+        nombre: "",
+        apellido: "",
+        sucursalNombre: "MONTEVIDEO AGRO",
+        responsable: "",
+        comentario: "Solicitar cotizacion",
+        respuesta: "Solicitar",
+        fecha_respuesta: ""
+      }
+    ];
+
+    let editingId = null;
+    let view = [];
+
+    function showToast(text, isError=false){
+      const el = $("toast");
+      el.textContent = text;
+      el.classList.toggle("err", isError);
+      el.style.display = "block";
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => el.style.display = "none", 4200);
+    }
+
+    function escapeHtml(s){
+      return String(s ?? "")
+        .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+    }
+
+    function todayISO(){
+      const d = new Date();
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth()+1).padStart(2,"0");
+      const dd = String(d.getDate()).padStart(2,"0");
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    function ensureDateIfRespuesta(row){
+      if ((row.respuesta || "").trim() && !(row.fecha_respuesta || "").trim()){
+        row.fecha_respuesta = todayISO();
+      }
+    }
+
+    function matchesQ(row, q){
+      if (!q) return true;
+      q = q.trim().toLowerCase();
+      const hay = [
+        row.material,row.cantidad,row.solicitud,row.necesidad,row.sucursal,
+        row.sucursalNombre,row.nombre,row.apellido,row.responsable,row.comentario,row.respuesta,row.fecha_respuesta
+      ].map(v => String(v ?? "").toLowerCase()).join(" | ");
+      return hay.includes(q);
+    }
+
+    function applyFilters(){
+      const q = ($("q").value || "").trim();
+      const fSucursal = $("fSucursal").value || "";
+      const fComentario = $("fComentario").value || "";
+      const fRespuesta  = $("fRespuesta").value || "";
+
+      view = DATA.filter(r => {
+        if (!matchesQ(r, q)) return false;
+        if (fSucursal && (r.sucursal || "") !== fSucursal) return false;
+        if (fComentario && (r.comentario || "") !== fComentario) return false;
+        if (fRespuesta && (r.respuesta || "") !== fRespuesta) return false;
+        return true;
+      });
+
+      draw();
+    }
+
+    ["q","fSucursal","fComentario","fRespuesta"].forEach(id=>{
+      $(id).addEventListener("input", applyFilters);
+      $(id).addEventListener("change", applyFilters);
+    });
+
+    $("clearFiltersBtn").addEventListener("click", ()=>{
+      $("q").value = "";
+      $("fSucursal").value = "";
+      $("fComentario").value = "";
+      $("fRespuesta").value = "";
+      applyFilters();
+    });
+
+    function selectHTML(options, value, placeholder="(Elegir)"){
+      const opts = [
+        `<option value="">${escapeHtml(placeholder)}</option>`,
+        ...options.map(o => `<option value="${escapeHtml(o)}" ${o===value ? "selected":""}>${escapeHtml(o)}</option>`)
+      ];
+      return opts.join("");
+    }
+
+    function renderRow(r){
+      const isEditing = (editingId === r.id);
+
+      if (!isEditing){
+        return `
+          <tr data-id="${r.id}">
+            <td><div class="cellInner">${escapeHtml(r.material)}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.cantidad)}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.solicitud)}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.necesidad)}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.sucursal || '')}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.sucursalNombre || '')}</div></td>
+            <td><div class="cellInner">${escapeHtml((CENTRO_TO_PEOPLE[r.sucursal]||[]).map(p=> (p.nombre + (p.apellido?(' '+p.apellido):''))).join(', ') || r.nombre || r.responsable || '')}</div></td>
+            <!-- puesto column removed -->
+            <td><div class="cellInner">${escapeHtml(r.comentario)}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.respuesta)}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.fecha_respuesta)}</div></td>
+            <td>
+              <div class="cellInner">
+                <div class="actions">
+                  <button class="small secondary" data-action="edit">✏️ Editar</button>
+                </div>
+              </div>
+            </td>
+          </tr>
+        `;
+      }
+
+      return `
+        <tr data-id="${r.id}">
+          <td><div class="cellInner"><input class="cell-input w160" data-field="material" value="${escapeHtml(r.material)}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w140" data-field="cantidad" type="number" min="0" step="1" value="${escapeHtml(r.cantidad)}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w160" data-field="solicitud" value="${escapeHtml(r.solicitud)}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w160" data-field="necesidad" value="${escapeHtml(r.necesidad)}"></div></td>
+
+          <!-- ✅ Sucursal dropdown en edición -->
+          <td><div class="cellInner">
+            <select class="cell-input w160" data-field="sucursal">
+              ${selectHTML(SUCURSAL_OPTS, r.sucursal)}
+            </select>
+          </div></td>
+
+          <td><div class="cellInner">
+            <select class="cell-input w160" data-field="sucursalNombre">
+              ${selectHTML(SUCURSAL_NOMBRE_OPTS, r.sucursalNombre)}
+            </select>
+          </div></td>
+
+          <td><div class="cellInner">
+            <select class="cell-input w160" data-field="puesto">
+              ${selectHTML(PUESTO_OPTS, r.puesto || "")}
+            </select>
+          </div></td>
+
+          <td><div class="cellInner">
+            <select class="cell-input w160" data-field="nombre" data-role="nombreSelect">
+              ${selectHTML(allFullNamesList(), (r.nombre && r.apellido) ? (r.nombre + (r.apellido?(' '+r.apellido):'')) : r.nombre || r.responsable || '')}
+            </select>
+          </div></td>
+
+          <td><div class="cellInner"><input class="cell-input w160" data-field="responsable" value="${escapeHtml(r.responsable)}"></div></td>
+
+          <td><div class="cellInner">
+            <select class="cell-input w200" data-field="comentario">
+              ${selectHTML(COMENTARIO_OPTS, r.comentario)}
+            </select>
+          </div></td>
+
+          <td><div class="cellInner">
+            <select class="cell-input w160" data-field="respuesta" data-role="respuestaSelect">
+              ${selectHTML(RESPUESTA_OPTS, r.respuesta)}
+            </select>
+          </div></td>
+
+          <td><div class="cellInner">
+            <input class="cell-input w160" data-field="fecha_respuesta" type="date" value="${escapeHtml(r.fecha_respuesta || "")}">
+          </div></td>
+
+          <td>
+            <div class="cellInner">
+              <div class="actions">
+                <button class="small primary" data-action="save">Guardar</button>
+                <button class="small" data-action="cancel">Cancelar</button>
+                <button class="small danger" data-action="delete">Eliminar</button>
+              </div>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+
+    function draw(){
+      const tbody = $("tbody");
+      const arr = (view.length ? view : DATA);
+      tbody.innerHTML = arr.map(renderRow).join("");
+    }
+
+    // ✅ Agregar fila
+    $("addBtn").addEventListener("click", ()=>{
+      const row = {
+        id: crypto.randomUUID(),
+        material: $("a_material").value.trim(),
+        cantidad: Number($("a_cantidad").value || 0),
+        solicitud: $("a_solicitud").value.trim(),
+        necesidad: $("a_necesidad").value.trim(),
+        sucursal: $("a_sucursal").value,
+        // split selected full name into nombre/apellido
+        nombre: (function(){ const v = $("a_nombre").value.trim(); const i = v.lastIndexOf(' '); return i>0 ? v.slice(0,i) : v; })(),
+        apellido: (function(){ const v = $("a_nombre").value.trim(); const i = v.lastIndexOf(' '); return i>0 ? v.slice(i+1) : ""; })(),
+        sucursalNombre: $("a_sucursal_nombre").value.trim(),
+        responsable: [$("a_nombre").value.trim()].filter(Boolean).join(' '),
+        comentario: $("a_comentario").value,
+        respuesta: $("a_respuesta").value,
+        fecha_respuesta: $("a_fecha_respuesta").value || ""
+      };
+
+      if (!row.material){
+        showToast("Material es obligatorio.", true);
+        return;
+      }
+
+      ensureDateIfRespuesta(row);
+      DATA.unshift(row);
+
+      // limpiar
+      $("a_material").value = "";
+      $("a_cantidad").value = 1;
+      $("a_solicitud").value = "";
+      $("a_necesidad").value = "";
+      $("a_sucursal").value = "";
+      // a_centro removed
+      $("a_nombre").value = "";
+      $("a_sucursal_nombre").value = "";
+      $("a_responsable").value = "";
+      $("a_comentario").value = "";
+      $("a_respuesta").value = "";
+      $("a_fecha_respuesta").value = "";
+
+      showToast("Agregado con éxito");
+      applyFilters();
+    });
+
+    // ✅ Autocompletar fecha cuando cambia respuesta en edición
+    $("tbody").addEventListener("change", (e)=>{
+      const sel = e.target.closest('select[data-role="respuestaSelect"]');
+      if (!sel) return;
+      const tr = e.target.closest("tr[data-id]");
+      if (!tr) return;
+      const dateInput = tr.querySelector('input[data-field="fecha_respuesta"]');
+      if (!dateInput) return;
+
+      if (sel.value && !dateInput.value){
+        dateInput.value = todayISO();
+      }
+    });
+
+    // ✅ Acciones tabla
+    $("tbody").addEventListener("click", (e)=>{
+      const btn = e.target.closest("[data-action]");
+      if (!btn) return;
+
+      const tr = e.target.closest("tr[data-id]");
+      if (!tr) return;
+
+      const id = tr.dataset.id;
+      const action = btn.dataset.action;
+
+      if (action === "edit"){ editingId = id; draw(); return; }
+      if (action === "cancel"){ editingId = null; draw(); return; }
+
+      if (action === "delete"){
+        if (!confirm("¿Eliminar esta fila?")) return;
+        DATA = DATA.filter(r => r.id !== id);
+        if (editingId === id) editingId = null;
+        showToast("Eliminado");
+        applyFilters();
+        return;
+      }
+
+      if (action === "save"){
+        const row = DATA.find(r => r.id === id);
+        if (!row) return;
+
+        const fields = tr.querySelectorAll("[data-field]");
+        fields.forEach(el=>{
+          const k = el.dataset.field;
+          let v = el.value ?? "";
+          if (k === "cantidad") v = Number(v || 0);
+          row[k] = (typeof v === "string") ? v.trim() : v;
+        });
+
+        // If nombre was edited as full name, split into nombre/apellido
+        if (row.nombre && typeof row.nombre === 'string'){
+          const v = row.nombre.trim();
+          const idx = v.lastIndexOf(' ');
+          if (idx > 0){
+            row.apellido = v.slice(idx+1);
+            row.nombre = v.slice(0, idx);
+          } else {
+            row.apellido = row.apellido || "";
+            row.nombre = v;
+          }
+          row.responsable = [row.nombre, row.apellido].filter(Boolean).join(' ');
+        }
+
+        ensureDateIfRespuesta(row);
+        editingId = null;
+        showToast("Guardado con éxito");
+        applyFilters();
+      }
+    });
+
+    // ✅ Export XLSX
+    function exportXlsx(){
+      const arr = (view.length ? view : DATA);
+      if (!arr.length){ alert("No hay datos para exportar."); return; }
+
+      const rows = arr.map(r => ({
+        "Material": r.material || "",
+        "Cantidad": r.cantidad ?? "",
+        "Solicitud": r.solicitud || "",
+        "Necesidad": r.necesidad || "",
+        "Sucursal": r.sucursalNombre || "",
+        "Nombre": (CENTRO_TO_PEOPLE[r.sucursal] || []).map(p=> (p.nombre + (p.apellido?(' '+p.apellido):''))).join(', ') || r.nombre || r.responsable || "",
+        // puesto removed from export
+        "Responsable": r.responsable || "",
+        "Comentario": r.comentario || "",
+        "Respuesta": r.respuesta || "",
+        "Fecha de respuesta": r.fecha_respuesta || ""
+      }));
+
+      const ws = XLSX.utils.json_to_sheet(rows);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Solicitudes");
+
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth()+1).padStart(2,'0');
+      const dd = String(now.getDate()).padStart(2,'0');
+      XLSX.writeFile(wb, `solicitudes_${yyyy}-${mm}-${dd}.xlsx`);
+    }
+    $("exportXlsxBtn").addEventListener("click", exportXlsx);
+
+    // ✅ Import XLSX (mapea columnas A..E a nombre, apellido, centro, sucursalNombre)
+    function importXlsxFile(file){
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try{
+          const data = new Uint8Array(ev.target.result);
+          const wb = XLSX.read(data, {type:'array'});
+          const ws = wb.Sheets[wb.SheetNames[0]];
+          const rows = XLSX.utils.sheet_to_json(ws, {header:1});
+          if(!Array.isArray(rows) || rows.length===0){
+            showToast('El archivo está vacío o no tiene hojas legibles', true);
+            return;
+          }
+
+          // rows is array of arrays. Map each to our DATA structure.
+          const imported = [];
+          // attempt to detect columns: prefer header names, otherwise heuristics
+          let nombreIdx = 0, apellidoIdx = 1, puestoIdx = 2, centroIdx = 3, sucursalIdx = 4;
+          // helper to detect centro code like S001
+          const isCentroCode = v => typeof v === 'string' && /^S\d{1,3}$/i.test(v.trim());
+          // normalize sucursal name check
+          const isKnownSucursalName = v => {
+            if(!v) return false;
+            const s = String(v).trim().toUpperCase();
+            return SUCURSAL_NOMBRE_OPTS.map(x=>x.toUpperCase()).includes(s);
+          };
+          for(let i=0;i<rows.length;i++){
+            const r = rows[i];
+            // skip empty rows
+            if(!r || r.length===0) continue;
+            // If first row looks like header, build index mapping
+            if(i===0){
+              const firstRow = r.map(c => String(c||'').toLowerCase());
+              const hasHeader = firstRow.some(c=> /nombre|apellido|puesto|centro|sucursal/.test(c));
+              if(hasHeader){
+                firstRow.forEach((c,idx)=>{
+                      if(/\bnombre\b/.test(c)) nombreIdx = idx;
+                      if(/apellido/.test(c)) apellidoIdx = idx;
+                      if(/puesto/.test(c)) puestoIdx = idx;
+                      if(/centro/.test(c)) centroIdx = idx;
+                      if(/sucursal/.test(c)) sucursalIdx = idx;
+                });
+                console.log('importXlsxFile: header detected, indices:', {nombreIdx,apellidoIdx,puestoIdx,centroIdx,sucursalIdx});
+                // skip header row
+                continue;
+              }else{
+                // no header: try to auto-detect by scanning this row and next few
+                const sample = [r].concat(rows.slice(1,5));
+                // try detect centro column
+                for(let col=0; col<Math.min(8, r.length); col++){
+                  const values = sample.map(s=>String((s[col]||'')).trim()).filter(Boolean);
+                  if(values.length && values.every(isCentroCode)) { centroIdx = col; break; }
+                }
+
+                // detect sucursal name column
+                for(let col=0; col<Math.min(8, r.length); col++){
+                  const values = sample.map(s=>String((s[col]||'')).trim()).filter(Boolean);
+                  if(values.length && values.some(isKnownSucursalName)) { sucursalIdx = col; break; }
+                }
+                // assume name is first text column that's not centro/sucursal
+                for(let col=0; col<Math.min(8, r.length); col++){
+                  if(col===centroIdx || col===sucursalIdx) continue;
+                  const v = String(r[col]||'').trim();
+                  if(v && /^[A-Za-zÁÉÍÓÚÑáéíóúñ .-]{2,40}$/.test(v)) { nombreIdx = col; break; }
+                }
+              }
+            }
+
+            // Read raw values
+            let nombre = String(r[nombreIdx] || '').trim();
+            let apellido = String(r[apellidoIdx] || '').trim();
+            const puesto = String(r[puestoIdx] || '').trim();
+            const centro = String(r[centroIdx] || '').trim();
+            const sucursalNombre = String(r[sucursalIdx] || '').trim();
+            // If apellido column missing or looks invalid, try splitting nombre into nombre/apellido
+            if(!apellido && nombre){
+              const parts = nombre.split(/\s+/);
+              if(parts.length>1){
+                apellido = parts.pop();
+                nombre = parts.join(' ');
+              }
+            }
+
+            const responsable = [nombre, apellido].filter(Boolean).join(' ');
+
+            imported.push({
+              id: crypto.randomUUID(),
+              material: "",
+              cantidad: 0,
+              solicitud: "",
+              necesidad: "",
+              sucursal: centro || "",
+              nombre: nombre || "",
+              apellido: apellido || "",
+              sucursalNombre: sucursalNombre || "",
+              puesto: puesto || "",
+              responsable: responsable || "",
+              comentario: "",
+              respuesta: "",
+              fecha_respuesta: ""
+            });
+            // add to option sets and mapping
+            if (centro) CENTRO_OPTS.push(centro);
+            if (sucursalNombre) SUCURSAL_NOMBRE_OPTS.push(sucursalNombre);
+            if (puesto) PUESTO_OPTS.push(puesto);
+            if (centro){
+              CENTRO_TO_PEOPLE[centro] = CENTRO_TO_PEOPLE[centro] || [];
+              // avoid duplicates for same person
+              const exists = CENTRO_TO_PEOPLE[centro].some(p=> (p.nombre===nombre && p.apellido===apellido && p.puesto===puesto));
+              if(!exists) CENTRO_TO_PEOPLE[centro].push({nombre, apellido, puesto, sucursalNombre});
+            }
+          }
+
+            // dedupe options
+            CENTRO_OPTS = Array.from(new Set(CENTRO_OPTS));
+            SUCURSAL_NOMBRE_OPTS = Array.from(new Set(SUCURSAL_NOMBRE_OPTS));
+
+            // Build global full-name and puesto lists from mapping
+            const allFullNames = [];
+            const allPuestos = [];
+            Object.values(CENTRO_TO_PEOPLE).forEach(list=>{
+              list.forEach(p=>{
+                const full = [p.nombre, p.apellido].filter(Boolean).join(' ');
+                if (full) allFullNames.push(full);
+                if (p.puesto) allPuestos.push(p.puesto);
+              });
+            });
+            let UNIQUE_FULLNAMES = Array.from(new Set(allFullNames));
+            let UNIQUE_PUESTOS = Array.from(new Set(allPuestos));
+
+            // If we didn't capture any puestos, attempt to auto-detect puesto column and rebuild mapping
+            if(UNIQUE_PUESTOS.length===0){
+              // analyze columns to find candidate puesto column
+              try{
+              const sample = rows.slice(0, 40);
+              const colScores = {};
+              for(let col=0; col<Math.min(8, (rows[0]||[]).length); col++){
+                const vals = sample.map(r=>String((r[col]||'')).trim()).filter(Boolean);
+                if(!vals.length) continue;
+                // ignore if looks like centro codes or known sucursal names
+                const nonCentro = vals.filter(v=> !/^S\d{1,3}$/i.test(v));
+                const nonSucursal = vals.filter(v => !SUCURSAL_NOMBRE_OPTS.map(x=>x.toUpperCase()).includes(String(v).toUpperCase()));
+                const alphaLike = vals.filter(v => /^[A-Za-zÁÉÍÓÚÑáéíóúñ .-]{2,40}$/.test(v));
+                // score columns that are alpha-like and not centro/sucursal
+                colScores[col] = (alphaLike.length / vals.length) * (nonCentro.length/vals.length) * (nonSucursal.length/vals.length);
+              }
+              const bestEntry = Object.entries(colScores).sort((a,b)=>b[1]-a[1])[0];
+              if(bestEntry && bestEntry[1] > 0.3){
+                const puestoCol = Number(bestEntry[0]);
+                // rebuild imported and CENTRO_TO_PEOPLE using detected puestoCol
+                const rebuilt = [];
+                for(let i=0;i<rows.length;i++){
+                  const r = rows[i];
+                  if(!r || r.length===0) continue;
+                  const first = String(r[0] || '').toLowerCase();
+                  if(i===0 && (first.includes('nombre')|| first.includes('puesto') || first.includes('centro') )) continue;
+                  const nombre = String(r[nombreIdx] || r[0] || '').trim();
+                  const apellido = String(r[apellidoIdx] || r[1] || '').trim();
+                  const puesto = String(r[puestoCol] || '').trim();
+                  const centro = String(r[centroIdx] || '').trim();
+                  const sucursalNombre = String(r[sucursalIdx] || '').trim();
+                  const responsable = [nombre, apellido].filter(Boolean).join(' ');
+                  rebuilt.push({id: crypto.randomUUID(), material:'', cantidad:0, solicitud:'', necesidad:'', sucursal: centro||'', nombre: nombre||'', apellido: apellido||'', puesto: puesto||'', sucursalNombre: sucursalNombre||'', responsable: responsable||'', comentario:'', respuesta:'', fecha_respuesta:''});
+                }
+                // replace imported and rebuild CENTRO_TO_PEOPLE
+                if(rebuilt.length){
+                  imported.length = 0;
+                  Array.prototype.push.apply(imported, rebuilt);
+                  CENTRO_TO_PEOPLE = {};
+                  PUESTO_OPTS = [];
+                  imported.forEach(it=>{
+                    if(it.sucursal) CENTRO_TO_PEOPLE[it.sucursal] = CENTRO_TO_PEOPLE[it.sucursal] || [];
+                    const exists = CENTRO_TO_PEOPLE[it.sucursal] && CENTRO_TO_PEOPLE[it.sucursal].some(p=> p.nombre===it.nombre && p.apellido===it.apellido && p.puesto===it.puesto);
+                    if(!exists) CENTRO_TO_PEOPLE[it.sucursal].push({nombre:it.nombre, apellido:it.apellido, puesto:it.puesto, sucursalNombre:it.sucursalNombre});
+                    if(it.puesto) PUESTO_OPTS.push(it.puesto);
+                  });
+                  // recompute unique lists
+                  const afn = [];
+                  Object.values(CENTRO_TO_PEOPLE).forEach(list=> list.forEach(p=>{ const full=[p.nombre,p.apellido].filter(Boolean).join(' '); if(full) afn.push(full); }));
+                  UNIQUE_FULLNAMES = Array.from(new Set(afn));
+                  UNIQUE_PUESTOS = Array.from(new Set(PUESTO_OPTS));
+                }
+              }
+              }catch(e){
+                console.warn('No se pudo auto-detectar puesto:', e);
+              }
+            }
+            // update global PUESTO_OPTS so edit-row uses updated list
+            PUESTO_OPTS = UNIQUE_PUESTOS.slice();
+
+            // Merge centro codes into SUCURSAL_OPTS (filter) so filter contains imported centros
+            SUCURSAL_OPTS = Array.from(new Set(CENTRO_OPTS.concat(SUCURSAL_OPTS)));
+
+            // refresh select elements
+            fillDynamicSelect($("a_sucursal"), CENTRO_OPTS, false);
+            fillDynamicSelect($("a_sucursal_nombre"), SUCURSAL_NOMBRE_OPTS, false);
+            fillDynamicSelect($("a_nombre"), UNIQUE_FULLNAMES, false);
+            
+            fillSucursalSelect($("fSucursal"), true);
+
+            // (already refreshed above)
+
+                if(imported.length){
+                  // prepend
+                  DATA = imported.concat(DATA);
+                  showToast(`Importadas ${imported.length} filas`);
+                  applyFilters();
+                } else {
+                  showToast('No se importaron filas', true);
+                }
+
+        }catch(err){
+          console.error(err);
+          showToast('Error leyendo el archivo: ' + (err && err.message ? err.message : String(err)), true);
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    $("importXlsxBtn").addEventListener("click", ()=>$("importFile").click());
+    $("importFile").addEventListener("change", (e)=>{
+      const f = e.target.files && e.target.files[0];
+      if(!f) return;
+      importXlsxFile(f);
+      e.target.value = "";
+    });
+
+    // When sucursal changes in add-form, populate nombre select from mapping and auto-fill sucursalNombre
+    function refreshAddNames(){
+      const centro = $("a_sucursal").value || "";
+      const people = CENTRO_TO_PEOPLE[centro] || [];
+      const fullNames = Array.from(new Set(people.map(p=> [p.nombre,p.apellido].filter(Boolean).join(' ')).filter(Boolean)));
+      fillDynamicSelect($("a_nombre"), fullNames, false);
+      if (fullNames.length===1){
+        $("a_nombre").value = fullNames[0];
+      }
+      const sucNom = (people.find(p=>p.sucursalNombre) || {}).sucursalNombre || "";
+      if(sucNom) $("a_sucursal_nombre").value = sucNom;
+      renderPeoplePanel(centro);
+      // update responsable
+      $("a_responsable").value = [$("a_nombre").value].filter(Boolean).join(' ');
+    }
+    $("a_sucursal").addEventListener("change", refreshAddNames);
+    // keep responsable in sync when nombre changes
+    $("a_nombre").addEventListener("change", ()=>{
+      $("a_responsable").value = [$("a_nombre").value].filter(Boolean).join(' ');
+      const centro = $("a_sucursal").value || "";
+      const selected = $("a_nombre").value || "";
+      if(centro && selected){
+        renderPeoplePanelWithSelected(centro, selected);
+      } else {
+        if(centro) renderPeoplePanel(centro);
+      }
+    });
+
+    // When sucursal name changes in add-form, find people by sucursalNombre and show them
+    $("a_sucursal_nombre").addEventListener("change", ()=>{
+      const sucNom = $("a_sucursal_nombre").value.trim();
+      if(!sucNom){ renderPeoplePanel(''); fillDynamicSelect($("a_nombre"), [], false); $("a_sucursal").value = ""; return; }
+      const people = [];
+      Object.values(CENTRO_TO_PEOPLE).forEach(list=> list.forEach(p=>{ if((p.sucursalNombre||'').trim().toUpperCase() === sucNom.toUpperCase()) people.push(p); }));
+      const fullNames = Array.from(new Set(people.map(p=> [p.nombre,p.apellido].filter(Boolean).join(' ')).filter(Boolean)));
+      fillDynamicSelect($("a_nombre"), fullNames, false);
+      if(fullNames.length===1){
+        $("a_nombre").value = fullNames[0];
+      }
+      // If possible, set centro select to the unique centro containing this sucursalNombre
+      const centros = Object.entries(CENTRO_TO_PEOPLE).filter(([centro,list])=> list.some(p=> (p.sucursalNombre||'').trim().toUpperCase()===sucNom.toUpperCase())).map(([c])=>c);
+      if(centros.length===1) $("a_sucursal").value = centros[0]; else $("a_sucursal").value = "";
+
+      // render panel for these people
+      const el = document.getElementById('peoplePanel');
+      if(!people.length){ el.innerHTML = `<small>No hay personas asociadas a ${escapeHtml(sucNom)}.</small>`; return; }
+      const rows = people.map(p=>`<div style="padding:6px 8px;border-bottom:1px solid rgba(0,0,0,.04)"><b>${escapeHtml(p.nombre)} ${escapeHtml(p.apellido)}</b> ${p.puesto?('<span style="color:var(--muted)"> - '+escapeHtml(p.puesto)+'</span>'):''} <span style="color:var(--muted)">(${escapeHtml(p.sucursalNombre)})</span></div>`).join('');
+      el.innerHTML = `<div style="font-weight:900;margin-bottom:6px">Personas en ${escapeHtml(sucNom)}</div>${rows}`;
+
+      // update responsable
+      $("a_responsable").value = [$("a_nombre").value].filter(Boolean).join(' ');
+    });
+
+    // When editing a row, if sucursal or puesto changes, populate that row's nombre select
+    $("tbody").addEventListener("change", (e)=>{
+      const selSucursal = e.target.closest('select[data-field="sucursal"]');
+      const selPuesto = e.target.closest('select[data-field="puesto"]');
+      if (!selSucursal && !selPuesto) return;
+      const tr = e.target.closest("tr[data-id]");
+      if (!tr) return;
+      const centro = tr.querySelector('select[data-field="sucursal"]').value || "";
+      const puestoVal = (tr.querySelector('select[data-field="puesto"]') || {}).value || "";
+      const people = CENTRO_TO_PEOPLE[centro] || [];
+      const fullNames = Array.from(new Set(people.filter(p=> !puestoVal || p.puesto===puestoVal).map(p=> [p.nombre,p.apellido].filter(Boolean).join(' ')).filter(Boolean)));
+      const nombreSel = tr.querySelector('select[data-role="nombreSelect"]');
+      if (nombreSel) fillDynamicSelect(nombreSel, fullNames, false);
+      if (nombreSel && fullNames.length===1) nombreSel.value = fullNames[0];
+      // update responsable input in row
+      const nombreVal = nombreSel ? nombreSel.value : '';
+      const respInput = tr.querySelector('input[data-field="responsable"]');
+      if (respInput) respInput.value = [nombreVal].filter(Boolean).join(' ');
+
+    });
+
+    // Init
+    applyFilters();
+  </script>
+</body>
+</html>
