@@ -4,6 +4,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Solicitudes - Interagrovial</title>
+
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
@@ -106,10 +107,6 @@
       border:1px solid rgba(46,125,50,.06);box-shadow: 0 8px 20px rgba(24,79,19,.04);
       text-align:center;display:block;
     }
-    @media (max-width:720px){
-      .cardHeader h3{position:static;transform:none;margin:0 auto 10px}
-      .card > h3{margin:6px 12px 12px}
-    }
 
     .row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
     label{font-size:12px;color:var(--muted);display:block;margin-bottom:8px;font-weight:800;text-align:center}
@@ -127,8 +124,8 @@
       outline:none;
       box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
       line-height: 1.4;
+      text-align:center;
     }
-    input::placeholder{color:var(--muted)}
     input:focus,select:focus{border-color: var(--jd-green-dark);box-shadow: 0 0 0 6px rgba(24,79,19,.12);}
 
     button{
@@ -152,8 +149,8 @@
       box-shadow:none;
       font-weight:800;
     }
-    button.danger{color:#ffd7dc;border-color:#5a2731;background: rgba(176,0,32,.16);}
     button.small{padding:6px 10px;border-radius:8px;font-size:11px;box-shadow:none;font-weight:700;white-space:nowrap;min-width:auto;}
+    button.danger{color:#ffd7dc;border-color:#5a2731;background: rgba(176,0,32,.16);}
     button[disabled]{opacity:.6;cursor:not-allowed;transform:none}
 
     .toast{margin-top:10px;font-size:13px;color:#2f7e2c;display:none;font-weight:900}
@@ -185,9 +182,6 @@
       box-shadow: 0 10px 18px rgba(15,23,32,.06);
       background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(245,253,244,0.9));
     }
-    tbody tr:nth-child(odd) .cellInner{background:#eef6ef}
-    tbody tr:nth-child(even) .cellInner{background:#e3eaee}
-    tbody tr:hover .cellInner{background: rgba(54,124,43,.12)}
 
     .cellInner .cell-input{
       width:100%;
@@ -199,7 +193,7 @@
       box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 6px 14px rgba(15,23,32,.04);
     }
 
-    td:last-child{min-width:160px}
+    td:last-child{min-width:180px}
     td:last-child .cellInner{padding:6px}
     .actions{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
 
@@ -207,6 +201,7 @@
     .w200{min-width:200px}
     .w160{min-width:160px}
     .w140{min-width:140px}
+    .w110{min-width:110px}
 
     .footer{
       position:fixed;left:16px;bottom:12px;font-size:12px;
@@ -225,7 +220,7 @@
   <div class="topbar">
     <h1 class="title">Solicitudes</h1>
     <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-      <div class="subpill"><b>Tabla</b> · Materiales</div>
+      <div class="subpill"><b>Firebase</b> · Firestore</div>
     </div>
   </div>
 
@@ -247,19 +242,16 @@
       </div>
 
       <div>
-        <label>Sucursal</label>
-        <select id="fSucursal" class="w160">
-          <option value="">(Todas)</option>
+        <label>Centro</label>
+        <select id="fCentro" class="w140">
+          <option value="">(Todos)</option>
         </select>
       </div>
 
       <div>
-        <label>Comentario</label>
-        <select id="fComentario" class="w200">
-          <option value="">(Todos)</option>
-          <option value="Solicitar cotizacion">Solicitar cotizacion</option>
-          <option value="Stock en la red">Stock en la red</option>
-          <option value="Ticket reserva">Ticket reserva</option>
+        <label>Sucursal (Nombre)</label>
+        <select id="fSucursal" class="w200">
+          <option value="">(Todas)</option>
         </select>
       </div>
 
@@ -281,13 +273,13 @@
 
     <div class="row row-add">
       <div><label>Material</label><input id="a_material" class="w160" placeholder="RE504836"></div>
-      <div><label>Cantidad</label><input id="a_cantidad" class="w140" type="number" min="0" step="1" value="1"></div>
+      <div><label>Cantidad</label><input id="a_cantidad" class="w110" type="number" min="0" step="1" value="1"></div>
       <div><label>Solicitud</label><input id="a_solicitud" class="w160"></div>
       <div><label>Necesidad</label><input id="a_necesidad" class="w160"></div>
 
       <div>
-        <label>Sucursal (Centro)</label>
-        <select id="a_sucursal" class="w160"></select>
+        <label>Centro</label>
+        <select id="a_centro" class="w140"></select>
       </div>
 
       <div>
@@ -300,7 +292,10 @@
         <select id="a_nombre" class="w220"></select>
       </div>
 
-      <div><label>Responsable</label><input id="a_responsable" class="w160" placeholder="Se completa solo"></div>
+      <div>
+        <label>Responsable</label>
+        <input id="a_responsable" class="w160" placeholder="Auto (SAP o mail)" readonly>
+      </div>
 
       <div>
         <label>Comentario</label>
@@ -330,10 +325,6 @@
     </div>
 
     <div id="toast" class="toast"></div>
-
-    <div id="peoplePanel" style="margin-top:12px;padding:10px;border:1px dashed var(--border);border-radius:10px;background:rgba(255,255,255,0.9)">
-      <small>Seleccioná una sucursal para ver personas relacionadas.</small>
-    </div>
   </div>
 
   <!-- TABLA -->
@@ -344,12 +335,13 @@
         <th>Cantidad</th>
         <th>Solicitud</th>
         <th>Necesidad</th>
+        <th>Centro</th>
         <th>Sucursal</th>
-        <th>Sucursal Nombre</th>
+        <th>Nombre</th>
         <th>Responsable</th>
         <th>Comentario</th>
         <th>Respuesta</th>
-        <th>Fecha de respuesta</th>
+        <th>Fecha respuesta</th>
         <th>Acciones</th>
       </tr>
     </thead>
@@ -358,15 +350,16 @@
 
   <div class="footer"><b>INTERAGROVIAL S.A</b></div>
 
-  <!-- ✅ FIREBASE + APP -->
   <script type="module">
+    // =========================
+    // ✅ Firebase (Firestore)
+    // =========================
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
     import {
       getFirestore, collection, addDoc, doc, updateDoc, deleteDoc,
-      serverTimestamp, query, orderBy, onSnapshot
+      serverTimestamp, query, orderBy, onSnapshot, getDoc
     } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
-    // ✅ MISMA config que tu app de "Carpetas"
     const firebaseConfig = {
       apiKey: "AIzaSyDIGkNekvGn0XrqGvDAuutCBSglod03644",
       authDomain: "carpetas-17846.firebaseapp.com",
@@ -380,31 +373,123 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
+    // ===============================
+    // ✅ PERSONAS (TU LISTA)
+    // ===============================
+    const PEOPLE = [
+      { puesto:"Vendedor", centro:"S001", sucursal:"MONTEVIDEO AGRO", nombre:"Andres Maza", mail:"asmaza@isa.com.uy", usuario_sap:"SUREP001" },
+      { puesto:"Vendedor", centro:"S001", sucursal:"MONTEVIDEO AGRO", nombre:"MARCOS SUASNAVAS", mail:"msuasnavas@isa.com.uy", usuario_sap:"SUREP002" },
+      { puesto:"Admin Taller", centro:"S001", sucursal:"MONTEVIDEO AGRO", nombre:"Santiago Lugaro", mail:"slugaro@isa.com.uy", usuario_sap:"" },
+      { puesto:"Jefe Rep.", centro:"S001", sucursal:"MONTEVIDEO AGRO", nombre:"GUSTAVO MIRANDA", mail:"gmiranda@isa.com.uy", usuario_sap:"SUJRP001" },
+
+      { puesto:"Jfe Taller Cons", centro:"S015", sucursal:"MONTEVIDEO CONS", nombre:"Pablo Carballo", mail:"pcarballo@isa.com.uy", usuario_sap:"" },
+      { puesto:"Amin Tll Cons", centro:"S015", sucursal:"MONTEVIDEO CONS", nombre:"Medina Elizabeth", mail:"emedina@isa.com.uy", usuario_sap:"" },
+      { puesto:"Jefe Rep.", centro:"S015", sucursal:"MONTEVIDEO CONS", nombre:"Leonardo Martinez", mail:"lmartinez@isa.com.uy", usuario_sap:"" },
+      { puesto:"Admin Rep Cons", centro:"S015", sucursal:"MONTEVIDEO CONS", nombre:"Antonella  Denucci", mail:"adenucci@isa.com.uy", usuario_sap:"" },
+      { puesto:"Vendedor Cons", centro:"S015", sucursal:"MONTEVIDEO CONS", nombre:"Martin  Callero", mail:"mcallero@isa.com.uy", usuario_sap:"SUREP026" },
+      { puesto:"Vendedor Cons", centro:"S015", sucursal:"MONTEVIDEO CONS", nombre:"Ignacio Nebuloni", mail:"inebuloni@isa.com.uy", usuario_sap:"SUREP027" },
+
+      { puesto:"Vendedor", centro:"S002", sucursal:"MERCEDES", nombre:"Andres Mansalitch", mail:"jandres@isa.com.uy", usuario_sap:"SUREP003" },
+      { puesto:"Vendedor", centro:"S002", sucursal:"MERCEDES", nombre:"Romina Sisurqui", mail:"rsisurqui@isa.com.uy", usuario_sap:"" },
+      { puesto:"Vendedor", centro:"S002", sucursal:"MERCEDES", nombre:"HECTOR BARRIOS", mail:"hbarrios@isa.com.uy", usuario_sap:"SUREP004" },
+      { puesto:"Admin Tllr", centro:"S002", sucursal:"MERCEDES", nombre:"Elena Cabrera", mail:"ecabrera@isa.com.uy", usuario_sap:"" },
+      { puesto:"Jefe Rep.", centro:"S002", sucursal:"MERCEDES", nombre:"Guillermo Cabrera", mail:"gcabrera@isa.com.uy", usuario_sap:"SUJRP003" },
+
+      { puesto:"Vendedor", centro:"S003", sucursal:"YOUNG", nombre:"JORGE MEZQUIDA", mail:"jmezquida@isa.com.uy", usuario_sap:"SUREP006" },
+      { puesto:"Vendedor", centro:"S003", sucursal:"YOUNG", nombre:"J. Luis RODRIGUEZ", mail:"jlrodriguez@isa.com.uy", usuario_sap:"SUREP005" },
+      { puesto:"Jfe Tllr", centro:"S003", sucursal:"YOUNG", nombre:"Eduardo Irureta", mail:"eirureta@isa.com.uy", usuario_sap:"" },
+      { puesto:"Jefe Rep.", centro:"S003", sucursal:"YOUNG", nombre:"Martin Molinari", mail:"mmolinari@isa.com.uy", usuario_sap:"" },
+
+      { puesto:"Vendedor", centro:"S004", sucursal:"PAYSANDÚ", nombre:"CLAUDIA SBRES", mail:"csbres@isa.com.uy", usuario_sap:"SUREP007" },
+      { puesto:"Vendedor", centro:"S004", sucursal:"PAYSANDÚ", nombre:"MATHIAS SCHIAPPAPIETRA", mail:"mschiappapietra@isa.com.uy", usuario_sap:"SUREP008" },
+      { puesto:"Admin Tllr", centro:"S004", sucursal:"PAYSANDÚ", nombre:"AnaPaula Maitinez", mail:"apmaitinez@isa.com.uy", usuario_sap:"" },
+      { puesto:"Jfe Tallr", centro:"S004", sucursal:"PAYSANDÚ", nombre:"David Duarte", mail:"dduarte@isa.com.uy", usuario_sap:"" },
+      { puesto:"Jefe Rep.", centro:"S004", sucursal:"PAYSANDÚ", nombre:"Martin Molinari", mail:"mmolinari@isa.com.uy", usuario_sap:"" },
+      { puesto:"Administr.", centro:"S004", sucursal:"PAYSANDÚ", nombre:"SILVINA MARISCO", mail:"smarsico@isa.com.uy", usuario_sap:"" },
+
+      { puesto:"Vendedor", centro:"S005", sucursal:"RÍO BRANCO", nombre:"ENSO COSTA", mail:"encosta@isa.com.uy", usuario_sap:"SUREP009" },
+      { puesto:"Jefe Rep.", centro:"S005", sucursal:"RÍO BRANCO", nombre:"Yanina Bentancour", mail:"ybentancor@isa.com.uy", usuario_sap:"SUJRP005" },
+      { puesto:"Jfe Tallr", centro:"S005", sucursal:"RÍO BRANCO", nombre:"Freddy Marimoria", mail:"marmoria@isa.com.uy", usuario_sap:"" },
+      { puesto:"Admin Tllr", centro:"S005", sucursal:"RÍO BRANCO", nombre:"Agustina Figueredo", mail:"afigueredo@isa.com.uy", usuario_sap:"" },
+      { puesto:"Admin Tllr", centro:"S005", sucursal:"RÍO BRANCO", nombre:"Gessica Silva", mail:"", usuario_sap:"" },
+
+      { puesto:"Vendedor", centro:"S006", sucursal:"GOMENSORO", nombre:"JOSÉ COSTEN", mail:"jcosten@isa.com.uy", usuario_sap:"SUREP011" },
+      { puesto:"Administr.", centro:"S006", sucursal:"GOMENSORO", nombre:"Marcela Silva", mail:"masilva@isa.com.uy", usuario_sap:"" },
+      { puesto:"Responsale", centro:"S006", sucursal:"GOMENSORO", nombre:"Mariano Arbiza", mail:"marbiza@isa.com.uy", usuario_sap:"" },
+
+      { puesto:"Vendedor", centro:"S007", sucursal:"FLORIDA", nombre:"CRISTHIAN RODRIGUEZ", mail:"crrodriguez@isa.com.uy", usuario_sap:"SUREP013" },
+      { puesto:"Vendedor", centro:"S007", sucursal:"FLORIDA", nombre:"Esteban Lorier", mail:"elorier@isa.com.uy", usuario_sap:"SUREP014" },
+      { puesto:"Jef Tllr", centro:"S007", sucursal:"FLORIDA", nombre:"Luis Cattaneo", mail:"lcattaneo@isa.com.uy", usuario_sap:"" },
+      { puesto:"Admin. Tllr", centro:"S007", sucursal:"FLORIDA", nombre:"Alicia  Cardozo", mail:"alcardozo@isa.com.uy", usuario_sap:"" },
+      { puesto:"Aux Admin.", centro:"S007", sucursal:"FLORIDA", nombre:"Ernestina Enciso", mail:"eenciso@isa.com.uy", usuario_sap:"" },
+      { puesto:"Gerente", centro:"S007", sucursal:"FLORIDA", nombre:"Ramiro Caceres", mail:"rcaceres@isa.com.uy", usuario_sap:"" },
+
+      { puesto:"Vendedor", centro:"S008", sucursal:"OMBÚES", nombre:"Lucas Rodriguez", mail:"lrodriguez@isa.com.uy", usuario_sap:"SUREP015" },
+      { puesto:"Vendedor", centro:"S009", sucursal:"OMBÚES", nombre:"Juan Manuel Dominguez", mail:"jdominguez@isa.com.uy", usuario_sap:"" },
+      { puesto:"Jfe Tllr", centro:"S008", sucursal:"OMBÚES", nombre:"Juan Pablo MARTINEZ", mail:"jpmartinez@isa.com.uy", usuario_sap:"SUREP016" },
+      { puesto:"Adm Tll", centro:"S008", sucursal:"OMBÚES", nombre:"Meliz Lacoste", mail:"mlacoste@isa.com.uy", usuario_sap:"" },
+      { puesto:"Jefe Rep.", centro:"S009", sucursal:"OMBÚES", nombre:"Rafael DAVILA", mail:"rdavila@isa.com.uy", usuario_sap:"SUJRP002" },
+
+      { puesto:"Vendedor", centro:"S010", sucursal:"TACUAREMBÓ", nombre:"Marcelo ÁLVAREZ", mail:"malvarez@isa.com.uy", usuario_sap:"SUREP018" },
+      { puesto:"Administr.", centro:"S010", sucursal:"TACUAREMBÓ", nombre:"Melany Hernandez", mail:"mhernandez@isa.com.uy", usuario_sap:"" },
+      { puesto:"Gte Suc", centro:"S010", sucursal:"TACUAREMBÓ", nombre:"Ignacio Porcile", mail:"iporcile@isa.com.uy", usuario_sap:"" },
+
+      { puesto:"Vendedor", centro:"S011", sucursal:"SAN CARLOS", nombre:"SILVIO NUÑEZ", mail:"snunez@isa.com.uy", usuario_sap:"SUREP020" },
+      { puesto:"Admin Tllr", centro:"S011", sucursal:"SAN CARLOS", nombre:"Agustina Mendez", mail:"amendez@isa.com.uy", usuario_sap:"" },
+      { puesto:"Vendedor", centro:"S011", sucursal:"SAN CARLOS", nombre:"Esteban Diaz", mail:"ediaz@isa.com.uy", usuario_sap:"SUREP019" },
+      { puesto:"Jfe Tllr", centro:"S011", sucursal:"SAN CARLOS", nombre:"Luis Olivera", mail:"lolivera@isa.com.uy", usuario_sap:"" },
+      { puesto:"Jefe Rep.", centro:"S011", sucursal:"SAN CARLOS", nombre:"KARINA PEREIRA", mail:"kpereira@isa.com.uy", usuario_sap:"SUJRP006" },
+
+      { puesto:"Analista", centro:"S012", sucursal:"PAYSANDÚ FORESTAL", nombre:"Federico Acosta", mail:"facosta@isa.com.uy", usuario_sap:"" },
+      { puesto:"Jefe Rep.", centro:"S012", sucursal:"PAYSANDÚ FORESTAL", nombre:"Mateo Cal", mail:"mcal@isa.com.uy", usuario_sap:"" },
+
+      { puesto:"Vendedor", centro:"S009", sucursal:"LASCANO", nombre:"CECILIA AROCENA", mail:"carocena@isa.com.uy", usuario_sap:"SUREP017" },
+      { puesto:"Vendedor", centro:"S009", sucursal:"LASCANO", nombre:"Carlos Nuñez", mail:"canunez@isa.com.uy", usuario_sap:"SUBOD008" },
+
+      { puesto:"Vendedor", centro:"S014", sucursal:"SALTO", nombre:"Ronaldo Guzman", mail:"rguzman@isa.com.uy", usuario_sap:"SUREP012" },
+      { puesto:"Vendedor", centro:"S014", sucursal:"SALTO", nombre:"Virginia Diaz", mail:"vidiaz@isa.com.uy", usuario_sap:"" },
+      { puesto:"Garantias", centro:"S014", sucursal:"SALTO", nombre:"Silvana Vignolo", mail:"svignolo@isa.com.uy", usuario_sap:"" },
+      { puesto:"Responsale", centro:"S014", sucursal:"SALTO", nombre:"Mariano Arbiza", mail:"marbiza@isa.com.uy", usuario_sap:"" },
+      { puesto:"Administr.", centro:"S014", sucursal:"SALTO", nombre:"Valeria Silva", mail:"vsilva@isa.com.uy", usuario_sap:"" },
+
+      { puesto:"Jefe Rep.", centro:"S016", sucursal:"SAN JOSÉ", nombre:"GUSTAVO MIRANDA", mail:"gmiranda@isa.com.uy", usuario_sap:"" },
+      { puesto:"Vendedor", centro:"S016", sucursal:"SAN JOSÉ", nombre:"LUIS BRICEÑO", mail:"lbriceno@isa.com.uy", usuario_sap:"SUREP028" },
+
+      { puesto:"Aux -Vendedor", centro:"S017", sucursal:"VALDENSE", nombre:"ESTEBAN NOAIN", mail:"enoain@isa.com.uy", usuario_sap:"SUREP030" },
+      { puesto:"Vendedor", centro:"S017", sucursal:"VALDENSE", nombre:"MICHAEL SHANNON", mail:"mshannon@isa.com.uy", usuario_sap:"SUREP029" },
+      { puesto:"Jefe Rep.", centro:"S017", sucursal:"VALDENSE", nombre:"Rafael DAVILA", mail:"rdavila@isa.com.uy", usuario_sap:"SUJRP002" },
+
+      { puesto:"Gerente", centro:"S018", sucursal:"DURAZNO", nombre:"Ramiro Caceres", mail:"rcaceres@isa.com.uy", usuario_sap:"" },
+      { puesto:"Vendedor", centro:"S018", sucursal:"DURAZNO", nombre:"Marcel Alzamendi", mail:"malzamendi@isa.com.uy", usuario_sap:"SUREP032" },
+      { puesto:"Vendedor", centro:"S018", sucursal:"DURAZNO", nombre:"MARIVI MOREIRA", mail:"dmmoreira@isa.com.uy", usuario_sap:"SUREP031" },
+
+      { puesto:"Vendedor", centro:"S019", sucursal:"TARARIRAS", nombre:"JORGE ÁVILA", mail:"javila@isa.com.uy", usuario_sap:"SUREP033" },
+      { puesto:"Vendedor", centro:"S019", sucursal:"TARARIRAS", nombre:"ANA LAURA MARTINEZ", mail:"tarariras@isa.com.uy", usuario_sap:"SUREP034" },
+      { puesto:"Jefe Rep.", centro:"S019", sucursal:"TARARIRAS", nombre:"Rafael DAVILA", mail:"rdavila@isa.com.uy", usuario_sap:"SUJRP002" },
+
+      { puesto:"Ref. Analisis", centro:"S013", sucursal:"Bodega Central", nombre:"Gerardo Morganti", mail:"gmorganti@isa.com.uy", usuario_sap:"CLOG001" },
+      { puesto:"Analista", centro:"S013", sucursal:"Bodega Central", nombre:"Antonella Lopez", mail:"alopez@isa.com.uy", usuario_sap:"CLOG002" },
+      { puesto:"Adm. Analisis", centro:"S013", sucursal:"Bodega Central", nombre:"Maria Castañolo", mail:"mcastanola@isa.com.uy", usuario_sap:"CLOG004" },
+      { puesto:"Resp. CL", centro:"S013", sucursal:"Bodega Central", nombre:"Hermes Velazquez", mail:"hvelazquez@isa.com.uy", usuario_sap:"CLOG008" },
+      { puesto:"Ref. Logistico", centro:"S013", sucursal:"Bodega Central", nombre:"Facundo Perez", mail:"faperez@isa.com.uy", usuario_sap:"CLOG009" },
+      { puesto:"Coord. Transp Log", centro:"S013", sucursal:"Bodega Central", nombre:"Nahuel Gonzalez", mail:"ngonzalez@isa.com.uy", usuario_sap:"CLOG010" },
+      { puesto:"Aux. Log 2A", centro:"S013", sucursal:"Bodega Central", nombre:"Agustin Fernandez", mail:"agfernandez@isa.com.uy", usuario_sap:"CLOG011" },
+
+      { puesto:"Jefe Rep.", centro:"S009", sucursal:"SAN CARLOS", nombre:"KARINA PEREIRA", mail:"kpereira@isa.com.uy", usuario_sap:"SUJRP006" }
+    ];
+
+    // =========================
+    // ✅ UI + helpers
+    // =========================
     const $ = (id) => document.getElementById(id);
+    const tbody = $("tbody");
 
-    // ============================================================
-    // ✅ DATOS YA CARGADOS (SALIDOS DE TU EXCEL - Hoja3)
-    //    Columnas: Puesto | Centro | Sucursal | Nombre | Mail | Usuario SAP
-    // ============================================================
-    let SUCURSAL_OPTS = ["S001","S002","S003","S004","S005","S006","S007","S008","S009","S010","S011","S012","S013","S014","S015","S016","S017","S018","S019"];
-    let CENTRO_OPTS = ["S001","S002","S003","S004","S005","S006","S007","S008","S009","S010","S011","S012","S013","S014","S015","S016","S017","S018","S019"];
-
-    let SUCURSAL_NOMBRE_OPTS = ["Bodega Central","DURAZNO","FLORIDA","GOMENSORO","LASCANO","MERCEDES","MONTEVIDEO AGRO","MONTEVIDEO CONS","MVDEO/SAN JOSE","OMBUES","PAYSANDU","PAYSANDU FORESTAL","RIO BRANCO","SALTO","SAN CARLOS","SAN JOSE","TACUAREMBO","TARARIRAS","YOUNG"];
-
-    let PUESTO_OPTS = ["Adm Tll","Adm. Analisis","Admin Rep Cons","Admin Taller","Admin Tllr","Admin. Tllr","Administr.","Amin Tll Cons","Analista","Aux -Vendedor","Aux Admin","Aux. Admin","Aux.Admin","Aux.Vendedor","Encargado","Encargado Taller","Gerente","Gte Suc","Jefe Rep.","Jefe Taller","Jefe Tallr","Jefe Tllr","Jfe Taller Cons","Responsable","Vendedor","Vendedor Jr","Vendedor Mostrador","Vtas Mostrador"];
-
-    // centro -> array de personas {nombre, apellido, fullName, puesto, sucursalNombre, mail, usuarioSAP}
-    let CENTRO_TO_PEOPLE = {"S001":[{"nombre":"Andres","apellido":"Maza","fullName":"Andres Maza","puesto":"Vendedor","sucursalNombre":"MONTEVIDEO AGRO","mail":"asmaza@isa.com.uy","usuarioSAP":"SUREP001"},{"nombre":"MARCOS","apellido":"SUASNAVAS","fullName":"MARCOS SUASNAVAS","puesto":"Vendedor","sucursalNombre":"MONTEVIDEO AGRO","mail":"msuasnavas@isa.com.uy","usuarioSAP":"SUREP002"},{"nombre":"Santiago","apellido":"Lugaro","fullName":"Santiago Lugaro","puesto":"Admin Taller","sucursalNombre":"MONTEVIDEO AGRO","mail":"slugaro@isa.com.uy","usuarioSAP":""},{"nombre":"GUSTAVO","apellido":"MIRANDA","fullName":"GUSTAVO MIRANDA","puesto":"Jefe Rep.","sucursalNombre":"MONTEVIDEO AGRO","mail":"gmiranda@isa.com.uy","usuarioSAP":"SUJRP001"},{"nombre":"Bruno","apellido":"Petrone","fullName":"Bruno Petrone","puesto":"Analista","sucursalNombre":"MONTEVIDEO AGRO","mail":"bpetrone@isa.com.uy","usuarioSAP":""},{"nombre":"CARLOS","apellido":"ROSSI","fullName":"CARLOS ROSSI","puesto":"Encargado Taller","sucursalNombre":"MONTEVIDEO AGRO","mail":"crossi@isa.com.uy","usuarioSAP":""},{"nombre":"Leonardo","apellido":"Gimenez","fullName":"Leonardo Gimenez","puesto":"Aux. Admin","sucursalNombre":"MONTEVIDEO AGRO","mail":"lgimenez@isa.com.uy","usuarioSAP":""},{"nombre":"Alejandro","apellido":"Techera","fullName":"Alejandro Techera","puesto":"Vendedor Mostrador","sucursalNombre":"MONTEVIDEO AGRO","mail":"atechera@isa.com.uy","usuarioSAP":""}],"S002":[{"nombre":"FERNANDO","apellido":"PEREZ","fullName":"FERNANDO PEREZ","puesto":"Vendedor","sucursalNombre":"MERCEDES","mail":"fperez@isa.com.uy","usuarioSAP":"SUREP006"},{"nombre":"ALVARO","apellido":"GARCIA","fullName":"ALVARO GARCIA","puesto":"Responsable","sucursalNombre":"MERCEDES","mail":"agarcia@isa.com.uy","usuarioSAP":"SURSP002"},{"nombre":"ANDREA","apellido":"SOSA","fullName":"ANDREA SOSA","puesto":"Aux. Admin","sucursalNombre":"MERCEDES","mail":"asosa@isa.com.uy","usuarioSAP":""},{"nombre":"MATIAS","apellido":"MARTINEZ","fullName":"MATIAS MARTINEZ","puesto":"Admin Taller","sucursalNombre":"MERCEDES","mail":"mmartinez@isa.com.uy","usuarioSAP":""}],"S003":[{"nombre":"GUILLERMO","apellido":"SILVA","fullName":"GUILLERMO SILVA","puesto":"Vendedor","sucursalNombre":"RIO BRANCO","mail":"gsilva@isa.com.uy","usuarioSAP":"SUREP010"},{"nombre":"JAVIER","apellido":"SOSA","fullName":"JAVIER SOSA","puesto":"Responsable","sucursalNombre":"RIO BRANCO","mail":"jsosa@isa.com.uy","usuarioSAP":"SURSP003"},{"nombre":"MARIANA","apellido":"GONZALEZ","fullName":"MARIANA GONZALEZ","puesto":"Aux. Admin","sucursalNombre":"RIO BRANCO","mail":"mgonzalez@isa.com.uy","usuarioSAP":""}],"S004":[{"nombre":"MARTIN","apellido":"PEREZ","fullName":"MARTIN PEREZ","puesto":"Vendedor","sucursalNombre":"Bodega Central","mail":"mperez@isa.com.uy","usuarioSAP":"SUREP020"},{"nombre":"SANTIAGO","apellido":"GARCIA","fullName":"SANTIAGO GARCIA","puesto":"Responsable","sucursalNombre":"Bodega Central","mail":"sgarcia@isa.com.uy","usuarioSAP":"SURSP004"}],"S005":[{"nombre":"ALBERTO","apellido":"SILVEIRA","fullName":"ALBERTO SILVEIRA","puesto":"Vendedor","sucursalNombre":"YOUNG","mail":"asilveira@isa.com.uy","usuarioSAP":"SUREP014"},{"nombre":"PABLO","apellido":"MARTINEZ","fullName":"PABLO MARTINEZ","puesto":"Responsable","sucursalNombre":"YOUNG","mail":"pmartinez@isa.com.uy","usuarioSAP":"SURSP005"},{"nombre":"ALVARO","apellido":"PEREIRA","fullName":"ALVARO PEREIRA","puesto":"Administr.","sucursalNombre":"YOUNG","mail":"apereira@isa.com.uy","usuarioSAP":""}],"S006":[{"nombre":"OSCAR","apellido":"RIVERO","fullName":"OSCAR RIVERO","puesto":"Vendedor","sucursalNombre":"PAYSANDU","mail":"orivero@isa.com.uy","usuarioSAP":"SUREP015"},{"nombre":"ENZO","apellido":"FERNANDEZ","fullName":"ENZO FERNANDEZ","puesto":"Vendedor","sucursalNombre":"PAYSANDU","mail":"efernandez@isa.com.uy","usuarioSAP":"SUREP016"},{"nombre":"EDUARDO","apellido":"FERNANDEZ","fullName":"EDUARDO FERNANDEZ","puesto":"Responsable","sucursalNombre":"PAYSANDU","mail":"edfernandez@isa.com.uy","usuarioSAP":"SURSP006"},{"nombre":"GONZALO","apellido":"GONZALEZ","fullName":"GONZALO GONZALEZ","puesto":"Administr.","sucursalNombre":"PAYSANDU","mail":"ggonzalez@isa.com.uy","usuarioSAP":""}],"S007":[{"nombre":"HUGO","apellido":"RIVERO","fullName":"HUGO RIVERO","puesto":"Vendedor","sucursalNombre":"PAYSANDU FORESTAL","mail":"hrivero@isa.com.uy","usuarioSAP":"SUREP017"},{"nombre":"OSCAR","apellido":"FERNANDEZ","fullName":"OSCAR FERNANDEZ","puesto":"Responsable","sucursalNombre":"PAYSANDU FORESTAL","mail":"offernandez@isa.com.uy","usuarioSAP":"SURSP007"},{"nombre":"ERIKA","apellido":"MARTINEZ","fullName":"ERIKA MARTINEZ","puesto":"Administr.","sucursalNombre":"PAYSANDU FORESTAL","mail":"emartinez@isa.com.uy","usuarioSAP":""}],"S008":[{"nombre":"PABLO","apellido":"SILVA","fullName":"PABLO SILVA","puesto":"Vendedor","sucursalNombre":"TARARIRAS","mail":"psilva@isa.com.uy","usuarioSAP":"SUREP008"},{"nombre":"RAFAEL","apellido":"GOMEZ","fullName":"RAFAEL GOMEZ","puesto":"Responsable","sucursalNombre":"TARARIRAS","mail":"rgomez@isa.com.uy","usuarioSAP":"SURSP008"}],"S009":[{"nombre":"MARTIN","apellido":"MARTINEZ","fullName":"MARTIN MARTINEZ","puesto":"Vendedor","sucursalNombre":"GOMENSORO","mail":"mmartin@isa.com.uy","usuarioSAP":"SUREP009"},{"nombre":"RICARDO","apellido":"SOSA","fullName":"RICARDO SOSA","puesto":"Responsable","sucursalNombre":"GOMENSORO","mail":"rsosa@isa.com.uy","usuarioSAP":"SURSP009"},{"nombre":"SANDRA","apellido":"GONZALEZ","fullName":"SANDRA GONZALEZ","puesto":"Administr.","sucursalNombre":"GOMENSORO","mail":"sgonzalez@isa.com.uy","usuarioSAP":""}],"S010":[{"nombre":"DIEGO","apellido":"PEREZ","fullName":"DIEGO PEREZ","puesto":"Vendedor","sucursalNombre":"SALTO","mail":"dperez@isa.com.uy","usuarioSAP":"SUREP011"},{"nombre":"CARLOS","apellido":"LOPEZ","fullName":"CARLOS LOPEZ","puesto":"Responsable","sucursalNombre":"SALTO","mail":"clopez@isa.com.uy","usuarioSAP":"SURSP010"}],"S011":[{"nombre":"GABRIEL","apellido":"GOMEZ","fullName":"GABRIEL GOMEZ","puesto":"Vendedor","sucursalNombre":"FLORIDA","mail":"ggomez@isa.com.uy","usuarioSAP":"SUREP012"},{"nombre":"RODRIGO","apellido":"MORALES","fullName":"RODRIGO MORALES","puesto":"Responsable","sucursalNombre":"FLORIDA","mail":"rmorales@isa.com.uy","usuarioSAP":"SURSP011"},{"nombre":"ANA","apellido":"SILVA","fullName":"ANA SILVA","puesto":"Aux. Admin","sucursalNombre":"FLORIDA","mail":"asilva@isa.com.uy","usuarioSAP":""}],"S012":[{"nombre":"MATEO","apellido":"RODRIGUEZ","fullName":"MATEO RODRIGUEZ","puesto":"Vendedor","sucursalNombre":"DURAZNO","mail":"mrodriguez@isa.com.uy","usuarioSAP":"SUREP013"},{"nombre":"PABLO","apellido":"PEREZ","fullName":"PABLO PEREZ","puesto":"Responsable","sucursalNombre":"DURAZNO","mail":"pperez@isa.com.uy","usuarioSAP":"SURSP012"}],"S013":[{"nombre":"SOFIA","apellido":"GONZALEZ","fullName":"SOFIA GONZALEZ","puesto":"Adm. Analisis","sucursalNombre":"MONTEVIDEO AGRO","mail":"sgonzalez2@isa.com.uy","usuarioSAP":""}],"S014":[{"nombre":"MARTIN","apellido":"SILVA","fullName":"MARTIN SILVA","puesto":"Vendedor","sucursalNombre":"OMBUES","mail":"msilva@isa.com.uy","usuarioSAP":"SUREP007"},{"nombre":"RAUL","apellido":"SOSA","fullName":"RAUL SOSA","puesto":"Responsable","sucursalNombre":"OMBUES","mail":"rsosa2@isa.com.uy","usuarioSAP":"SURSP014"}],"S015":[{"nombre":"Pablo","apellido":"Carballo","fullName":"Pablo Carballo","puesto":"Jfe Taller Cons","sucursalNombre":"MONTEVIDEO CONS","mail":"pcarballo@isa.com.uy","usuarioSAP":""},{"nombre":"GONZALO","apellido":"GOLDARACENA","fullName":"GONZALO GOLDARACENA","puesto":"Gerente","sucursalNombre":"MONTEVIDEO CONS","mail":"ggoldaracena@isa.com.uy","usuarioSAP":""},{"nombre":"MAURICIO","apellido":"LARRAÑAGA","fullName":"MAURICIO LARRAÑAGA","puesto":"Vendedor","sucursalNombre":"MONTEVIDEO CONS","mail":"mlarranaga@isa.com.uy","usuarioSAP":""},{"nombre":"MARIANA","apellido":"FERNANDEZ","fullName":"MARIANA FERNANDEZ","puesto":"Administr.","sucursalNombre":"MONTEVIDEO CONS","mail":"mfernandez@isa.com.uy","usuarioSAP":""}],"S016":[{"nombre":"GUSTAVO","apellido":"MIRANDA","fullName":"GUSTAVO MIRANDA","puesto":"Jefe Rep.","sucursalNombre":"MVDEO/SAN JOSE","mail":"gmiranda@isa.com.uy","usuarioSAP":"SUJRP001"}],"S017":[{"nombre":"NICOLAS","apellido":"PEREZ","fullName":"NICOLAS PEREZ","puesto":"Vendedor","sucursalNombre":"SAN CARLOS","mail":"nperez@isa.com.uy","usuarioSAP":"SUREP018"},{"nombre":"MARIO","apellido":"GOMEZ","fullName":"MARIO GOMEZ","puesto":"Responsable","sucursalNombre":"SAN CARLOS","mail":"mgomez@isa.com.uy","usuarioSAP":"SURSP017"}],"S018":[{"nombre":"SERGIO","apellido":"GONZALEZ","fullName":"SERGIO GONZALEZ","puesto":"Vendedor","sucursalNombre":"TACUAREMBO","mail":"segonzalez@isa.com.uy","usuarioSAP":"SUREP019"},{"nombre":"LUCIA","apellido":"MARTINEZ","fullName":"LUCIA MARTINEZ","puesto":"Aux Admin","sucursalNombre":"TACUAREMBO","mail":"lmartinez@isa.com.uy","usuarioSAP":""}],"S019":[{"nombre":"JULIO","apellido":"GONZALEZ","fullName":"JULIO GONZALEZ","puesto":"Vendedor","sucursalNombre":"SAN JOSE","mail":"jgonzalez@isa.com.uy","usuarioSAP":"SUREP003"},{"nombre":"SILVIA","apellido":"LOPEZ","fullName":"SILVIA LOPEZ","puesto":"Responsable","sucursalNombre":"SAN JOSE","mail":"slopez@isa.com.uy","usuarioSAP":"SURSP019"},{"nombre":"MARIA","apellido":"PEREIRA","fullName":"MARIA PEREIRA","puesto":"Administr.","sucursalNombre":"SAN JOSE","mail":"mpereira@isa.com.uy","usuarioSAP":""}]};
-
-    const COMENTARIO_OPTS = ["Solicitar cotizacion","Stock en la red","Ticket reserva"];
-    const RESPUESTA_OPTS  = ["Solicitar","No solicitar"];
-
-    // ✅ UI helpers
     function escapeHtml(s){
       return String(s ?? "")
         .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
         .replaceAll('"',"&quot;").replaceAll("'","&#039;");
     }
+    function norm(s){ return (s ?? "").toString().trim().toLowerCase(); }
 
     function showToast(text, isError=false){
       const el = $("toast");
@@ -414,7 +499,6 @@
       clearTimeout(showToast._t);
       showToast._t = setTimeout(() => el.style.display = "none", 4200);
     }
-
     function todayISO(){
       const d = new Date();
       const yyyy = d.getFullYear();
@@ -422,99 +506,154 @@
       const dd = String(d.getDate()).padStart(2,"0");
       return `${yyyy}-${mm}-${dd}`;
     }
-
     function ensureDateIfRespuesta(row){
       if ((row.respuesta || "").trim() && !(row.fecha_respuesta || "").trim()){
         row.fecha_respuesta = todayISO();
       }
     }
 
-    function fillSucursalSelect(sel, includeAll=false){
-      const base = includeAll ? [`<option value="">(Todas)</option>`] : [`<option value="" selected>(Elegir)</option>`];
-      sel.innerHTML = base.concat(SUCURSAL_OPTS.map(s => `<option value="${s}">${s}</option>`)).join("");
+    function uniqSorted(arr){
+      return Array.from(new Set(arr.filter(Boolean))).sort((a,b)=> a.localeCompare(b, "es", { sensitivity:"base" }));
+    }
+    function setOptions(sel, values, placeholder){
+      sel.innerHTML = `<option value="">${escapeHtml(placeholder || "(Elegir)")}</option>` +
+        values.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join("");
     }
 
-    function fillDynamicSelect(sel, arr, includeAll=false){
-      const base = includeAll ? [`<option value="">(Todas)</option>`] : [`<option value="" selected>(Elegir)</option>`];
-      sel.innerHTML = base.concat((arr||[]).map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`)).join("");
-    }
+    // =========================
+    // ✅ Selects desde PEOPLE
+    // =========================
+    const CENTROS = uniqSorted(PEOPLE.map(p => p.centro));
+    const SUCURSALES = uniqSorted(PEOPLE.map(p => p.sucursal));
 
-    function selectHTML(options, value, placeholder="(Elegir)"){
-      const opts = [
-        `<option value="">${escapeHtml(placeholder)}</option>`,
-        ...options.map(o => `<option value="${escapeHtml(o)}" ${o===value ? "selected":""}>${escapeHtml(o)}</option>`)
-      ];
-      return opts.join("");
-    }
-
-    function renderPeoplePanel(centro){
-      const el = $("peoplePanel");
-      if(!centro){
-        el.innerHTML = '<small>Seleccioná una sucursal para ver personas relacionadas.</small>';
-        return;
+    // Mapeo de centro -> sucursal (para autocompletar)
+    const CENTRO_SUCURSAL_MAP = {};
+    PEOPLE.forEach(p => {
+      if (!CENTRO_SUCURSAL_MAP[p.centro]) {
+        CENTRO_SUCURSAL_MAP[p.centro] = p.sucursal;
       }
-      const people = CENTRO_TO_PEOPLE[centro] || [];
-      if(!people.length){
-        el.innerHTML = `<small>No hay personas asociadas a ${escapeHtml(centro)}.</small>`;
-        return;
-      }
-      const rows = people.map(p =>
-        `<div style="padding:6px 8px;border-bottom:1px solid rgba(0,0,0,.04)">
-          <b>${escapeHtml(p.fullName)}</b>
-          ${p.puesto?('<span style="color:var(--muted)"> - '+escapeHtml(p.puesto)+'</span>'):''}
-          <span style="color:var(--muted)">(${escapeHtml(p.sucursalNombre||"")})</span>
-        </div>`
-      ).join("");
-      el.innerHTML = `<div style="font-weight:900;margin-bottom:6px">Personas en ${escapeHtml(centro)}</div>${rows}`;
+    });
+
+    // Filtros
+    setOptions($("fCentro"), CENTROS, "(Todos)");
+    setOptions($("fSucursal"), SUCURSALES, "(Todas)");
+
+    // Agregar
+    setOptions($("a_centro"), CENTROS, "(Elegir)");
+    setOptions($("a_sucursal_nombre"), [], "(Elegir)");
+    setOptions($("a_nombre"), [], "(Elegir)");
+
+    function getPeopleByFilters(centro, sucursal){
+      return PEOPLE.filter(p => {
+        if (centro && p.centro !== centro) return false;
+        if (sucursal && p.sucursal !== sucursal) return false;
+        return true;
+      });
     }
 
-    // ============================================================
-    // ✅ FIRESTORE DATA
-    // ============================================================
-    // Colección donde se guardan las filas:
+    function refreshDependentSelects(){
+      const centro = $("a_centro").value;
+      const sucursal = $("a_sucursal_nombre").value;
+
+      // Sucursales según centro
+      const sucOpts = uniqSorted(getPeopleByFilters(centro, "").map(p => p.sucursal));
+      setOptions($("a_sucursal_nombre"), sucOpts, "(Elegir)");
+
+      // Auto-completar sucursal si existe una sola opción
+      if (centro && sucOpts.length === 1) {
+        $("a_sucursal_nombre").value = sucOpts[0];
+      } else if (sucursal && sucOpts.includes(sucursal)) {
+        // Mantener si todavía existe
+        $("a_sucursal_nombre").value = sucursal;
+      }
+
+      // Nombres según centro+sucursal
+      const people = getPeopleByFilters(centro, $("a_sucursal_nombre").value);
+      const nameOpts = uniqSorted(people.map(p => p.nombre));
+      setOptions($("a_nombre"), nameOpts, "(Elegir)");
+
+      // Limpiar responsable
+      $("a_responsable").value = "";
+    }
+
+    function fillResponsableFromNombre(){
+      const centro = $("a_centro").value;
+      const sucursal = $("a_sucursal_nombre").value;
+
+      // Buscar al jefe de la sucursal (puesto que contiene "Jefe")
+      const jefe = PEOPLE.find(p =>
+        (!centro || p.centro === centro) &&
+        (!sucursal || p.sucursal === sucursal) &&
+        (p.puesto.includes("Jefe") || p.puesto.includes("jefe"))
+      );
+
+      if (jefe){
+        $("a_responsable").value = jefe.nombre;
+      } else {
+        $("a_responsable").value = "";
+      }
+    }
+
+    $("a_centro").addEventListener("change", () => {
+      refreshDependentSelects();
+      applyFilters();
+    });
+    $("a_sucursal_nombre").addEventListener("change", () => {
+      const centro = $("a_centro").value;
+      const people = getPeopleByFilters(centro, $("a_sucursal_nombre").value);
+      const nameOpts = uniqSorted(people.map(p => p.nombre));
+      setOptions($("a_nombre"), nameOpts, "(Elegir)");
+      $("a_responsable").value = "";
+    });
+    $("a_nombre").addEventListener("change", fillResponsableFromNombre);
+
+    // Inicial
+    refreshDependentSelects();
+
+    // =========================
+    // ✅ Firestore colección
+    // =========================
     const COL = "solicitudes";
-
-    let cache = [];   // [{id, data}]
+    let cache = [];
     let view = [];
     let editingId = null;
 
-    function matchesQ(row, q){
+    function matchesText(r, q){
       if (!q) return true;
-      q = q.trim().toLowerCase();
       const hay = [
-        row.material,row.cantidad,row.solicitud,row.necesidad,row.sucursal,
-        row.sucursalNombre,row.responsable,row.comentario,row.respuesta,row.fecha_respuesta
-      ].map(v => String(v ?? "").toLowerCase()).join(" | ");
+        r.material, r.cantidad, r.solicitud, r.necesidad, r.centro, r.sucursalNombre,
+        r.nombre, r.responsable, r.comentario, r.respuesta, r.fecha_respuesta
+      ].map(x => norm(x)).join(" | ");
       return hay.includes(q);
     }
 
     function applyFilters(){
-      const q = ($("q").value || "").trim();
-      const fSucursal = $("fSucursal").value || "";
-      const fComentario = $("fComentario").value || "";
-      const fRespuesta  = $("fRespuesta").value || "";
+      const q = norm($("q").value);
+      const fCentro = $("fCentro").value;
+      const fSucursal = $("fSucursal").value;
+      const fRespuesta = $("fRespuesta").value;
 
       view = cache.filter(x => {
         const r = x.data;
-        if (!matchesQ(r, q)) return false;
-        if (fSucursal && (r.sucursal || "") !== fSucursal) return false;
-        if (fComentario && (r.comentario || "") !== fComentario) return false;
+        if (fCentro && (r.centro || "") !== fCentro) return false;
+        if (fSucursal && (r.sucursalNombre || "") !== fSucursal) return false;
         if (fRespuesta && (r.respuesta || "") !== fRespuesta) return false;
+        if (!matchesText(r, q)) return false;
         return true;
       });
 
       draw();
     }
 
-    ["q","fSucursal","fComentario","fRespuesta"].forEach(id=>{
+    ["q","fCentro","fSucursal","fRespuesta"].forEach(id=>{
       $(id).addEventListener("input", applyFilters);
       $(id).addEventListener("change", applyFilters);
     });
 
     $("clearFiltersBtn").addEventListener("click", ()=>{
       $("q").value = "";
+      $("fCentro").value = "";
       $("fSucursal").value = "";
-      $("fComentario").value = "";
       $("fRespuesta").value = "";
       applyFilters();
     });
@@ -524,17 +663,18 @@
 
       if (!isEditing){
         return `
-          <tr data-id="${id}">
-            <td><div class="cellInner">${escapeHtml(r.material)}</div></td>
-            <td><div class="cellInner">${escapeHtml(r.cantidad)}</div></td>
-            <td><div class="cellInner">${escapeHtml(r.solicitud)}</div></td>
-            <td><div class="cellInner">${escapeHtml(r.necesidad)}</div></td>
-            <td><div class="cellInner">${escapeHtml(r.sucursal || '')}</div></td>
-            <td><div class="cellInner">${escapeHtml(r.sucursalNombre || '')}</div></td>
-            <td><div class="cellInner">${escapeHtml(r.responsable || '')}</div></td>
-            <td><div class="cellInner">${escapeHtml(r.comentario || '')}</div></td>
-            <td><div class="cellInner">${escapeHtml(r.respuesta || '')}</div></td>
-            <td><div class="cellInner">${escapeHtml(r.fecha_respuesta || '')}</div></td>
+          <tr data-id="${escapeHtml(id)}">
+            <td><div class="cellInner">${escapeHtml(r.material || "")}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.cantidad || "")}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.solicitud || "")}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.necesidad || "")}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.centro || "")}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.sucursalNombre || "")}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.nombre || "")}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.responsable || "")}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.comentario || "")}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.respuesta || "")}</div></td>
+            <td><div class="cellInner">${escapeHtml(r.fecha_respuesta || "")}</div></td>
             <td>
               <div class="cellInner">
                 <div class="actions">
@@ -546,49 +686,36 @@
         `;
       }
 
-      const people = CENTRO_TO_PEOPLE[r.sucursal] || [];
-      const fullNames = Array.from(new Set(people.map(p => p.fullName).filter(Boolean))).sort();
-
       return `
-        <tr data-id="${id}">
-          <td><div class="cellInner"><input class="cell-input w160" data-field="material" value="${escapeHtml(r.material)}"></div></td>
-          <td><div class="cellInner"><input class="cell-input w140" data-field="cantidad" type="number" min="0" step="1" value="${escapeHtml(r.cantidad)}"></div></td>
-          <td><div class="cellInner"><input class="cell-input w160" data-field="solicitud" value="${escapeHtml(r.solicitud)}"></div></td>
-          <td><div class="cellInner"><input class="cell-input w160" data-field="necesidad" value="${escapeHtml(r.necesidad)}"></div></td>
+        <tr data-id="${escapeHtml(id)}">
+          <td><div class="cellInner"><input class="cell-input w160" data-field="material" value="${escapeHtml(r.material||"")}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w110" data-field="cantidad" type="number" min="0" step="1" value="${escapeHtml(r.cantidad||"")}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w160" data-field="solicitud" value="${escapeHtml(r.solicitud||"")}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w160" data-field="necesidad" value="${escapeHtml(r.necesidad||"")}"></div></td>
 
-          <td><div class="cellInner">
-            <select class="cell-input w160" data-field="sucursal" data-role="editSucursal">
-              ${selectHTML(SUCURSAL_OPTS, r.sucursal)}
-            </select>
-          </div></td>
-
-          <td><div class="cellInner">
-            <select class="cell-input w200" data-field="sucursalNombre">
-              ${selectHTML(SUCURSAL_NOMBRE_OPTS, r.sucursalNombre)}
-            </select>
-          </div></td>
-
-          <td><div class="cellInner">
-            <select class="cell-input w220" data-role="editNombreSelect">
-              ${selectHTML(fullNames, r.responsable || "")}
-            </select>
-          </div></td>
+          <td><div class="cellInner"><input class="cell-input w140" data-field="centro" value="${escapeHtml(r.centro||"")}" readonly></div></td>
+          <td><div class="cellInner"><input class="cell-input w200" data-field="sucursalNombre" value="${escapeHtml(r.sucursalNombre||"")}" readonly></div></td>
+          <td><div class="cellInner"><input class="cell-input w200" data-field="nombre" value="${escapeHtml(r.nombre||"")}" readonly></div></td>
+          <td><div class="cellInner"><input class="cell-input w160" data-field="responsable" value="${escapeHtml(r.responsable||"")}"></div></td>
 
           <td><div class="cellInner">
             <select class="cell-input w200" data-field="comentario">
-              ${selectHTML(COMENTARIO_OPTS, r.comentario || "")}
+              <option value="" ${(r.comentario||"")===""?"selected":""}>(Elegir)</option>
+              <option value="Solicitar cotizacion" ${(r.comentario||"")==="Solicitar cotizacion"?"selected":""}>Solicitar cotizacion</option>
+              <option value="Stock en la red" ${(r.comentario||"")==="Stock en la red"?"selected":""}>Stock en la red</option>
+              <option value="Ticket reserva" ${(r.comentario||"")==="Ticket reserva"?"selected":""}>Ticket reserva</option>
             </select>
           </div></td>
 
           <td><div class="cellInner">
-            <select class="cell-input w160" data-field="respuesta" data-role="respuestaSelect">
-              ${selectHTML(RESPUESTA_OPTS, r.respuesta || "")}
+            <select class="cell-input w160" data-field="respuesta">
+              <option value="" ${(r.respuesta||"")===""?"selected":""}>(Elegir)</option>
+              <option value="Solicitar" ${(r.respuesta||"")==="Solicitar"?"selected":""}>Solicitar</option>
+              <option value="No solicitar" ${(r.respuesta||"")==="No solicitar"?"selected":""}>No solicitar</option>
             </select>
           </div></td>
 
-          <td><div class="cellInner">
-            <input class="cell-input w160" data-field="fecha_respuesta" type="date" value="${escapeHtml(r.fecha_respuesta || "")}">
-          </div></td>
+          <td><div class="cellInner"><input class="cell-input w160" data-field="fecha_respuesta" type="date" value="${escapeHtml(r.fecha_respuesta||"")}"></div></td>
 
           <td>
             <div class="cellInner">
@@ -604,30 +731,49 @@
     }
 
     function draw(){
-      const tbody = $("tbody");
-      const arr = (view.length ? view : cache);
-      tbody.innerHTML = arr.map(x => renderRow(x.id, x.data)).join("");
+      const data = (view.length ? view : cache);
+      tbody.innerHTML = data.map(x => renderRow(x.id, x.data)).join("");
     }
 
-    // ✅ Agregar fila -> Firestore
+    // =========================
+    // ✅ LISTENER Firestore
+    // =========================
+    const qSnap = query(collection(db, COL), orderBy("createdAt","desc"));
+    onSnapshot(qSnap, (snap)=>{
+      cache = [];
+      snap.forEach(d => cache.push({ id: d.id, data: d.data() }));
+      applyFilters();
+    }, (err)=>{
+      console.error(err);
+      showToast("No se pudo leer Firestore", true);
+    });
+
+    // =========================
+    // ✅ AGREGAR
+    // =========================
     $("addBtn").addEventListener("click", async ()=>{
       const row = {
         material: $("a_material").value.trim(),
-        cantidad: Number($("a_cantidad").value || 0),
+        cantidad: ($("a_cantidad").value ?? "").toString().trim(),
         solicitud: $("a_solicitud").value.trim(),
         necesidad: $("a_necesidad").value.trim(),
-        sucursal: $("a_sucursal").value || "",
-        sucursalNombre: $("a_sucursal_nombre").value.trim(),
-        responsable: ($("a_nombre").value || "").trim(),
-        comentario: $("a_comentario").value || "",
-        respuesta: $("a_respuesta").value || "",
+        centro: $("a_centro").value,
+        sucursalNombre: $("a_sucursal_nombre").value,
+        nombre: $("a_nombre").value,
+        responsable: $("a_responsable").value.trim(),
+        comentario: $("a_comentario").value,
+        respuesta: $("a_respuesta").value,
         fecha_respuesta: $("a_fecha_respuesta").value || "",
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       };
 
-      if (!row.material){
-        showToast("Material es obligatorio.", true);
+      if (!row.material && !row.solicitud && !row.necesidad){
+        alert("Ingresá al menos Material / Solicitud / Necesidad.");
+        return;
+      }
+      if (!row.centro || !row.sucursalNombre || !row.nombre){
+        alert("Elegí Centro, Sucursal y Nombre.");
         return;
       }
 
@@ -635,45 +781,29 @@
 
       try{
         await addDoc(collection(db, COL), row);
-
-        // limpiar
-        $("a_material").value = "";
-        $("a_cantidad").value = 1;
-        $("a_solicitud").value = "";
-        $("a_necesidad").value = "";
-        $("a_sucursal").value = "";
-        $("a_sucursal_nombre").value = "";
-        $("a_nombre").value = "";
-        $("a_responsable").value = "";
-        $("a_comentario").value = "";
-        $("a_respuesta").value = "";
-        $("a_fecha_respuesta").value = "";
-
         showToast("Agregado con éxito");
-        // onSnapshot se encarga de refrescar
+
+        // limpiar (mantengo centro para agilizar)
+        $("a_material").value="";
+        $("a_cantidad").value="1";
+        $("a_solicitud").value="";
+        $("a_necesidad").value="";
+        $("a_comentario").value="";
+        $("a_respuesta").value="";
+        $("a_fecha_respuesta").value="";
+        $("a_nombre").value="";
+        $("a_responsable").value="";
       } catch(e){
         console.error(e);
-        showToast("Error guardando en Firestore.", true);
+        showToast("Error al guardar", true);
         alert(e?.message || String(e));
       }
     });
 
-    // ✅ Autocompletar fecha cuando cambia respuesta en edición
-    $("tbody").addEventListener("change", (e)=>{
-      const sel = e.target.closest('select[data-role="respuestaSelect"]');
-      if (!sel) return;
-      const tr = e.target.closest("tr[data-id]");
-      if (!tr) return;
-      const dateInput = tr.querySelector('input[data-field="fecha_respuesta"]');
-      if (!dateInput) return;
-
-      if (sel.value && !dateInput.value){
-        dateInput.value = todayISO();
-      }
-    });
-
-    // ✅ Acciones tabla -> update/delete Firestore
-    $("tbody").addEventListener("click", async (e)=>{
+    // =========================
+    // ✅ EDITAR / GUARDAR / ELIMINAR
+    // =========================
+    tbody.addEventListener("click", async (e)=>{
       const btn = e.target.closest("[data-action]");
       if (!btn) return;
 
@@ -686,90 +816,75 @@
       if (action === "edit"){ editingId = id; draw(); return; }
       if (action === "cancel"){ editingId = null; draw(); return; }
 
-      if (action === "delete"){
-        if (!confirm("¿Eliminar esta fila?")) return;
-        try{
-          await deleteDoc(doc(db, COL, id));
-          if (editingId === id) editingId = null;
-          showToast("Eliminado");
-        }catch(err){
-          console.error(err);
-          showToast("Error eliminando.", true);
-          alert(err?.message || String(err));
-        }
-        return;
-      }
-
       if (action === "save"){
-        const updated = {};
         const fields = tr.querySelectorAll("[data-field]");
-        fields.forEach(el=>{
-          const k = el.dataset.field;
-          let v = el.value ?? "";
-          if (k === "cantidad") v = Number(v || 0);
-          updated[k] = (typeof v === "string") ? v.trim() : v;
-        });
-
-        const nombreSel = tr.querySelector('[data-role="editNombreSelect"]');
-        updated.responsable = (nombreSel?.value || "").trim();
+        const updated = {};
+        fields.forEach(el => updated[el.dataset.field] = (el.value ?? "").toString().trim());
 
         ensureDateIfRespuesta(updated);
         updated.updatedAt = serverTimestamp();
 
         try{
+          btn.disabled = true;
           await updateDoc(doc(db, COL, id), updated);
           editingId = null;
-          showToast("Guardado con éxito");
-        }catch(err){
+          showToast("Guardado");
+        } catch(err){
           console.error(err);
-          showToast("Error guardando.", true);
+          showToast("Error al guardar", true);
           alert(err?.message || String(err));
+        } finally {
+          btn.disabled = false;
+        }
+        return;
+      }
+
+      if (action === "delete"){
+        if (!confirm("¿Seguro que querés eliminar esta fila?")) return;
+        try{
+          btn.disabled = true;
+          await deleteDoc(doc(db, COL, id));
+          if (editingId === id) editingId = null;
+          showToast("Eliminado");
+        } catch(err){
+          console.error(err);
+          showToast("Error al eliminar", true);
+          alert(err?.message || String(err));
+        } finally{
+          btn.disabled = false;
         }
       }
     });
 
-    // ✅ Cascada edición: cambia sucursal => filtra nombres y sugiere sucursalNombre
-    $("tbody").addEventListener("change", (e)=>{
-      const selSucursal = e.target.closest('select[data-role="editSucursal"]');
-      if(!selSucursal) return;
+    // =========================
+    // ✅ EXPORT XLSX
+    // =========================
+    function rowsForExport(){
+      const data = (view.length ? view : cache).map(x => {
+        const r = x.data;
+        return {
+          "ID": x.id,
+          "Material": r.material || "",
+          "Cantidad": r.cantidad || "",
+          "Solicitud": r.solicitud || "",
+          "Necesidad": r.necesidad || "",
+          "Centro": r.centro || "",
+          "Sucursal": r.sucursalNombre || "",
+          "Nombre": r.nombre || "",
+          "Responsable": r.responsable || "",
+          "Comentario": r.comentario || "",
+          "Respuesta": r.respuesta || "",
+          "Fecha respuesta": r.fecha_respuesta || ""
+        };
+      });
+      return data;
+    }
 
-      const tr = e.target.closest("tr[data-id]");
-      if(!tr) return;
+    $("exportXlsxBtn").addEventListener("click", ()=>{
+      const data = rowsForExport();
+      if (!data.length){ alert("No hay datos para exportar."); return; }
 
-      const centro = selSucursal.value || "";
-      const people = CENTRO_TO_PEOPLE[centro] || [];
-      const fullNames = Array.from(new Set(people.map(p => p.fullName).filter(Boolean))).sort();
-
-      const nombreSel = tr.querySelector('[data-role="editNombreSelect"]');
-      if(nombreSel){
-        fillDynamicSelect(nombreSel, fullNames, false);
-        if(fullNames.length === 1) nombreSel.value = fullNames[0];
-      }
-
-      const sucNom = (people.find(p => p.sucursalNombre)?.sucursalNombre) || "";
-      const sucNomSel = tr.querySelector('select[data-field="sucursalNombre"]');
-      if(sucNomSel && sucNom) sucNomSel.value = sucNom;
-    });
-
-    // ✅ Export XLSX (desde Firestore)
-    function exportXlsx(){
-      const arr = (view.length ? view : cache).map(x => x.data);
-      if (!arr.length){ alert("No hay datos para exportar."); return; }
-
-      const rows = arr.map(r => ({
-        "Material": r.material || "",
-        "Cantidad": r.cantidad ?? "",
-        "Solicitud": r.solicitud || "",
-        "Necesidad": r.necesidad || "",
-        "Centro": r.sucursal || "",
-        "Sucursal": r.sucursalNombre || "",
-        "Responsable": r.responsable || "",
-        "Comentario": r.comentario || "",
-        "Respuesta": r.respuesta || "",
-        "Fecha de respuesta": r.fecha_respuesta || ""
-      }));
-
-      const ws = XLSX.utils.json_to_sheet(rows);
+      const ws = XLSX.utils.json_to_sheet(data);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, "Solicitudes");
 
@@ -778,84 +893,7 @@
       const mm = String(now.getMonth()+1).padStart(2,'0');
       const dd = String(now.getDate()).padStart(2,'0');
       XLSX.writeFile(wb, `solicitudes_${yyyy}-${mm}-${dd}.xlsx`);
-    }
-    $("exportXlsxBtn").addEventListener("click", exportXlsx);
-
-    // ✅ Cascada agregar (Centro -> nombres + autocompleta sucursalNombre)
-    function refreshAddNames(){
-      const centro = $("a_sucursal").value || "";
-      const people = CENTRO_TO_PEOPLE[centro] || [];
-      const fullNames = Array.from(new Set(people.map(p => p.fullName).filter(Boolean))).sort();
-
-      fillDynamicSelect($("a_nombre"), fullNames, false);
-      if(fullNames.length === 1) $("a_nombre").value = fullNames[0];
-
-      const sucNom = (people.find(p => p.sucursalNombre)?.sucursalNombre) || "";
-      if(sucNom) $("a_sucursal_nombre").value = sucNom;
-
-      $("a_responsable").value = ($("a_nombre").value || "").trim();
-      renderPeoplePanel(centro);
-    }
-    $("a_sucursal").addEventListener("change", refreshAddNames);
-
-    $("a_nombre").addEventListener("change", ()=>{
-      $("a_responsable").value = ($("a_nombre").value || "").trim();
-      const centro = $("a_sucursal").value || "";
-      if(centro) renderPeoplePanel(centro);
     });
-
-    // ✅ Cascada alternativa (Sucursal Nombre -> nombres + intenta setear centro si es único)
-    $("a_sucursal_nombre").addEventListener("change", ()=>{
-      const sucNom = ($("a_sucursal_nombre").value || "").trim();
-      if(!sucNom){
-        $("a_sucursal").value = "";
-        fillDynamicSelect($("a_nombre"), [], false);
-        $("a_responsable").value = "";
-        renderPeoplePanel("");
-        return;
-      }
-
-      const people = [];
-      const centros = new Set();
-      Object.entries(CENTRO_TO_PEOPLE).forEach(([centro, list])=>{
-        list.forEach(p=>{
-          if((p.sucursalNombre||"").trim().toUpperCase() === sucNom.toUpperCase()){
-            people.push(p);
-            centros.add(centro);
-          }
-        });
-      });
-
-      const fullNames = Array.from(new Set(people.map(p => p.fullName).filter(Boolean))).sort();
-      fillDynamicSelect($("a_nombre"), fullNames, false);
-      if(fullNames.length === 1) $("a_nombre").value = fullNames[0];
-
-      const centroList = Array.from(centros);
-      $("a_sucursal").value = (centroList.length === 1) ? centroList[0] : "";
-
-      $("a_responsable").value = ($("a_nombre").value || "").trim();
-      if($("a_sucursal").value) renderPeoplePanel($("a_sucursal").value);
-    });
-
-    // ============================================================
-    // ✅ Firestore realtime listener
-    // ============================================================
-    const qSnap = query(collection(db, COL), orderBy("createdAt", "desc"));
-    onSnapshot(qSnap, (snap)=>{
-      cache = [];
-      snap.forEach(d => cache.push({ id: d.id, data: d.data() }));
-      applyFilters();
-    }, (err)=>{
-      console.error(err);
-      showToast("No se pudo leer Firestore.", true);
-    });
-
-    // Init selects + table
-    fillSucursalSelect($("fSucursal"), true);
-    fillDynamicSelect($("a_sucursal"), CENTRO_OPTS, false);
-    fillDynamicSelect($("a_sucursal_nombre"), SUCURSAL_NOMBRE_OPTS, false);
-    fillDynamicSelect($("a_nombre"), [], false);
-    applyFilters();
   </script>
 </body>
 </html>
