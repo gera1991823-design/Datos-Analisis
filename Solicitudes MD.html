@@ -430,6 +430,10 @@
       { puesto:"Adm Tll", centro:"S008", sucursal:"OMBÚES", nombre:"Meliz Lacoste", mail:"mlacoste@isa.com.uy", usuario_sap:"" },
       { puesto:"Jefe Rep.", centro:"S008", sucursal:"OMBÚES", nombre:"Rafael DAVILA", mail:"rdavila@isa.com.uy", usuario_sap:"SUJRP002" },
 
+      { puesto:"Vendedor", centro:"S009", sucursal:"LASCANO", nombre:"CECILIA AROCENA", mail:"carocena@isa.com.uy", usuario_sap:"SUREP017" },
+      { puesto:"Vendedor", centro:"S009", sucursal:"LASCANO", nombre:"Carlos Nuñez", mail:"canunez@isa.com.uy", usuario_sap:"SUBOD008" },
+      { puesto:"Jefe Rep.", centro:"S009", sucursal:"LASCANO", nombre:"KARINA PEREIRA", mail:"kpereira@isa.com.uy", usuario_sap:"SUJRP006" },
+
       { puesto:"Vendedor", centro:"S010", sucursal:"TACUAREMBÓ", nombre:"Marcelo ÁLVAREZ", mail:"malvarez@isa.com.uy", usuario_sap:"SUREP018" },
       { puesto:"Administr.", centro:"S010", sucursal:"TACUAREMBÓ", nombre:"Melany Hernandez", mail:"mhernandez@isa.com.uy", usuario_sap:"" },
       { puesto:"Gte Suc", centro:"S010", sucursal:"TACUAREMBÓ", nombre:"Ignacio Porcile", mail:"iporcile@isa.com.uy", usuario_sap:"" },
@@ -443,14 +447,10 @@
       { puesto:"Analista", centro:"S012", sucursal:"PAYSANDÚ FORESTAL", nombre:"Federico Acosta", mail:"facosta@isa.com.uy", usuario_sap:"" },
       { puesto:"Jefe Rep.", centro:"S012", sucursal:"PAYSANDÚ FORESTAL", nombre:"Mateo Cal", mail:"mcal@isa.com.uy", usuario_sap:"" },
 
-      { puesto:"Vendedor", centro:"S009", sucursal:"LASCANO", nombre:"CECILIA AROCENA", mail:"carocena@isa.com.uy", usuario_sap:"SUREP017" },
-      { puesto:"Vendedor", centro:"S009", sucursal:"LASCANO", nombre:"Carlos Nuñez", mail:"canunez@isa.com.uy", usuario_sap:"SUBOD008" },
-      { puesto:"Jefe Rep.", centro:"S009", sucursal:"LASCANO", nombre:"KARINA PEREIRA", mail:"kpereira@isa.com.uy", usuario_sap:"SUJRP006" },
-
       { puesto:"Vendedor", centro:"S014", sucursal:"SALTO", nombre:"Ronaldo Guzman", mail:"rguzman@isa.com.uy", usuario_sap:"SUREP012" },
       { puesto:"Vendedor", centro:"S014", sucursal:"SALTO", nombre:"Virginia Diaz", mail:"vidiaz@isa.com.uy", usuario_sap:"" },
       { puesto:"Garantias", centro:"S014", sucursal:"SALTO", nombre:"Silvana Vignolo", mail:"svignolo@isa.com.uy", usuario_sap:"" },
-      { puesto:"Jefe Rep.", centro:"S014", sucursal:"SALTO", nombre:"Mariano Arbiza", mail:"marbiza@isa.com.uy", usuario_sap:"" },
+      { puesto:"Responsale", centro:"S014", sucursal:"SALTO", nombre:"Mariano Arbiza", mail:"marbiza@isa.com.uy", usuario_sap:"" },
       { puesto:"Administr.", centro:"S014", sucursal:"SALTO", nombre:"Valeria Silva", mail:"vsilva@isa.com.uy", usuario_sap:"" },
 
       { puesto:"Jefe Rep.", centro:"S016", sucursal:"SAN JOSÉ", nombre:"GUSTAVO MIRANDA", mail:"gmiranda@isa.com.uy", usuario_sap:"" },
@@ -527,12 +527,19 @@
     const CENTROS = uniqSorted(PEOPLE.map(p => p.centro));
     const SUCURSALES = uniqSorted(PEOPLE.map(p => p.sucursal));
 
-    // Mapeo de centro -> sucursal (para autocompletar)
+    // Mapeo de centro -> sucursal preferida (la más frecuente)
     const CENTRO_SUCURSAL_MAP = {};
+    // Contar ocurrencias por centro->sucursal
+    const centroCounts = {};
     PEOPLE.forEach(p => {
-      if (!CENTRO_SUCURSAL_MAP[p.centro]) {
-        CENTRO_SUCURSAL_MAP[p.centro] = p.sucursal;
-      }
+      centroCounts[p.centro] = centroCounts[p.centro] || {};
+      centroCounts[p.centro][p.sucursal] = (centroCounts[p.centro][p.sucursal] || 0) + 1;
+    });
+    // Elegir la sucursal con más ocurrencias por centro
+    Object.keys(centroCounts).forEach(centro => {
+      const sucMap = centroCounts[centro];
+      const preferred = Object.keys(sucMap).sort((a,b) => sucMap[b] - sucMap[a])[0];
+      if (preferred) CENTRO_SUCURSAL_MAP[centro] = preferred;
     });
 
     // Filtros
@@ -560,11 +567,19 @@
       const sucOpts = uniqSorted(getPeopleByFilters(centro, "").map(p => p.sucursal));
       setOptions($("a_sucursal_nombre"), sucOpts, "(Elegir)");
 
-      // Auto-completar sucursal si existe una sola opción
-      if (centro && sucOpts.length === 1) {
-        $("a_sucursal_nombre").value = sucOpts[0];
+      // Intentar auto-completar con la sucursal preferida del centro
+      if (centro) {
+        const preferred = CENTRO_SUCURSAL_MAP[centro];
+        if (preferred && sucOpts.includes(preferred)) {
+          $("a_sucursal_nombre").value = preferred;
+        } else if (sucOpts.length === 1) {
+          // Si sólo hay una opción, usarla
+          $("a_sucursal_nombre").value = sucOpts[0];
+        } else if (sucursal && sucOpts.includes(sucursal)) {
+          // Mantener si todavía existe
+          $("a_sucursal_nombre").value = sucursal;
+        }
       } else if (sucursal && sucOpts.includes(sucursal)) {
-        // Mantener si todavía existe
         $("a_sucursal_nombre").value = sucursal;
       }
 
@@ -898,5 +913,3 @@
   </script>
 </body>
 </html>
-
-
