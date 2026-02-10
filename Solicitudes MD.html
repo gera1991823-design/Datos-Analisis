@@ -1,218 +1,436 @@
 <!doctype html>
 <html lang="es">
+
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Solicitudes - Interagrovial</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <style>
-    :root{
-      --jd-green:#184f13;
-      --jd-green-dark:#0f3a0f;
-      --jd-yellow:#ffde00;
+    :root {
+      --jd-green: #184f13;
+      --jd-green-dark: #0f3a0f;
+      --jd-yellow: #ffde00;
 
-      --bg:#f4faf4;
-      --text:#071217;
-      --row-text:#274939;
-      --muted:#5f6b67;
+      --bg: #f4faf4;
+      --text: #071217;
+      --row-text: #274939;
+      --muted: #5f6b67;
 
-      --border:#e8f2e8;
-      --border-strong:#d7e9d7;
+      --border: #e8f2e8;
+      --border-strong: #d7e9d7;
 
-      --shadow:0 16px 36px rgba(15,23,32,.08);
-      --shadow2:0 10px 22px rgba(15,23,32,.06);
-      --radius:14px;
+      --shadow: 0 16px 36px rgba(15, 23, 32, .08);
+      --shadow2: 0 10px 22px rgba(15, 23, 32, .06);
+      --radius: 14px;
     }
 
-    *{box-sizing:border-box}
-    html{scrollbar-gutter: stable;}
-    body{
+    * {
+      box-sizing: border-box
+    }
+
+    html {
+      scrollbar-gutter: stable;
+    }
+
+    body {
       font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
       margin: 22px;
-      background: radial-gradient(1200px 600px at 15% 0%, rgba(46,125,50,.04), transparent 55%),
-                  radial-gradient(1200px 600px at 85% 0%, rgba(255,222,0,.02), transparent 55%),
-                  var(--bg);
+      background: radial-gradient(1200px 600px at 15% 0%, rgba(46, 125, 50, .04), transparent 55%),
+        radial-gradient(1200px 600px at 85% 0%, rgba(255, 222, 0, .02), transparent 55%),
+        var(--bg);
       color: var(--text);
-      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
-    .topbar{
-      display:flex;align-items:center;justify-content:space-between;
-      gap:14px;flex-wrap:wrap;margin-bottom:18px;padding:12px 14px;
-      background: linear-gradient(90deg, rgba(24,79,19,0.06), rgba(255,222,0,0.02));
-      border:1px solid rgba(15,64,18,.06);
-      border-radius:12px;box-shadow: 0 8px 22px rgba(24,79,19,.03);
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+      padding: 12px 14px;
+      background: linear-gradient(90deg, rgba(24, 79, 19, 0.06), rgba(255, 222, 0, 0.02));
+      border: 1px solid rgba(15, 64, 18, .06);
+      border-radius: 12px;
+      box-shadow: 0 8px 22px rgba(24, 79, 19, .03);
       position: relative;
     }
-    .title{
-      display:flex;align-items:center;gap:12px;margin:0;
-      font-size:22px;font-weight:800;letter-spacing:.025em;
+
+    .title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: .025em;
       color: var(--jd-green-dark);
-      position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-      background:#fff;padding:10px 18px;border-radius:10px;
-      box-shadow: 0 8px 26px rgba(15,23,32,.06);
-      z-index:3;border:1px solid rgba(15,23,32,.06);
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      background: #fff;
+      padding: 10px 18px;
+      border-radius: 10px;
+      box-shadow: 0 8px 26px rgba(15, 23, 32, .06);
+      z-index: 3;
+      border: 1px solid rgba(15, 23, 32, .06);
     }
-    @media (max-width: 720px){
-      .title{position:static;transform:none;margin:0 auto;font-size:20px;padding:8px 14px}
-      .topbar{padding:10px 10px}
+
+    @media (max-width: 720px) {
+      .title {
+        position: static;
+        transform: none;
+        margin: 0 auto;
+        font-size: 20px;
+        padding: 8px 14px
+      }
+
+      .topbar {
+        padding: 10px 10px
+      }
     }
-    .subpill{
-      display:inline-flex;align-items:center;gap:8px;
-      border:1px solid var(--border);
-      padding:8px 12px;border-radius:999px;
-      background: rgba(0,0,0,.03);
-      font-size:12px;color:var(--muted);
+
+    .subpill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--border);
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, .03);
+      font-size: 12px;
+      color: var(--muted);
       box-shadow: var(--shadow2);
     }
-    .subpill b{color:var(--jd-green)}
 
-    .card{
+    .subpill b {
+      color: var(--jd-green)
+    }
+
+    .card {
       background: linear-gradient(180deg, #fff, #fbfffb);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 18px 20px;
       box-shadow: var(--shadow);
       margin-bottom: 14px;
-      overflow:hidden;
-      position:relative;
+      overflow: hidden;
+      position: relative;
       padding-left: 20px;
     }
-    .accentBar{
-      position:absolute;left:0;top:0;height:100%;width:10px;
+
+    .accentBar {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 10px;
       background: var(--jd-green);
-      border-top-left-radius:var(--radius);border-bottom-left-radius:var(--radius);
-      box-shadow: 0 8px 20px rgba(24,79,19,.06);
-    }
-    .cardHeader{
-      display:flex;align-items:center;justify-content:flex-start;
-      gap:10px;margin-bottom:12px;position:relative;min-height:56px;padding-right:12px;
-      border-bottom:1px solid var(--border);padding-bottom:14px;margin-bottom:18px;
-    }
-    .cardHeader .row{ margin-left:auto; display:flex; gap:8px; align-items:center }
-    .cardHeader h3{
-      position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-      font-size:13px;padding:10px 18px;border-radius:12px;
-      background: linear-gradient(90deg, rgba(255,222,0,.08), rgba(46,125,50,.04));
-      color:var(--jd-green-dark);font-weight:900;text-transform:uppercase;letter-spacing:.12em;
-      border:1px solid rgba(46,125,50,.10);box-shadow: 0 8px 20px rgba(24,79,19,.04);
-    }
-    .card > h3{
-      margin:6px auto 12px;font-size:14px;padding:10px 18px;border-radius:12px;
-      background: linear-gradient(90deg, rgba(255,222,0,.04), rgba(255,222,0,.02));
-      color:var(--jd-green-dark);font-weight:900;text-transform:uppercase;letter-spacing:.08em;
-      border:1px solid rgba(46,125,50,.06);box-shadow: 0 8px 20px rgba(24,79,19,.04);
-      text-align:center;display:block;
+      border-top-left-radius: var(--radius);
+      border-bottom-left-radius: var(--radius);
+      box-shadow: 0 8px 20px rgba(24, 79, 19, .06);
     }
 
-    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
-    label{font-size:12px;color:var(--muted);display:block;margin-bottom:8px;font-weight:800;text-align:center}
-    .card .row > div, .card .row-add > div{display:flex;flex-direction:column;align-items:center;min-width:0}
+    .cardHeader {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 10px;
+      margin-bottom: 12px;
+      position: relative;
+      min-height: 56px;
+      padding-right: 12px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 14px;
+      margin-bottom: 18px;
+    }
 
-    input,select{
-      padding:10px 12px;
-      border:1px solid var(--border-strong);
-      border-radius:14px;
-      font-size:14px;
+    .cardHeader .row {
+      margin-left: auto;
+      display: flex;
+      gap: 8px;
+      align-items: center
+    }
+
+    .cardHeader h3 {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 13px;
+      padding: 10px 18px;
+      border-radius: 12px;
+      background: linear-gradient(90deg, rgba(255, 222, 0, .08), rgba(46, 125, 50, .04));
+      color: var(--jd-green-dark);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      border: 1px solid rgba(46, 125, 50, .10);
+      box-shadow: 0 8px 20px rgba(24, 79, 19, .04);
+    }
+
+    .card>h3 {
+      margin: 6px auto 12px;
+      font-size: 14px;
+      padding: 10px 18px;
+      border-radius: 12px;
+      background: linear-gradient(90deg, rgba(255, 222, 0, .04), rgba(255, 222, 0, .02));
+      color: var(--jd-green-dark);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      border: 1px solid rgba(46, 125, 50, .06);
+      box-shadow: 0 8px 20px rgba(24, 79, 19, .04);
+      text-align: center;
+      display: block;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: end
+    }
+
+    label {
+      font-size: 12px;
+      color: var(--muted);
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 800;
+      text-align: center
+    }
+
+    .card .row>div,
+    .card .row-add>div {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 0
+    }
+
+    input,
+    select {
+      padding: 10px 12px;
+      border: 1px solid var(--border-strong);
+      border-radius: 14px;
+      font-size: 14px;
       font-family: inherit;
-      min-width:160px;
-      background: rgba(0,0,0,.04);
+      min-width: 160px;
+      background: rgba(0, 0, 0, .04);
       color: var(--text);
-      outline:none;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
+      outline: none;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .03);
       line-height: 1.4;
-      text-align:center;
+      text-align: center;
     }
-    input:focus,select:focus{border-color: var(--jd-green-dark);box-shadow: 0 0 0 6px rgba(24,79,19,.12);}
 
-    button{
-      padding:10px 12px;border:1px solid var(--border-strong);
-      background: rgba(0,0,0,.04);
-      border-radius:14px;cursor:pointer;
-      transition:.12s ease;font-weight:900;color:var(--text);
+    input:focus,
+    select:focus {
+      border-color: var(--jd-green-dark);
+      box-shadow: 0 0 0 6px rgba(24, 79, 19, .12);
+    }
+
+    button {
+      padding: 10px 12px;
+      border: 1px solid var(--border-strong);
+      background: rgba(0, 0, 0, .04);
+      border-radius: 14px;
+      cursor: pointer;
+      transition: .12s ease;
+      font-weight: 900;
+      color: var(--text);
       box-shadow: var(--shadow2);
     }
-    button:hover{transform: translateY(-1px)}
-    button.primary{
+
+    button:hover {
+      transform: translateY(-1px)
+    }
+
+    button.primary {
       background: linear-gradient(135deg, var(--jd-green), var(--jd-green-dark));
-      border-color: rgba(15,64,18,.95);
-      color:#fff;
-      box-shadow: 0 16px 34px rgba(24,79,19,.22);
+      border-color: rgba(15, 64, 18, .95);
+      color: #fff;
+      box-shadow: 0 16px 34px rgba(24, 79, 19, .22);
     }
-    button.secondary{
+
+    button.secondary {
       background: linear-gradient(135deg, var(--jd-yellow), #ffd600);
-      border-color: rgba(24,79,19,.06);
+      border-color: rgba(24, 79, 19, .06);
       color: var(--jd-green-dark);
-      box-shadow:none;
-      font-weight:800;
+      box-shadow: none;
+      font-weight: 800;
     }
-    button.small{padding:6px 10px;border-radius:8px;font-size:11px;box-shadow:none;font-weight:700;white-space:nowrap;min-width:auto;}
-    button.danger{color:#ffd7dc;border-color:#5a2731;background: rgba(176,0,32,.16);}
-    button[disabled]{opacity:.6;cursor:not-allowed;transform:none}
 
-    .toast{margin-top:10px;font-size:13px;color:#2f7e2c;display:none;font-weight:900}
-    .toast.err{color:#ff2d2d}
+    button.small {
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      box-shadow: none;
+      font-weight: 700;
+      white-space: nowrap;
+      min-width: auto;
+    }
 
-    table{
-      width:100%;
-      border-collapse:separate;
-      border-spacing:0 14px;
-      border:1px solid var(--border);
+    button.danger {
+      color: #ffd7dc;
+      border-color: #5a2731;
+      background: rgba(176, 0, 32, .16);
+    }
+
+    button[disabled] {
+      opacity: .6;
+      cursor: not-allowed;
+      transform: none
+    }
+
+    .toast {
+      margin-top: 10px;
+      font-size: 13px;
+      color: #2f7e2c;
+      display: none;
+      font-weight: 900
+    }
+
+    .toast.err {
+      color: #ff2d2d
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 14px;
+      border: 1px solid var(--border);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
     }
-    thead th{
-      background: rgba(0,0,0,.03);
-      position:sticky;top:0;z-index:2;
-      text-align:center;
-    }
-    th,td{
-      padding:0;font-size:14px;vertical-align:middle;white-space:nowrap;text-align:center;color:var(--text);font-weight:600;
-    }
-    th{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:12px 8px;}
 
-    .cellInner{
-      display:flex;align-items:center;justify-content:center;
-      padding:14px 10px;border-radius:10px;height:48px;width:100%;
-      font-weight:600;color: var(--row-text);
-      border:1px solid rgba(15,23,32,.04);
-      box-shadow: 0 10px 18px rgba(15,23,32,.06);
-      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(245,253,244,0.9));
+    thead th {
+      background: rgba(0, 0, 0, .03);
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      text-align: center;
     }
 
-    .cellInner .cell-input{
-      width:100%;
-      background:#fff;
-      border:1px solid rgba(46,125,50,.14);
-      padding:6px 10px;height:36px;
-      font-size:14px;font-weight:600;font-family:inherit;
-      border-radius:10px;text-align:center;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 6px 14px rgba(15,23,32,.04);
+    th,
+    td {
+      padding: 0;
+      font-size: 14px;
+      vertical-align: middle;
+      white-space: nowrap;
+      text-align: center;
+      color: var(--text);
+      font-weight: 600;
     }
 
-    td:last-child{min-width:180px}
-    td:last-child .cellInner{padding:6px}
-    .actions{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+    th {
+      font-size: 13px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 12px 8px;
+    }
 
-    .w220{min-width:220px}
-    .w200{min-width:200px}
-    .w160{min-width:160px}
-    .w140{min-width:140px}
-    .w110{min-width:110px}
+    tbody tr:nth-child(even) {
+      background: #dae6da;
+    }
 
-    .footer{
-      position:fixed;left:16px;bottom:12px;font-size:12px;
-      color:var(--text);background: rgba(255,255,255,.98);
-      border:1px solid var(--border);
-      border-left:7px solid var(--jd-green);
-      padding:9px 12px;border-radius:14px;
+    tbody tr:hover {
+      background: #caddca;
+      transition: background 0.1s;
+    }
+
+    .cellInner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 10px;
+      border-radius: 10px;
+      height: 48px;
+      width: 100%;
+      font-weight: 600;
+      color: var(--row-text);
+      border: 1px solid rgba(15, 23, 32, .04);
+      box-shadow: 0 10px 18px rgba(15, 23, 32, .06);
+      background: rgba(0, 50, 20, 0.04);
+    }
+
+    .cellInner .cell-input {
+      width: 100%;
+      background: #fff;
+      border: 1px solid rgba(46, 125, 50, .14);
+      padding: 6px 10px;
+      height: 36px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: inherit;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .9), 0 6px 14px rgba(15, 23, 32, .04);
+    }
+
+    td:last-child {
+      min-width: 180px
+    }
+
+    td:last-child .cellInner {
+      padding: 6px
+    }
+
+    .actions {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      flex-wrap: wrap
+    }
+
+    .w220 {
+      min-width: 220px
+    }
+
+    .w200 {
+      min-width: 200px
+    }
+
+    .w160 {
+      min-width: 160px
+    }
+
+    .w140 {
+      min-width: 140px
+    }
+
+    .w110 {
+      min-width: 110px
+    }
+
+    .footer {
+      position: fixed;
+      right: 16px;
+      bottom: 12px;
+      font-size: 12px;
+      color: var(--text);
+      background: rgba(255, 255, 255, .98);
+      border: 1px solid var(--border);
+      border-right: 7px solid var(--jd-green);
+      padding: 9px 12px;
+      border-radius: 14px;
       box-shadow: var(--shadow2);
       backdrop-filter: blur(6px);
+      text-align: right;
     }
-    .footer b{color:var(--jd-green)}
+
+    .footer b {
+      color: var(--jd-green)
+    }
   </style>
 </head>
 
@@ -377,106 +595,106 @@
     // ✅ PERSONAS (TU LISTA)
     // ===============================
     const PEOPLE = [
-      { puesto:"Vendedor", centro:"S001", sucursal:"MONTEVIDEO AGRO", nombre:"Andres Maza", mail:"asmaza@isa.com.uy", usuario_sap:"SUREP001" },
-      { puesto:"Vendedor", centro:"S001", sucursal:"MONTEVIDEO AGRO", nombre:"MARCOS SUASNAVAS", mail:"msuasnavas@isa.com.uy", usuario_sap:"SUREP002" },
-      { puesto:"Admin Taller", centro:"S001", sucursal:"MONTEVIDEO AGRO", nombre:"Santiago Lugaro", mail:"slugaro@isa.com.uy", usuario_sap:"" },
-      { puesto:"Jefe Rep.", centro:"S001", sucursal:"MONTEVIDEO AGRO", nombre:"GUSTAVO MIRANDA", mail:"gmiranda@isa.com.uy", usuario_sap:"SUJRP001" },
+      { puesto: "Vendedor", centro: "S001", sucursal: "MONTEVIDEO AGRO", nombre: "Andres Maza", mail: "asmaza@isa.com.uy", usuario_sap: "SUREP001" },
+      { puesto: "Vendedor", centro: "S001", sucursal: "MONTEVIDEO AGRO", nombre: "MARCOS SUASNAVAS", mail: "msuasnavas@isa.com.uy", usuario_sap: "SUREP002" },
+      { puesto: "Admin Taller", centro: "S001", sucursal: "MONTEVIDEO AGRO", nombre: "Santiago Lugaro", mail: "slugaro@isa.com.uy", usuario_sap: "" },
+      { puesto: "Jefe Rep.", centro: "S001", sucursal: "MONTEVIDEO AGRO", nombre: "GUSTAVO MIRANDA", mail: "gmiranda@isa.com.uy", usuario_sap: "SUJRP001" },
 
-      { puesto:"Jfe Taller Cons", centro:"S015", sucursal:"MONTEVIDEO CONS", nombre:"Pablo Carballo", mail:"pcarballo@isa.com.uy", usuario_sap:"" },
-      { puesto:"Amin Tll Cons", centro:"S015", sucursal:"MONTEVIDEO CONS", nombre:"Medina Elizabeth", mail:"emedina@isa.com.uy", usuario_sap:"" },
-      { puesto:"Jefe Rep.", centro:"S015", sucursal:"MONTEVIDEO CONS", nombre:"Leonardo Martinez", mail:"lmartinez@isa.com.uy", usuario_sap:"" },
-      { puesto:"Admin Rep Cons", centro:"S015", sucursal:"MONTEVIDEO CONS", nombre:"Antonella  Denucci", mail:"adenucci@isa.com.uy", usuario_sap:"" },
-      { puesto:"Vendedor Cons", centro:"S015", sucursal:"MONTEVIDEO CONS", nombre:"Martin  Callero", mail:"mcallero@isa.com.uy", usuario_sap:"SUREP026" },
-      { puesto:"Vendedor Cons", centro:"S015", sucursal:"MONTEVIDEO CONS", nombre:"Ignacio Nebuloni", mail:"inebuloni@isa.com.uy", usuario_sap:"SUREP027" },
+      { puesto: "Jfe Taller Cons", centro: "S015", sucursal: "MONTEVIDEO CONS", nombre: "Pablo Carballo", mail: "pcarballo@isa.com.uy", usuario_sap: "" },
+      { puesto: "Amin Tll Cons", centro: "S015", sucursal: "MONTEVIDEO CONS", nombre: "Medina Elizabeth", mail: "emedina@isa.com.uy", usuario_sap: "" },
+      { puesto: "Jefe Rep.", centro: "S015", sucursal: "MONTEVIDEO CONS", nombre: "Leonardo Martinez", mail: "lmartinez@isa.com.uy", usuario_sap: "" },
+      { puesto: "Admin Rep Cons", centro: "S015", sucursal: "MONTEVIDEO CONS", nombre: "Antonella  Denucci", mail: "adenucci@isa.com.uy", usuario_sap: "" },
+      { puesto: "Vendedor Cons", centro: "S015", sucursal: "MONTEVIDEO CONS", nombre: "Martin  Callero", mail: "mcallero@isa.com.uy", usuario_sap: "SUREP026" },
+      { puesto: "Vendedor Cons", centro: "S015", sucursal: "MONTEVIDEO CONS", nombre: "Ignacio Nebuloni", mail: "inebuloni@isa.com.uy", usuario_sap: "SUREP027" },
 
-      { puesto:"Vendedor", centro:"S002", sucursal:"MERCEDES", nombre:"Andres Mansalitch", mail:"jandres@isa.com.uy", usuario_sap:"SUREP003" },
-      { puesto:"Vendedor", centro:"S002", sucursal:"MERCEDES", nombre:"Romina Sisurqui", mail:"rsisurqui@isa.com.uy", usuario_sap:"" },
-      { puesto:"Vendedor", centro:"S002", sucursal:"MERCEDES", nombre:"HECTOR BARRIOS", mail:"hbarrios@isa.com.uy", usuario_sap:"SUREP004" },
-      { puesto:"Admin Tllr", centro:"S002", sucursal:"MERCEDES", nombre:"Elena Cabrera", mail:"ecabrera@isa.com.uy", usuario_sap:"" },
-      { puesto:"Jefe Rep.", centro:"S002", sucursal:"MERCEDES", nombre:"Guillermo Cabrera", mail:"gcabrera@isa.com.uy", usuario_sap:"SUJRP003" },
+      { puesto: "Vendedor", centro: "S002", sucursal: "MERCEDES", nombre: "Andres Mansalitch", mail: "jandres@isa.com.uy", usuario_sap: "SUREP003" },
+      { puesto: "Vendedor", centro: "S002", sucursal: "MERCEDES", nombre: "Romina Sisurqui", mail: "rsisurqui@isa.com.uy", usuario_sap: "" },
+      { puesto: "Vendedor", centro: "S002", sucursal: "MERCEDES", nombre: "HECTOR BARRIOS", mail: "hbarrios@isa.com.uy", usuario_sap: "SUREP004" },
+      { puesto: "Admin Tllr", centro: "S002", sucursal: "MERCEDES", nombre: "Elena Cabrera", mail: "ecabrera@isa.com.uy", usuario_sap: "" },
+      { puesto: "Jefe Rep.", centro: "S002", sucursal: "MERCEDES", nombre: "Guillermo Cabrera", mail: "gcabrera@isa.com.uy", usuario_sap: "SUJRP003" },
 
-      { puesto:"Vendedor", centro:"S003", sucursal:"YOUNG", nombre:"JORGE MEZQUIDA", mail:"jmezquida@isa.com.uy", usuario_sap:"SUREP006" },
-      { puesto:"Vendedor", centro:"S003", sucursal:"YOUNG", nombre:"J. Luis RODRIGUEZ", mail:"jlrodriguez@isa.com.uy", usuario_sap:"SUREP005" },
-      { puesto:"Jfe Tllr", centro:"S003", sucursal:"YOUNG", nombre:"Eduardo Irureta", mail:"eirureta@isa.com.uy", usuario_sap:"" },
-      { puesto:"Jefe Rep.", centro:"S003", sucursal:"YOUNG", nombre:"Martin Molinari", mail:"mmolinari@isa.com.uy", usuario_sap:"" },
+      { puesto: "Vendedor", centro: "S003", sucursal: "YOUNG", nombre: "JORGE MEZQUIDA", mail: "jmezquida@isa.com.uy", usuario_sap: "SUREP006" },
+      { puesto: "Vendedor", centro: "S003", sucursal: "YOUNG", nombre: "J. Luis RODRIGUEZ", mail: "jlrodriguez@isa.com.uy", usuario_sap: "SUREP005" },
+      { puesto: "Jfe Tllr", centro: "S003", sucursal: "YOUNG", nombre: "Eduardo Irureta", mail: "eirureta@isa.com.uy", usuario_sap: "" },
+      { puesto: "Jefe Rep.", centro: "S003", sucursal: "YOUNG", nombre: "Martin Molinari", mail: "mmolinari@isa.com.uy", usuario_sap: "" },
 
-      { puesto:"Vendedor", centro:"S004", sucursal:"PAYSANDÚ", nombre:"CLAUDIA SBRES", mail:"csbres@isa.com.uy", usuario_sap:"SUREP007" },
-      { puesto:"Vendedor", centro:"S004", sucursal:"PAYSANDÚ", nombre:"MATHIAS SCHIAPPAPIETRA", mail:"mschiappapietra@isa.com.uy", usuario_sap:"SUREP008" },
-      { puesto:"Admin Tllr", centro:"S004", sucursal:"PAYSANDÚ", nombre:"AnaPaula Maitinez", mail:"apmaitinez@isa.com.uy", usuario_sap:"" },
-      { puesto:"Jfe Tallr", centro:"S004", sucursal:"PAYSANDÚ", nombre:"David Duarte", mail:"dduarte@isa.com.uy", usuario_sap:"" },
-      { puesto:"Jefe Rep.", centro:"S004", sucursal:"PAYSANDÚ", nombre:"Martin Molinari", mail:"mmolinari@isa.com.uy", usuario_sap:"" },
-      { puesto:"Administr.", centro:"S004", sucursal:"PAYSANDÚ", nombre:"SILVINA MARISCO", mail:"smarsico@isa.com.uy", usuario_sap:"" },
+      { puesto: "Vendedor", centro: "S004", sucursal: "PAYSANDÚ", nombre: "CLAUDIA SBRES", mail: "csbres@isa.com.uy", usuario_sap: "SUREP007" },
+      { puesto: "Vendedor", centro: "S004", sucursal: "PAYSANDÚ", nombre: "MATHIAS SCHIAPPAPIETRA", mail: "mschiappapietra@isa.com.uy", usuario_sap: "SUREP008" },
+      { puesto: "Admin Tllr", centro: "S004", sucursal: "PAYSANDÚ", nombre: "AnaPaula Maitinez", mail: "apmaitinez@isa.com.uy", usuario_sap: "" },
+      { puesto: "Jfe Tallr", centro: "S004", sucursal: "PAYSANDÚ", nombre: "David Duarte", mail: "dduarte@isa.com.uy", usuario_sap: "" },
+      { puesto: "Jefe Rep.", centro: "S004", sucursal: "PAYSANDÚ", nombre: "Martin Molinari", mail: "mmolinari@isa.com.uy", usuario_sap: "" },
+      { puesto: "Administr.", centro: "S004", sucursal: "PAYSANDÚ", nombre: "SILVINA MARISCO", mail: "smarsico@isa.com.uy", usuario_sap: "" },
 
-      { puesto:"Vendedor", centro:"S005", sucursal:"RÍO BRANCO", nombre:"ENSO COSTA", mail:"encosta@isa.com.uy", usuario_sap:"SUREP009" },
-      { puesto:"Jefe Rep.", centro:"S005", sucursal:"RÍO BRANCO", nombre:"Yanina Bentancour", mail:"ybentancor@isa.com.uy", usuario_sap:"SUJRP005" },
-      { puesto:"Jfe Tallr", centro:"S005", sucursal:"RÍO BRANCO", nombre:"Freddy Marimoria", mail:"marmoria@isa.com.uy", usuario_sap:"" },
-      { puesto:"Admin Tllr", centro:"S005", sucursal:"RÍO BRANCO", nombre:"Agustina Figueredo", mail:"afigueredo@isa.com.uy", usuario_sap:"" },
-      { puesto:"Admin Tllr", centro:"S005", sucursal:"RÍO BRANCO", nombre:"Gessica Silva", mail:"", usuario_sap:"" },
+      { puesto: "Vendedor", centro: "S005", sucursal: "RÍO BRANCO", nombre: "ENSO COSTA", mail: "encosta@isa.com.uy", usuario_sap: "SUREP009" },
+      { puesto: "Jefe Rep.", centro: "S005", sucursal: "RÍO BRANCO", nombre: "Yanina Bentancour", mail: "ybentancor@isa.com.uy", usuario_sap: "SUJRP005" },
+      { puesto: "Jfe Tallr", centro: "S005", sucursal: "RÍO BRANCO", nombre: "Freddy Marimoria", mail: "marmoria@isa.com.uy", usuario_sap: "" },
+      { puesto: "Admin Tllr", centro: "S005", sucursal: "RÍO BRANCO", nombre: "Agustina Figueredo", mail: "afigueredo@isa.com.uy", usuario_sap: "" },
+      { puesto: "Admin Tllr", centro: "S005", sucursal: "RÍO BRANCO", nombre: "Gessica Silva", mail: "", usuario_sap: "" },
 
-      { puesto:"Vendedor", centro:"S006", sucursal:"GOMENSORO", nombre:"JOSÉ COSTEN", mail:"jcosten@isa.com.uy", usuario_sap:"SUREP011" },
-      { puesto:"Administr.", centro:"S006", sucursal:"GOMENSORO", nombre:"Marcela Silva", mail:"masilva@isa.com.uy", usuario_sap:"" },
-      { puesto:"Responsale", centro:"S006", sucursal:"GOMENSORO", nombre:"Mariano Arbiza", mail:"marbiza@isa.com.uy", usuario_sap:"" },
+      { puesto: "Vendedor", centro: "S006", sucursal: "GOMENSORO", nombre: "JOSÉ COSTEN", mail: "jcosten@isa.com.uy", usuario_sap: "SUREP011" },
+      { puesto: "Administr.", centro: "S006", sucursal: "GOMENSORO", nombre: "Marcela Silva", mail: "masilva@isa.com.uy", usuario_sap: "" },
+      { puesto: "Responsale", centro: "S006", sucursal: "GOMENSORO", nombre: "Mariano Arbiza", mail: "marbiza@isa.com.uy", usuario_sap: "" },
 
-      { puesto:"Vendedor", centro:"S007", sucursal:"FLORIDA", nombre:"CRISTHIAN RODRIGUEZ", mail:"crrodriguez@isa.com.uy", usuario_sap:"SUREP013" },
-      { puesto:"Vendedor", centro:"S007", sucursal:"FLORIDA", nombre:"Esteban Lorier", mail:"elorier@isa.com.uy", usuario_sap:"SUREP014" },
-      { puesto:"Jef Tllr", centro:"S007", sucursal:"FLORIDA", nombre:"Luis Cattaneo", mail:"lcattaneo@isa.com.uy", usuario_sap:"" },
-      { puesto:"Admin. Tllr", centro:"S007", sucursal:"FLORIDA", nombre:"Alicia  Cardozo", mail:"alcardozo@isa.com.uy", usuario_sap:"" },
-      { puesto:"Aux Admin.", centro:"S007", sucursal:"FLORIDA", nombre:"Ernestina Enciso", mail:"eenciso@isa.com.uy", usuario_sap:"" },
-      { puesto:"Gerente", centro:"S007", sucursal:"FLORIDA", nombre:"Ramiro Caceres", mail:"rcaceres@isa.com.uy", usuario_sap:"" },
+      { puesto: "Vendedor", centro: "S007", sucursal: "FLORIDA", nombre: "CRISTHIAN RODRIGUEZ", mail: "crrodriguez@isa.com.uy", usuario_sap: "SUREP013" },
+      { puesto: "Vendedor", centro: "S007", sucursal: "FLORIDA", nombre: "Esteban Lorier", mail: "elorier@isa.com.uy", usuario_sap: "SUREP014" },
+      { puesto: "Jef Tllr", centro: "S007", sucursal: "FLORIDA", nombre: "Luis Cattaneo", mail: "lcattaneo@isa.com.uy", usuario_sap: "" },
+      { puesto: "Admin. Tllr", centro: "S007", sucursal: "FLORIDA", nombre: "Alicia  Cardozo", mail: "alcardozo@isa.com.uy", usuario_sap: "" },
+      { puesto: "Aux Admin.", centro: "S007", sucursal: "FLORIDA", nombre: "Ernestina Enciso", mail: "eenciso@isa.com.uy", usuario_sap: "" },
+      { puesto: "Gerente", centro: "S007", sucursal: "FLORIDA", nombre: "Ramiro Caceres", mail: "rcaceres@isa.com.uy", usuario_sap: "" },
 
-      { puesto:"Vendedor", centro:"S008", sucursal:"OMBÚES", nombre:"Lucas Rodriguez", mail:"lrodriguez@isa.com.uy", usuario_sap:"SUREP015" },
-      { puesto:"Vendedor", centro:"S008", sucursal:"OMBÚES", nombre:"Juan Manuel Dominguez", mail:"jdominguez@isa.com.uy", usuario_sap:"" },
-      { puesto:"Jfe Tllr", centro:"S008", sucursal:"OMBÚES", nombre:"Juan Pablo MARTINEZ", mail:"jpmartinez@isa.com.uy", usuario_sap:"SUREP016" },
-      { puesto:"Adm Tll", centro:"S008", sucursal:"OMBÚES", nombre:"Meliz Lacoste", mail:"mlacoste@isa.com.uy", usuario_sap:"" },
-      { puesto:"Jefe Rep.", centro:"S008", sucursal:"OMBÚES", nombre:"Rafael DAVILA", mail:"rdavila@isa.com.uy", usuario_sap:"SUJRP002" },
+      { puesto: "Vendedor", centro: "S008", sucursal: "OMBÚES", nombre: "Lucas Rodriguez", mail: "lrodriguez@isa.com.uy", usuario_sap: "SUREP015" },
+      { puesto: "Vendedor", centro: "S008", sucursal: "OMBÚES", nombre: "Juan Manuel Dominguez", mail: "jdominguez@isa.com.uy", usuario_sap: "" },
+      { puesto: "Jfe Tllr", centro: "S008", sucursal: "OMBÚES", nombre: "Juan Pablo MARTINEZ", mail: "jpmartinez@isa.com.uy", usuario_sap: "SUREP016" },
+      { puesto: "Adm Tll", centro: "S008", sucursal: "OMBÚES", nombre: "Meliz Lacoste", mail: "mlacoste@isa.com.uy", usuario_sap: "" },
+      { puesto: "Jefe Rep.", centro: "S008", sucursal: "OMBÚES", nombre: "Rafael DAVILA", mail: "rdavila@isa.com.uy", usuario_sap: "SUJRP002" },
 
-      { puesto:"Vendedor", centro:"S009", sucursal:"LASCANO", nombre:"CECILIA AROCENA", mail:"carocena@isa.com.uy", usuario_sap:"SUREP017" },
-      { puesto:"Vendedor", centro:"S009", sucursal:"LASCANO", nombre:"Carlos Nuñez", mail:"canunez@isa.com.uy", usuario_sap:"SUBOD008" },
-      { puesto:"Jefe Rep.", centro:"S009", sucursal:"LASCANO", nombre:"KARINA PEREIRA", mail:"kpereira@isa.com.uy", usuario_sap:"SUJRP006" },
+      { puesto: "Vendedor", centro: "S009", sucursal: "LASCANO", nombre: "CECILIA AROCENA", mail: "carocena@isa.com.uy", usuario_sap: "SUREP017" },
+      { puesto: "Vendedor", centro: "S009", sucursal: "LASCANO", nombre: "Carlos Nuñez", mail: "canunez@isa.com.uy", usuario_sap: "SUBOD008" },
+      { puesto: "Jefe Rep.", centro: "S009", sucursal: "LASCANO", nombre: "KARINA PEREIRA", mail: "kpereira@isa.com.uy", usuario_sap: "SUJRP006" },
 
-      { puesto:"Vendedor", centro:"S010", sucursal:"TACUAREMBÓ", nombre:"Marcelo ÁLVAREZ", mail:"malvarez@isa.com.uy", usuario_sap:"SUREP018" },
-      { puesto:"Administr.", centro:"S010", sucursal:"TACUAREMBÓ", nombre:"Melany Hernandez", mail:"mhernandez@isa.com.uy", usuario_sap:"" },
-      { puesto:"Gte Suc", centro:"S010", sucursal:"TACUAREMBÓ", nombre:"Ignacio Porcile", mail:"iporcile@isa.com.uy", usuario_sap:"" },
+      { puesto: "Vendedor", centro: "S010", sucursal: "TACUAREMBÓ", nombre: "Marcelo ÁLVAREZ", mail: "malvarez@isa.com.uy", usuario_sap: "SUREP018" },
+      { puesto: "Administr.", centro: "S010", sucursal: "TACUAREMBÓ", nombre: "Melany Hernandez", mail: "mhernandez@isa.com.uy", usuario_sap: "" },
+      { puesto: "Gte Suc", centro: "S010", sucursal: "TACUAREMBÓ", nombre: "Ignacio Porcile", mail: "iporcile@isa.com.uy", usuario_sap: "" },
 
-      { puesto:"Vendedor", centro:"S011", sucursal:"SAN CARLOS", nombre:"SILVIO NUÑEZ", mail:"snunez@isa.com.uy", usuario_sap:"SUREP020" },
-      { puesto:"Admin Tllr", centro:"S011", sucursal:"SAN CARLOS", nombre:"Agustina Mendez", mail:"amendez@isa.com.uy", usuario_sap:"" },
-      { puesto:"Vendedor", centro:"S011", sucursal:"SAN CARLOS", nombre:"Esteban Diaz", mail:"ediaz@isa.com.uy", usuario_sap:"SUREP019" },
-      { puesto:"Jfe Tllr", centro:"S011", sucursal:"SAN CARLOS", nombre:"Luis Olivera", mail:"lolivera@isa.com.uy", usuario_sap:"" },
-      { puesto:"Jefe Rep.", centro:"S011", sucursal:"SAN CARLOS", nombre:"KARINA PEREIRA", mail:"kpereira@isa.com.uy", usuario_sap:"SUJRP006" },
+      { puesto: "Vendedor", centro: "S011", sucursal: "SAN CARLOS", nombre: "SILVIO NUÑEZ", mail: "snunez@isa.com.uy", usuario_sap: "SUREP020" },
+      { puesto: "Admin Tllr", centro: "S011", sucursal: "SAN CARLOS", nombre: "Agustina Mendez", mail: "amendez@isa.com.uy", usuario_sap: "" },
+      { puesto: "Vendedor", centro: "S011", sucursal: "SAN CARLOS", nombre: "Esteban Diaz", mail: "ediaz@isa.com.uy", usuario_sap: "SUREP019" },
+      { puesto: "Jfe Tllr", centro: "S011", sucursal: "SAN CARLOS", nombre: "Luis Olivera", mail: "lolivera@isa.com.uy", usuario_sap: "" },
+      { puesto: "Jefe Rep.", centro: "S011", sucursal: "SAN CARLOS", nombre: "KARINA PEREIRA", mail: "kpereira@isa.com.uy", usuario_sap: "SUJRP006" },
 
-      { puesto:"Analista", centro:"S012", sucursal:"PAYSANDÚ FORESTAL", nombre:"Federico Acosta", mail:"facosta@isa.com.uy", usuario_sap:"" },
-      { puesto:"Jefe Rep.", centro:"S012", sucursal:"PAYSANDÚ FORESTAL", nombre:"Mateo Cal", mail:"mcal@isa.com.uy", usuario_sap:"" },
+      { puesto: "Analista", centro: "S012", sucursal: "PAYSANDÚ FORESTAL", nombre: "Federico Acosta", mail: "facosta@isa.com.uy", usuario_sap: "" },
+      { puesto: "Jefe Rep.", centro: "S012", sucursal: "PAYSANDÚ FORESTAL", nombre: "Mateo Cal", mail: "mcal@isa.com.uy", usuario_sap: "" },
 
-      { puesto:"Vendedor", centro:"S014", sucursal:"SALTO", nombre:"Ronaldo Guzman", mail:"rguzman@isa.com.uy", usuario_sap:"SUREP012" },
-      { puesto:"Vendedor", centro:"S014", sucursal:"SALTO", nombre:"Virginia Diaz", mail:"vidiaz@isa.com.uy", usuario_sap:"" },
-      { puesto:"Garantias", centro:"S014", sucursal:"SALTO", nombre:"Silvana Vignolo", mail:"svignolo@isa.com.uy", usuario_sap:"" },
-      { puesto:"Responsale", centro:"S014", sucursal:"SALTO", nombre:"Mariano Arbiza", mail:"marbiza@isa.com.uy", usuario_sap:"" },
-      { puesto:"Administr.", centro:"S014", sucursal:"SALTO", nombre:"Valeria Silva", mail:"vsilva@isa.com.uy", usuario_sap:"" },
+      { puesto: "Vendedor", centro: "S014", sucursal: "SALTO", nombre: "Ronaldo Guzman", mail: "rguzman@isa.com.uy", usuario_sap: "SUREP012" },
+      { puesto: "Vendedor", centro: "S014", sucursal: "SALTO", nombre: "Virginia Diaz", mail: "vidiaz@isa.com.uy", usuario_sap: "" },
+      { puesto: "Garantias", centro: "S014", sucursal: "SALTO", nombre: "Silvana Vignolo", mail: "svignolo@isa.com.uy", usuario_sap: "" },
+      { puesto: "Responsale", centro: "S014", sucursal: "SALTO", nombre: "Mariano Arbiza", mail: "marbiza@isa.com.uy", usuario_sap: "" },
+      { puesto: "Administr.", centro: "S014", sucursal: "SALTO", nombre: "Valeria Silva", mail: "vsilva@isa.com.uy", usuario_sap: "" },
 
-      { puesto:"Jefe Rep.", centro:"S016", sucursal:"SAN JOSÉ", nombre:"GUSTAVO MIRANDA", mail:"gmiranda@isa.com.uy", usuario_sap:"" },
-      { puesto:"Vendedor", centro:"S016", sucursal:"SAN JOSÉ", nombre:"LUIS BRICEÑO", mail:"lbriceno@isa.com.uy", usuario_sap:"SUREP028" },
+      { puesto: "Jefe Rep.", centro: "S016", sucursal: "SAN JOSÉ", nombre: "GUSTAVO MIRANDA", mail: "gmiranda@isa.com.uy", usuario_sap: "" },
+      { puesto: "Vendedor", centro: "S016", sucursal: "SAN JOSÉ", nombre: "LUIS BRICEÑO", mail: "lbriceno@isa.com.uy", usuario_sap: "SUREP028" },
 
-      { puesto:"Aux -Vendedor", centro:"S017", sucursal:"VALDENSE", nombre:"ESTEBAN NOAIN", mail:"enoain@isa.com.uy", usuario_sap:"SUREP030" },
-      { puesto:"Vendedor", centro:"S017", sucursal:"VALDENSE", nombre:"MICHAEL SHANNON", mail:"mshannon@isa.com.uy", usuario_sap:"SUREP029" },
-      { puesto:"Jefe Rep.", centro:"S017", sucursal:"VALDENSE", nombre:"Rafael DAVILA", mail:"rdavila@isa.com.uy", usuario_sap:"SUJRP002" },
+      { puesto: "Aux -Vendedor", centro: "S017", sucursal: "VALDENSE", nombre: "ESTEBAN NOAIN", mail: "enoain@isa.com.uy", usuario_sap: "SUREP030" },
+      { puesto: "Vendedor", centro: "S017", sucursal: "VALDENSE", nombre: "MICHAEL SHANNON", mail: "mshannon@isa.com.uy", usuario_sap: "SUREP029" },
+      { puesto: "Jefe Rep.", centro: "S017", sucursal: "VALDENSE", nombre: "Rafael DAVILA", mail: "rdavila@isa.com.uy", usuario_sap: "SUJRP002" },
 
-      { puesto:"Gerente", centro:"S018", sucursal:"DURAZNO", nombre:"Ramiro Caceres", mail:"rcaceres@isa.com.uy", usuario_sap:"" },
-      { puesto:"Vendedor", centro:"S018", sucursal:"DURAZNO", nombre:"Marcel Alzamendi", mail:"malzamendi@isa.com.uy", usuario_sap:"SUREP032" },
-      { puesto:"Vendedor", centro:"S018", sucursal:"DURAZNO", nombre:"MARIVI MOREIRA", mail:"dmmoreira@isa.com.uy", usuario_sap:"SUREP031" },
+      { puesto: "Gerente", centro: "S018", sucursal: "DURAZNO", nombre: "Ramiro Caceres", mail: "rcaceres@isa.com.uy", usuario_sap: "" },
+      { puesto: "Vendedor", centro: "S018", sucursal: "DURAZNO", nombre: "Marcel Alzamendi", mail: "malzamendi@isa.com.uy", usuario_sap: "SUREP032" },
+      { puesto: "Vendedor", centro: "S018", sucursal: "DURAZNO", nombre: "MARIVI MOREIRA", mail: "dmmoreira@isa.com.uy", usuario_sap: "SUREP031" },
 
-      { puesto:"Vendedor", centro:"S019", sucursal:"TARARIRAS", nombre:"JORGE ÁVILA", mail:"javila@isa.com.uy", usuario_sap:"SUREP033" },
-      { puesto:"Vendedor", centro:"S019", sucursal:"TARARIRAS", nombre:"ANA LAURA MARTINEZ", mail:"tarariras@isa.com.uy", usuario_sap:"SUREP034" },
-      { puesto:"Jefe Rep.", centro:"S019", sucursal:"TARARIRAS", nombre:"Rafael DAVILA", mail:"rdavila@isa.com.uy", usuario_sap:"SUJRP002" },
+      { puesto: "Vendedor", centro: "S019", sucursal: "TARARIRAS", nombre: "JORGE ÁVILA", mail: "javila@isa.com.uy", usuario_sap: "SUREP033" },
+      { puesto: "Vendedor", centro: "S019", sucursal: "TARARIRAS", nombre: "ANA LAURA MARTINEZ", mail: "tarariras@isa.com.uy", usuario_sap: "SUREP034" },
+      { puesto: "Jefe Rep.", centro: "S019", sucursal: "TARARIRAS", nombre: "Rafael DAVILA", mail: "rdavila@isa.com.uy", usuario_sap: "SUJRP002" },
 
-      { puesto:"Ref. Analisis", centro:"S013", sucursal:"Bodega Central", nombre:"Gerardo Morganti", mail:"gmorganti@isa.com.uy", usuario_sap:"CLOG001" },
-      { puesto:"Analista", centro:"S013", sucursal:"Bodega Central", nombre:"Antonella Lopez", mail:"alopez@isa.com.uy", usuario_sap:"CLOG002" },
-      { puesto:"Adm. Analisis", centro:"S013", sucursal:"Bodega Central", nombre:"Maria Castañolo", mail:"mcastanola@isa.com.uy", usuario_sap:"CLOG004" },
-      { puesto:"Resp. CL", centro:"S013", sucursal:"Bodega Central", nombre:"Hermes Velazquez", mail:"hvelazquez@isa.com.uy", usuario_sap:"CLOG008" },
-      { puesto:"Ref. Logistico", centro:"S013", sucursal:"Bodega Central", nombre:"Facundo Perez", mail:"faperez@isa.com.uy", usuario_sap:"CLOG009" },
-      { puesto:"Coord. Transp Log", centro:"S013", sucursal:"Bodega Central", nombre:"Nahuel Gonzalez", mail:"ngonzalez@isa.com.uy", usuario_sap:"CLOG010" },
-      { puesto:"Aux. Log 2A", centro:"S013", sucursal:"Bodega Central", nombre:"Agustin Fernandez", mail:"agfernandez@isa.com.uy", usuario_sap:"CLOG011" },
+      { puesto: "Ref. Analisis", centro: "S013", sucursal: "Bodega Central", nombre: "Gerardo Morganti", mail: "gmorganti@isa.com.uy", usuario_sap: "CLOG001" },
+      { puesto: "Analista", centro: "S013", sucursal: "Bodega Central", nombre: "Antonella Lopez", mail: "alopez@isa.com.uy", usuario_sap: "CLOG002" },
+      { puesto: "Adm. Analisis", centro: "S013", sucursal: "Bodega Central", nombre: "Maria Castañolo", mail: "mcastanola@isa.com.uy", usuario_sap: "CLOG004" },
+      { puesto: "Resp. CL", centro: "S013", sucursal: "Bodega Central", nombre: "Hermes Velazquez", mail: "hvelazquez@isa.com.uy", usuario_sap: "CLOG008" },
+      { puesto: "Ref. Logistico", centro: "S013", sucursal: "Bodega Central", nombre: "Facundo Perez", mail: "faperez@isa.com.uy", usuario_sap: "CLOG009" },
+      { puesto: "Coord. Transp Log", centro: "S013", sucursal: "Bodega Central", nombre: "Nahuel Gonzalez", mail: "ngonzalez@isa.com.uy", usuario_sap: "CLOG010" },
+      { puesto: "Aux. Log 2A", centro: "S013", sucursal: "Bodega Central", nombre: "Agustin Fernandez", mail: "agfernandez@isa.com.uy", usuario_sap: "CLOG011" },
 
-      { puesto:"Jefe Rep.", centro:"S009", sucursal:"SAN CARLOS", nombre:"KARINA PEREIRA", mail:"kpereira@isa.com.uy", usuario_sap:"SUJRP006" }
+      { puesto: "Jefe Rep.", centro: "S009", sucursal: "SAN CARLOS", nombre: "KARINA PEREIRA", mail: "kpereira@isa.com.uy", usuario_sap: "SUJRP006" }
     ];
 
     // =========================
@@ -485,14 +703,14 @@
     const $ = (id) => document.getElementById(id);
     const tbody = $("tbody");
 
-    function escapeHtml(s){
+    function escapeHtml(s) {
       return String(s ?? "")
-        .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+        .replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;").replaceAll("'", "&#039;");
     }
-    function norm(s){ return (s ?? "").toString().trim().toLowerCase(); }
+    function norm(s) { return (s ?? "").toString().trim().toLowerCase(); }
 
-    function showToast(text, isError=false){
+    function showToast(text, isError = false) {
       const el = $("toast");
       el.textContent = text;
       el.classList.toggle("err", isError);
@@ -500,23 +718,23 @@
       clearTimeout(showToast._t);
       showToast._t = setTimeout(() => el.style.display = "none", 4200);
     }
-    function todayISO(){
+    function todayISO() {
       const d = new Date();
       const yyyy = d.getFullYear();
-      const mm = String(d.getMonth()+1).padStart(2,"0");
-      const dd = String(d.getDate()).padStart(2,"0");
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      const dd = String(d.getDate()).padStart(2, "0");
       return `${yyyy}-${mm}-${dd}`;
     }
-    function ensureDateIfRespuesta(row){
-      if ((row.respuesta || "").trim() && !(row.fecha_respuesta || "").trim()){
+    function ensureDateIfRespuesta(row) {
+      if ((row.respuesta || "").trim() && !(row.fecha_respuesta || "").trim()) {
         row.fecha_respuesta = todayISO();
       }
     }
 
-    function uniqSorted(arr){
-      return Array.from(new Set(arr.filter(Boolean))).sort((a,b)=> a.localeCompare(b, "es", { sensitivity:"base" }));
+    function uniqSorted(arr) {
+      return Array.from(new Set(arr.filter(Boolean))).sort((a, b) => a.localeCompare(b, "es", { sensitivity: "base" }));
     }
-    function setOptions(sel, values, placeholder){
+    function setOptions(sel, values, placeholder) {
       sel.innerHTML = `<option value="">${escapeHtml(placeholder || "(Elegir)")}</option>` +
         values.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join("");
     }
@@ -538,7 +756,7 @@
     // Elegir la sucursal con más ocurrencias por centro
     Object.keys(centroCounts).forEach(centro => {
       const sucMap = centroCounts[centro];
-      const preferred = Object.keys(sucMap).sort((a,b) => sucMap[b] - sucMap[a])[0];
+      const preferred = Object.keys(sucMap).sort((a, b) => sucMap[b] - sucMap[a])[0];
       if (preferred) CENTRO_SUCURSAL_MAP[centro] = preferred;
     });
 
@@ -551,7 +769,7 @@
     setOptions($("a_sucursal_nombre"), [], "(Elegir)");
     setOptions($("a_nombre"), [], "(Elegir)");
 
-    function getPeopleByFilters(centro, sucursal){
+    function getPeopleByFilters(centro, sucursal) {
       return PEOPLE.filter(p => {
         if (centro && p.centro !== centro) return false;
         if (sucursal && p.sucursal !== sucursal) return false;
@@ -559,7 +777,7 @@
       });
     }
 
-    function refreshDependentSelects(){
+    function refreshDependentSelects() {
       const centro = $("a_centro").value;
       const sucursal = $("a_sucursal_nombre").value;
 
@@ -592,7 +810,7 @@
       $("a_responsable").value = "";
     }
 
-    function fillResponsableFromNombre(){
+    function fillResponsableFromNombre() {
       const centro = $("a_centro").value;
       const sucursal = $("a_sucursal_nombre").value;
 
@@ -603,7 +821,7 @@
         (p.puesto.includes("Jefe") || p.puesto.includes("jefe"))
       );
 
-      if (jefe){
+      if (jefe) {
         $("a_responsable").value = jefe.nombre;
       } else {
         $("a_responsable").value = "";
@@ -634,7 +852,7 @@
     let view = [];
     let editingId = null;
 
-    function matchesText(r, q){
+    function matchesText(r, q) {
       if (!q) return true;
       const hay = [
         r.material, r.cantidad, r.solicitud, r.necesidad, r.centro, r.sucursalNombre,
@@ -643,7 +861,7 @@
       return hay.includes(q);
     }
 
-    function applyFilters(){
+    function applyFilters() {
       const q = norm($("q").value);
       const fCentro = $("fCentro").value;
       const fSucursal = $("fSucursal").value;
@@ -661,12 +879,12 @@
       draw();
     }
 
-    ["q","fCentro","fSucursal","fRespuesta"].forEach(id=>{
+    ["q", "fCentro", "fSucursal", "fRespuesta"].forEach(id => {
       $(id).addEventListener("input", applyFilters);
       $(id).addEventListener("change", applyFilters);
     });
 
-    $("clearFiltersBtn").addEventListener("click", ()=>{
+    $("clearFiltersBtn").addEventListener("click", () => {
       $("q").value = "";
       $("fCentro").value = "";
       $("fSucursal").value = "";
@@ -674,10 +892,10 @@
       applyFilters();
     });
 
-    function renderRow(id, r){
+    function renderRow(id, r) {
       const isEditing = (editingId === id);
 
-      if (!isEditing){
+      if (!isEditing) {
         return `
           <tr data-id="${escapeHtml(id)}">
             <td><div class="cellInner">${escapeHtml(r.material || "")}</div></td>
@@ -704,34 +922,34 @@
 
       return `
         <tr data-id="${escapeHtml(id)}">
-          <td><div class="cellInner"><input class="cell-input w160" data-field="material" value="${escapeHtml(r.material||"")}"></div></td>
-          <td><div class="cellInner"><input class="cell-input w110" data-field="cantidad" type="number" min="0" step="1" value="${escapeHtml(r.cantidad||"")}"></div></td>
-          <td><div class="cellInner"><input class="cell-input w160" data-field="solicitud" value="${escapeHtml(r.solicitud||"")}"></div></td>
-          <td><div class="cellInner"><input class="cell-input w160" data-field="necesidad" value="${escapeHtml(r.necesidad||"")}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w160" data-field="material" value="${escapeHtml(r.material || "")}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w110" data-field="cantidad" type="number" min="0" step="1" value="${escapeHtml(r.cantidad || "")}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w160" data-field="solicitud" value="${escapeHtml(r.solicitud || "")}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w160" data-field="necesidad" value="${escapeHtml(r.necesidad || "")}"></div></td>
 
-          <td><div class="cellInner"><input class="cell-input w140" data-field="centro" value="${escapeHtml(r.centro||"")}" readonly></div></td>
-          <td><div class="cellInner"><input class="cell-input w200" data-field="sucursalNombre" value="${escapeHtml(r.sucursalNombre||"")}" readonly></div></td>
-          <td><div class="cellInner"><input class="cell-input w200" data-field="nombre" value="${escapeHtml(r.nombre||"")}" readonly></div></td>
-          <td><div class="cellInner"><input class="cell-input w160" data-field="responsable" value="${escapeHtml(r.responsable||"")}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w140" data-field="centro" value="${escapeHtml(r.centro || "")}" readonly></div></td>
+          <td><div class="cellInner"><input class="cell-input w200" data-field="sucursalNombre" value="${escapeHtml(r.sucursalNombre || "")}" readonly></div></td>
+          <td><div class="cellInner"><input class="cell-input w200" data-field="nombre" value="${escapeHtml(r.nombre || "")}" readonly></div></td>
+          <td><div class="cellInner"><input class="cell-input w160" data-field="responsable" value="${escapeHtml(r.responsable || "")}"></div></td>
 
           <td><div class="cellInner">
             <select class="cell-input w200" data-field="comentario">
-              <option value="" ${(r.comentario||"")===""?"selected":""}>(Elegir)</option>
-              <option value="Solicitar cotizacion" ${(r.comentario||"")==="Solicitar cotizacion"?"selected":""}>Solicitar cotizacion</option>
-              <option value="Stock en la red" ${(r.comentario||"")==="Stock en la red"?"selected":""}>Stock en la red</option>
-              <option value="Ticket reserva" ${(r.comentario||"")==="Ticket reserva"?"selected":""}>Ticket reserva</option>
+              <option value="" ${(r.comentario || "") === "" ? "selected" : ""}>(Elegir)</option>
+              <option value="Solicitar cotizacion" ${(r.comentario || "") === "Solicitar cotizacion" ? "selected" : ""}>Solicitar cotizacion</option>
+              <option value="Stock en la red" ${(r.comentario || "") === "Stock en la red" ? "selected" : ""}>Stock en la red</option>
+              <option value="Ticket reserva" ${(r.comentario || "") === "Ticket reserva" ? "selected" : ""}>Ticket reserva</option>
             </select>
           </div></td>
 
           <td><div class="cellInner">
             <select class="cell-input w160" data-field="respuesta">
-              <option value="" ${(r.respuesta||"")===""?"selected":""}>(Elegir)</option>
-              <option value="Solicitar" ${(r.respuesta||"")==="Solicitar"?"selected":""}>Solicitar</option>
-              <option value="No solicitar" ${(r.respuesta||"")==="No solicitar"?"selected":""}>No solicitar</option>
+              <option value="" ${(r.respuesta || "") === "" ? "selected" : ""}>(Elegir)</option>
+              <option value="Solicitar" ${(r.respuesta || "") === "Solicitar" ? "selected" : ""}>Solicitar</option>
+              <option value="No solicitar" ${(r.respuesta || "") === "No solicitar" ? "selected" : ""}>No solicitar</option>
             </select>
           </div></td>
 
-          <td><div class="cellInner"><input class="cell-input w160" data-field="fecha_respuesta" type="date" value="${escapeHtml(r.fecha_respuesta||"")}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w160" data-field="fecha_respuesta" type="date" value="${escapeHtml(r.fecha_respuesta || "")}"></div></td>
 
           <td>
             <div class="cellInner">
@@ -746,7 +964,7 @@
       `;
     }
 
-    function draw(){
+    function draw() {
       const data = (view.length ? view : cache);
       tbody.innerHTML = data.map(x => renderRow(x.id, x.data)).join("");
     }
@@ -754,12 +972,12 @@
     // =========================
     // ✅ LISTENER Firestore
     // =========================
-    const qSnap = query(collection(db, COL), orderBy("createdAt","desc"));
-    onSnapshot(qSnap, (snap)=>{
+    const qSnap = query(collection(db, COL), orderBy("createdAt", "desc"));
+    onSnapshot(qSnap, (snap) => {
       cache = [];
       snap.forEach(d => cache.push({ id: d.id, data: d.data() }));
       applyFilters();
-    }, (err)=>{
+    }, (err) => {
       console.error(err);
       showToast("No se pudo leer Firestore", true);
     });
@@ -767,7 +985,7 @@
     // =========================
     // ✅ AGREGAR
     // =========================
-    $("addBtn").addEventListener("click", async ()=>{
+    $("addBtn").addEventListener("click", async () => {
       const row = {
         material: $("a_material").value.trim(),
         cantidad: ($("a_cantidad").value ?? "").toString().trim(),
@@ -784,32 +1002,32 @@
         updatedAt: serverTimestamp()
       };
 
-      if (!row.material && !row.solicitud && !row.necesidad){
+      if (!row.material && !row.solicitud && !row.necesidad) {
         alert("Ingresá al menos Material / Solicitud / Necesidad.");
         return;
       }
-      if (!row.centro || !row.sucursalNombre || !row.nombre){
+      if (!row.centro || !row.sucursalNombre || !row.nombre) {
         alert("Elegí Centro, Sucursal y Nombre.");
         return;
       }
 
       ensureDateIfRespuesta(row);
 
-      try{
+      try {
         await addDoc(collection(db, COL), row);
         showToast("Agregado con éxito");
 
         // limpiar (mantengo centro para agilizar)
-        $("a_material").value="";
-        $("a_cantidad").value="1";
-        $("a_solicitud").value="";
-        $("a_necesidad").value="";
-        $("a_comentario").value="";
-        $("a_respuesta").value="";
-        $("a_fecha_respuesta").value="";
-        $("a_nombre").value="";
-        $("a_responsable").value="";
-      } catch(e){
+        $("a_material").value = "";
+        $("a_cantidad").value = "1";
+        $("a_solicitud").value = "";
+        $("a_necesidad").value = "";
+        $("a_comentario").value = "";
+        $("a_respuesta").value = "";
+        $("a_fecha_respuesta").value = "";
+        $("a_nombre").value = "";
+        $("a_responsable").value = "";
+      } catch (e) {
         console.error(e);
         showToast("Error al guardar", true);
         alert(e?.message || String(e));
@@ -819,7 +1037,7 @@
     // =========================
     // ✅ EDITAR / GUARDAR / ELIMINAR
     // =========================
-    tbody.addEventListener("click", async (e)=>{
+    tbody.addEventListener("click", async (e) => {
       const btn = e.target.closest("[data-action]");
       if (!btn) return;
 
@@ -829,10 +1047,10 @@
       const id = tr.dataset.id;
       const action = btn.dataset.action;
 
-      if (action === "edit"){ editingId = id; draw(); return; }
-      if (action === "cancel"){ editingId = null; draw(); return; }
+      if (action === "edit") { editingId = id; draw(); return; }
+      if (action === "cancel") { editingId = null; draw(); return; }
 
-      if (action === "save"){
+      if (action === "save") {
         const fields = tr.querySelectorAll("[data-field]");
         const updated = {};
         fields.forEach(el => updated[el.dataset.field] = (el.value ?? "").toString().trim());
@@ -840,12 +1058,12 @@
         ensureDateIfRespuesta(updated);
         updated.updatedAt = serverTimestamp();
 
-        try{
+        try {
           btn.disabled = true;
           await updateDoc(doc(db, COL, id), updated);
           editingId = null;
           showToast("Guardado");
-        } catch(err){
+        } catch (err) {
           console.error(err);
           showToast("Error al guardar", true);
           alert(err?.message || String(err));
@@ -855,18 +1073,18 @@
         return;
       }
 
-      if (action === "delete"){
+      if (action === "delete") {
         if (!confirm("¿Seguro que querés eliminar esta fila?")) return;
-        try{
+        try {
           btn.disabled = true;
           await deleteDoc(doc(db, COL, id));
           if (editingId === id) editingId = null;
           showToast("Eliminado");
-        } catch(err){
+        } catch (err) {
           console.error(err);
           showToast("Error al eliminar", true);
           alert(err?.message || String(err));
-        } finally{
+        } finally {
           btn.disabled = false;
         }
       }
@@ -875,7 +1093,7 @@
     // =========================
     // ✅ EXPORT XLSX
     // =========================
-    function rowsForExport(){
+    function rowsForExport() {
       const data = (view.length ? view : cache).map(x => {
         const r = x.data;
         return {
@@ -896,9 +1114,9 @@
       return data;
     }
 
-    $("exportXlsxBtn").addEventListener("click", ()=>{
+    $("exportXlsxBtn").addEventListener("click", () => {
       const data = rowsForExport();
-      if (!data.length){ alert("No hay datos para exportar."); return; }
+      if (!data.length) { alert("No hay datos para exportar."); return; }
 
       const ws = XLSX.utils.json_to_sheet(data);
       const wb = XLSX.utils.book_new();
@@ -906,10 +1124,11 @@
 
       const now = new Date();
       const yyyy = now.getFullYear();
-      const mm = String(now.getMonth()+1).padStart(2,'0');
-      const dd = String(now.getDate()).padStart(2,'0');
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const dd = String(now.getDate()).padStart(2, '0');
       XLSX.writeFile(wb, `solicitudes_${yyyy}-${mm}-${dd}.xlsx`);
     });
   </script>
 </body>
+
 </html>
