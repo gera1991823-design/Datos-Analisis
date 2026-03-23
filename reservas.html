@@ -1,428 +1,548 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Reservas de Importaciones</title>
-
-  <!-- XLSX (SheetJS) para exportar a Excel -->
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Reservas de Importaciones - Interagrovial</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
-  <!-- ✅ ESTILO CLARO (igual al de Reclamos) -->
   <style>
     :root{
-      /* Interagrovial / John Deere-ish accents */
-      --green:#367C2B;
-      --yellow:#FFDE00;
-
-      /* light ui */
-      --bg1:#eef2f5;
-      --bg2:#e6edf2;
-      --panel:#ffffff;
-      --panel2:#f8fbfd;
-
-      --text:#0b1220;
-      --muted:#5a6876;
-
-      --line:rgba(10,40,20,.12);
+      --jd-green:#184f13;
+      --jd-green-dark:#0f3a0f;
+      --jd-yellow:#ffde00;
+      --bg:#f6faf6;
+      --surface:#ffffff;
+      --surface-2:#fbfffb;
+      --text:#071217;
+      --muted:#5f6b67;
+      --row-text:#274939;
+      --border:#e7efe7;
+      --border-strong:#d6e5d6;
+      --shadow:0 18px 48px rgba(10,16,12,.10);
+      --shadow2:0 10px 22px rgba(10,16,12,.08);
       --radius:16px;
-      --shadow: 0 14px 34px rgba(0,0,0,.10);
-      --shadow2: 0 8px 18px rgba(0,0,0,.08);
-
-      --sans: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      --accent-gradient: linear-gradient(90deg, var(--jd-green), var(--jd-green-dark));
     }
 
-    *{ box-sizing:border-box; }
+    *{box-sizing:border-box}
+    html { scrollbar-gutter: stable; }
     body{
+      font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
       margin:0;
-      font-family:var(--sans);
-      color:var(--text);
+      padding:18px 18px 90px;
       background:
-        radial-gradient(900px 600px at 15% 0%, rgba(54,124,43,.12), transparent 60%),
-        radial-gradient(700px 500px at 85% 10%, rgba(255,222,0,.10), transparent 55%),
-        linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 100%);
+        radial-gradient(1200px 600px at 15% 0%, rgba(46,125,50,.06), transparent 55%),
+        radial-gradient(1200px 600px at 85% 0%, rgba(255,222,0,.03), transparent 55%),
+        var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
     }
 
-    .wrap{ width:100%; padding:16px; }
-
-    /* Top bar */
     .topbar{
-      display:flex;
-      align-items:flex-end;
-      justify-content:space-between;
-      flex-wrap:wrap;
-      gap:12px;
-      padding:14px 16px;
-      border-radius:18px;
-      background:linear-gradient(90deg, rgba(54,124,43,.16), rgba(255,222,0,.10));
-      border:1px solid rgba(54,124,43,.18);
-      box-shadow:var(--shadow2);
-      margin-bottom:14px;
-    }
-    .titleRow{
+      position: sticky;
+      top: 0;
+      z-index: 50;
       display:flex;
       align-items:center;
-      gap:10px;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+      margin: 0 0 18px 0;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, #0f1b12 0%, #101f14 100%);
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: 0 18px 50px rgba(0,0,0,.22);
+      backdrop-filter: blur(8px);
     }
-    .titleCol{
+
+    .companyName{
+      font-size:13px;
+      font-weight:900;
+      letter-spacing:.06em;
+      color:rgba(255,255,255,.60);
+      text-transform:uppercase;
+    }
+
+    .title{
+      margin: 0 auto;
+      background: transparent;
+      box-shadow: none;
+      border: none;
+      padding: 0;
+      font-size: 34px;
+      font-weight: 900;
+      color: #ffffff;
+      letter-spacing: .03em;
+      text-transform: none;
+      display:flex;
+      align-items:center;
+      gap:14px;
+    }
+
+    .titleIcon{
+      width: 52px;
+      height: 52px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(255,222,0,.18), rgba(255,255,255,.08));
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.18), 0 8px 20px rgba(0,0,0,.16);
+      flex: 0 0 auto;
+    }
+    .titleIcon svg{ width: 28px; height: 28px; display:block; }
+
+    .titleText{
       display:flex;
       flex-direction:column;
-      gap:6px;
-    }
-    h1{
-      margin:0;
-      font-size:26px;
-      letter-spacing:.2px;
-    }
-    .subtitle{
-      margin:0;
-      color:var(--muted);
-      font-size:13px;
-      line-height:1.2;
+      align-items:flex-start;
+      line-height:1;
     }
 
-    /* Cards */
-    .card{
-      background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(248,251,253,.92));
-      border:1px solid rgba(10,40,20,.10);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      padding:14px;
-      margin-bottom:14px;
-      overflow:hidden;
+    .titleText small{
+      margin-top: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.64);
     }
 
-    /* Meta row (status) */
-    .meta{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
-      flex-wrap:wrap;
-      padding:12px 14px;
-      border-radius:14px;
-      background:linear-gradient(90deg, rgba(54,124,43,.10), rgba(255,255,255,.55));
-      border:1px solid rgba(10,40,20,.10);
-      margin-bottom:12px;
-    }
-
-    .pill{
-      font-size:12px;
-      border:1px solid rgba(10,40,20,.12);
-      border-radius:999px;
-      padding:6px 12px;
-      color:var(--muted);
-      background:rgba(255,255,255,.70);
+    .subpill{
       display:inline-flex;
       align-items:center;
       gap:8px;
+      border:1px solid rgba(255,255,255,.12);
+      padding:8px 12px;
+      border-radius:999px;
+      background: rgba(255,255,255,.06);
+      font-size:12px;
+      color: rgba(255,255,255,.85);
+      box-shadow: none;
+    }
+
+    .subpill b{color: var(--jd-yellow)}
+
+    @media (max-width: 720px){
+      .topbar{padding:12px 12px}
+      .title{font-size:28px}
+    }
+
+    .card{
+      background: linear-gradient(180deg, var(--surface), var(--surface-2));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      box-shadow: var(--shadow);
+      margin-bottom: 14px;
+      overflow:hidden;
+      position:relative;
+      padding-left: 20px;
+    }
+
+    .accentBar{
+      position:absolute;
+      left:0;
+      top:0;
+      height:100%;
+      width:10px;
+      background: var(--accent-gradient);
+      border-top-left-radius:var(--radius);
+      border-bottom-left-radius:var(--radius);
+      box-shadow: 0 10px 22px rgba(24,79,19,.10);
+      display:block;
+    }
+
+    .cardHeader{
+      display:flex;
+      align-items:center;
+      justify-content:flex-start;
+      gap:10px;
+      margin-bottom:12px;
+      position:relative;
+      min-height:56px;
+      padding-right:12px;
+      border-bottom:1px solid var(--border);
+      padding-bottom:14px;
+      margin-bottom:18px;
+    }
+
+    .cardHeader .row{ margin-left:auto; display:flex; gap:8px; align-items:center }
+
+    .cardHeader h3{
+      position:absolute;
+      left:50%;
+      top:50%;
+      transform:translate(-50%,-50%);
+      font-size:12px;
+      padding:10px 18px;
+      border-radius:14px;
+      background: linear-gradient(90deg, rgba(255,222,0,.12), rgba(46,125,50,.06));
+      color: var(--jd-green-dark);
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      border:1px solid rgba(46,125,50,.12);
+      box-shadow: 0 10px 22px rgba(24,79,19,.08);
+      z-index:2;
       white-space:nowrap;
     }
 
-    .dot{
-      width:8px; height:8px; border-radius:999px;
-      background:var(--yellow);
-      box-shadow:0 0 0 6px rgba(255,222,0,.14);
+    .card > h3{
+      margin:6px auto 12px;
+      font-size:12px;
+      padding:10px 18px;
+      border-radius:14px;
+      background: linear-gradient(90deg, rgba(255,222,0,.10), rgba(255,222,0,.04));
+      color: var(--jd-green-dark);
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.10em;
+      border:1px solid rgba(46,125,50,.10);
+      box-shadow: 0 10px 22px rgba(24,79,19,.08);
+      text-align:center;
+      display:block;
     }
 
-    /* Controls */
-    .toolbar{
+    @media (max-width:720px){
+      .cardHeader h3{position:static;transform:none;margin:0 auto 10px}
+      .card > h3{margin:6px 12px 12px}
+    }
+
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+    .row-add{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+
+    label{
+      font-size:12px;
+      color:var(--muted);
+      display:block;
+      margin-bottom:8px;
+      font-weight:800;
+      text-align:center;
+    }
+
+    .card .row > div,
+    .card .row-add > div{
       display:flex;
-      flex-wrap:wrap;
-      gap:10px;
+      flex-direction:column;
       align-items:center;
-      justify-content:flex-end;
+      min-width:0;
     }
 
-    input, select{
-      height:40px;
+    input,select{
       padding:10px 12px;
-      border-radius:12px;
-      border:1px solid rgba(10,40,20,.14);
-      background:rgba(255,255,255,.92);
+      border:1px solid var(--border-strong);
+      border-radius:14px;
+      font-size:14px;
+      font-family: inherit;
+      min-width:160px;
+      background: rgba(10,16,12,.03);
+      color: var(--text);
       outline:none;
-      box-shadow: inset 0 0 0 1px rgba(54,124,43,.08);
-      font-size:13px;
-      color:var(--text);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.65);
+      height: auto;
+      line-height: 1.4;
     }
-    input::placeholder{ color:rgba(90,104,118,.55); }
-    input:focus, select:focus{
-      border-color:rgba(54,124,43,.40);
-      box-shadow:0 0 0 4px rgba(54,124,43,.12);
+
+    input::placeholder{color:var(--muted)}
+
+    input:focus,select:focus{
+      border-color: rgba(24,79,19,.9);
+      box-shadow: 0 0 0 6px rgba(24,79,19,.14);
     }
 
     button{
-      border:0;
+      padding:10px 12px;
+      border:1px solid var(--border-strong);
+      background: rgba(10,16,12,.03);
+      border-radius:14px;
       cursor:pointer;
-      user-select:none;
-      font-family:var(--sans);
+      transition:.12s ease;
+      font-weight:900;
+      color: var(--text);
+      box-shadow: var(--shadow2);
+      font-family: inherit;
     }
 
-    .primary, .secondary, .danger{
-      height:40px;
-      border-radius:12px;
-      padding:0 14px;
-      font-size:13px;
-      font-weight:600;
-      border:1px solid rgba(10,40,20,.14);
-      box-shadow: var(--shadow2);
-      transition:.15s ease;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
+    button:hover{transform: translateY(-1px)}
+
+    button.primary{
+      background: linear-gradient(135deg, var(--jd-green), var(--jd-green-dark));
+      border-color: rgba(15,64,18,.95);
+      color:#fff;
+      box-shadow: 0 16px 34px rgba(24,79,19,.22);
+    }
+
+    button.secondary{
+      background: linear-gradient(135deg, var(--jd-yellow), #ffd600);
+      border-color: rgba(255,222,0,.55);
+      color: #0b1a10;
+      box-shadow: 0 10px 20px rgba(255,222,0,.12);
+    }
+
+    button.danger{
+      color:#ffd7dc;
+      border-color:#5a2731;
+      background: rgba(176,0,32,.16);
+    }
+
+    button.small{
+      padding:6px 10px;
+      border-radius:10px;
+      font-size:11px;
+      box-shadow:none;
+      font-weight:800;
+      min-width:auto;
+      max-width:none;
       white-space:nowrap;
     }
-    .primary{
-      background:linear-gradient(135deg, rgba(54,124,43,.92), rgba(54,124,43,.72));
-      color:#fff;
-      border-color:rgba(54,124,43,.35);
-    }
-    .secondary{
-      background:rgba(255,255,255,.92);
-      color:var(--text);
-    }
-    .danger{
-      background:linear-gradient(135deg, rgba(180,40,40,.22), rgba(255,255,255,.92));
-      border-color:rgba(180,40,40,.30);
-      color:#8a1d1d;
-    }
-    .primary:hover, .secondary:hover, .danger:hover{
-      transform:translateY(-1px);
-      box-shadow: 0 12px 26px rgba(0,0,0,.12);
+
+    .muted{color:var(--muted);font-size:12px;margin-top:8px}
+    .toast{margin-top:10px;font-size:13px;color:#2f7e2c;display:none;font-weight:900}
+    .toast.err{color:#b00020}
+
+    table{
+      width:100%;
+      min-width:1500px;
+      border-collapse:separate;
+      border-spacing:4px 12px;
+      background: transparent;
+      border:1px solid var(--border-strong);
+      border-radius: var(--radius);
+      overflow:visible;
+      box-shadow: var(--shadow);
     }
 
-    /* Table */
-   .tableWrap{
-  width:100%;
-  overflow:auto;
-  max-height: calc(100vh - 280px);
-}
+    thead th{
+      background: linear-gradient(180deg, #184f13, #0f3a0f);
+      position:static;
+      text-align:center;
+      color: rgba(255,255,255,.92);
+      border-bottom: 1px solid rgba(255,255,255,.14);
+      box-shadow: inset 0 -1px 0 rgba(255,255,255,.08);
+      font-size:12px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      padding:12px 10px;
+      white-space:nowrap;
+    }
 
-/* ✅ separación real entre filas y columnas */
-table{
-  width:100%;
-  min-width:1500px;
-  border-collapse:separate;
-  border-spacing: 0px 10px; /* (col gap) (row gap) */
-  font-size:13px;
-}
+    td{
+      border-bottom: none;
+      padding:0;
+      font-size:14px;
+      vertical-align:middle;
+      white-space:nowrap;
+      text-align:center;
+      font-weight:600;
+      background-clip: padding-box;
+    }
 
-/* Header igual */
-thead th{
-  position:sticky;
-  top:0;
-  z-index:5;
-  background:linear-gradient(180deg, rgba(54,124,43,.90), rgba(30,90,30,.90));
-  color:#fff;
-  padding:11px 10px;
-  border-bottom:2px solid var(--yellow);
-  white-space:nowrap;
-  font-weight:800;
-  text-align:center;
+    tbody tr{
+      transition: background .12s ease;
+      box-shadow: 0 8px 18px rgba(10,16,12,.06);
+      border-radius:12px;
+    }
 
-  /* ✅ que el header también se vea “pill” */
-  border-radius:12px;
-}
+    tbody tr td{background:transparent}
 
-/* ✅ cada celda como “pill / tarjeta” */
-tbody td{
-  padding:10px 12px;
-  white-space:nowrap;
-  vertical-align:middle;
-  text-align:center;
-
-  background:rgba(255,255,255,.92);
-  border:1px solid rgba(10,40,20,.10);
-  border-radius:14px;
-  box-shadow: 0 6px 14px rgba(0,0,0,.06);
-
-  /* mejora visual */
-  color: var(--text);
-}
-
-/* ✅ alternancia de fila (sutil) */
-tbody tr:nth-child(even) td{
-  background:rgba(248,251,253,.95);
-}
-
-/* ✅ hover de fila (sin romper el estilo pill) */
-tbody tr:hover td{
-  background:rgba(54,124,43,.08);
-  border-color:rgba(54,124,43,.20);
-}
-
-/* ✅ foco al editar */
-tbody td[contenteditable="true"]:focus{
-  outline:2px solid rgba(54,124,43,.35);
-  background: rgba(255,255,255,1);
-}
-
-/* ✅ el select “Cumplido” también pill */
-.jd-select{
-  width:100%;
-  min-width:150px;
-  background:transparent;
-  color:var(--text);
-  border:1px solid rgba(10,40,20,.14);
-  border-radius:10px;
-  padding:6px 10px;
-  outline:none;
-  text-align:center;
-}
-.jd-select:focus{
-  border-color:rgba(54,124,43,.40);
-  box-shadow:0 0 0 3px rgba(54,124,43,.12);
-}
-
-
-    .row-actions{
+    .cellInner{
       display:flex;
-      gap:8px;
       align-items:center;
       justify-content:center;
+      padding:14px 10px;
+      border-radius:12px;
+      height:48px;
+      width:100%;
+      box-sizing:border-box;
+      font-weight:700;
+      color: var(--row-text);
+      border:1px solid rgba(24,79,19,.12);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.45), 0 6px 14px rgba(24,79,19,.04);
+      background: linear-gradient(180deg, #f1f6f0, #e8f0e6);
     }
-    .icon-btn{
-      width:34px; height:34px;
+
+    tbody tr:nth-child(odd) .cellInner{ background: linear-gradient(180deg, #f0f5ef, #e6eee4); }
+    tbody tr:nth-child(even) .cellInner{ background: linear-gradient(180deg, #e4ece2, #dae5d8); }
+    tbody tr:hover .cellInner{ background: linear-gradient(180deg, #dde8db, #d2e0cf); }
+
+    .cellInner .cell-input{
+      width:100%;
+      box-sizing:border-box;
+      background:#fff;
+      border:1px solid rgba(24,79,19,.16);
+      padding:6px 10px;
+      height: 36px;
+      font-size: 14px;
+      font-weight: 700;
+      font-family: inherit;
+      margin: 0;
       border-radius:10px;
-      border:1px solid rgba(10,40,20,.14);
-      background:rgba(255,255,255,.92);
-      color:var(--text);
-      cursor:pointer;
-      display:inline-flex;
-      align-items:center;
+      text-align:center;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 6px 14px rgba(10,16,12,.05);
+    }
+
+    .cellInner input.cell-input:focus,
+    .cellInner select.cell-input:focus {
+      border-color: rgba(24,79,19,.95);
+      box-shadow: 0 10px 22px rgba(24,79,19,.14);
+      outline: none;
+    }
+
+    .actions{
+      display:flex;
+      gap:6px;
+      flex-wrap:nowrap;
       justify-content:center;
-      transition:.15s ease;
-      box-shadow: var(--shadow2);
+      width:100%;
     }
-    .icon-btn:hover{
-      border-color:rgba(54,124,43,.35);
-      transform:translateY(-1px);
-    }
-    .icon-btn.danger{
-      border-color:rgba(180,40,40,.30);
-      background:rgba(180,40,40,.10);
-      color:#8a1d1d;
-    }
+
+    .tableWrap{ width:100%; overflow:auto; }
+
+    .w110{min-width:110px}
+    .w140{min-width:140px}
+    .w160{min-width:160px}
+    .w200{min-width:200px}
+    .w220{min-width:220px}
 
     .footer{
-      margin-top:12px;
-      padding:12px 14px;
-      border-radius:16px;
-      border:1px solid rgba(10,40,20,.10);
-      background:rgba(255,255,255,.70);
-      color:var(--muted);
+      position:fixed;
+      left:16px;
+      bottom:12px;
       font-size:12px;
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      flex-wrap:wrap;
+      color: #0b1a10;
+      background: rgba(255,255,255,.98);
+      border:1px solid var(--border);
+      border-left:7px solid var(--jd-green);
+      padding:9px 12px;
+      border-radius:14px;
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(6px);
     }
-    .footer code{ font-family:var(--mono); color:var(--text); }
+
+    .footer b{color:var(--jd-green)}
 
     @media (max-width: 900px){
-      .toolbar{ justify-content:stretch; }
-      input, select, .primary, .secondary, .danger{ width:100%; }
+      input, select, button{ width:100%; }
       table{ min-width: 1400px; }
     }
   </style>
 </head>
 
 <body>
-  <div class="wrap">
-
-    <!-- ✅ Header visual como Reclamos -->
-    <div class="topbar">
-      <div class="titleRow">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
-             xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <rect x="1" y="3" width="22" height="18" rx="2"
-                stroke="currentColor" stroke-width="1.2" fill="#fff" />
-          <path d="M6 8h6M6 12h12M6 16h6"
-                stroke="#367c2b" stroke-width="1.4"
-                stroke-linecap="round" stroke-linejoin="round"/>
+  <div class="topbar">
+    <span class="companyName">INTERAGROVIAL S.A</span>
+    <h1 class="title">
+      <span class="titleIcon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 7.5C4 6.67 4.67 6 5.5 6h13c.83 0 1.5.67 1.5 1.5v9c0 .83-.67 1.5-1.5 1.5h-13C4.67 18 4 17.33 4 16.5v-9Z" stroke="#FFDE00" stroke-width="1.6" fill="rgba(255,255,255,0.06)"/>
+          <path d="M7 9.5h10M7 12h10M7 14.5h6" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round"/>
         </svg>
+      </span>
+      <span class="titleText">
+        Reservas
+        <small>Importaciones</small>
+      </span>
+    </h1>
 
-        <div class="titleCol">
-          <h1>Reservas de Importaciones</h1>
-          <p class="subtitle">Tabla editable · buscador + filtro · exportación Excel (XLSX) · sincroniza en vivo (Firestore)</p>
-        </div>
-      </div>
+    <div class="subpill"><b>En vivo</b> Firestore</div>
+  </div>
 
-      <div class="toolbar">
-        <input id="search" style="min-width:260px" placeholder="Buscar (caja, material, OC, descripción...)" />
-        <select id="filterCumplido">
-          <option value="all">Cumplido: Todos</option>
-          <option value="si">Cumplido: Sí</option>
-          <option value="no">Cumplido: No</option>
-          <option value="sin realizar">Cumplido: Sin realizar</option>
-        </select>
-
-        <button class="primary" id="addRow">＋ Agregar fila</button>
-        <button class="secondary" id="exportXlsx">⬇ Exportar XLSX</button>
-        <button class="danger" id="clearAll">🗑 Vaciar</button>
+  <div class="card">
+    <div class="accentBar"></div>
+    <div class="cardHeader">
+      <h3>Filtros</h3>
+      <div class="row" style="gap:8px">
+        <button id="clearFiltersBtn" class="secondary" type="button">Limpiar filtros</button>
+        <button id="exportXlsxBtn" class="secondary" type="button">Descargar XLSX</button>
       </div>
     </div>
 
-    <div class="card">
-      <div class="meta">
-        <div class="pill"><span class="dot"></span> Vista principal</div>
-        <div class="pill">Filas: <strong id="rowCount" style="color:var(--text)">0</strong></div>
-        <div class="pill">Estado: <strong id="syncStatus" style="color:var(--text)">Conectando…</strong></div>
+    <div class="row">
+      <div>
+        <label>Buscar (cualquier campo)</label>
+        <input id="q" class="w220" placeholder="Ej: caja, material, OC, descripcion" />
       </div>
-
-      <div class="tableWrap">
-        <table id="grid">
-          <thead>
-            <tr>
-              <th class="col-small">Caja</th>
-              <th class="col-small">Material</th>
-              <th class="col-xs">Cantidad pack</th>
-              <th class="col-xs">Cantid</th>
-              <th class="col-wide">Descripción</th>
-              <th class="col-wide">Comentario</th>
-              <th class="col-mid">O/C</th>
-              <th class="col-xs">Carpeta</th>
-              <th class="col-mid">Pedido Trasla</th>
-              <th class="col-xs">Sucurs</th>
-              <th class="col-mid">Fecha</th>
-              <th class="col-mid">Hora de carga</th>
-              <th class="col-small">Cumplido</th>
-              <th class="col-xs">Acción</th>
-            </tr>
-          </thead>
-          <tbody id="tbody"></tbody>
-        </table>
-      </div>
-
-      <div class="footer">
-        <div>Tip: click en una celda para editar. Enter confirma. Cambios se sincronizan para todas las PCs.</div>
-        <div>Back-end: <code>Firebase Firestore</code> · (se quitó <code>localStorage</code>)</div>
+      <div>
+        <label>Cumplido</label>
+        <select id="fCumplido" class="w160">
+          <option value="">Todos</option>
+          <option value="SIN REALIZAR">SIN REALIZAR</option>
+          <option value="SI">SI</option>
+          <option value="NO">NO</option>
+        </select>
       </div>
     </div>
   </div>
 
+  <div class="card">
+    <div class="accentBar"></div>
+    <h3>Agregar fila</h3>
+
+    <div class="row row-add">
+      <div><label>Caja</label><input id="caja" class="w140" /></div>
+      <div><label>Material</label><input id="material" class="w160" /></div>
+      <div><label>Cantidad pack</label><input id="cantidadPack" class="w140" /></div>
+      <div><label>Cantid</label><input id="cantid" class="w110" /></div>
+      <div><label>Descripcion</label><input id="descripcion" class="w220" /></div>
+      <div><label>Comentario</label><input id="comentario" class="w220" /></div>
+      <div><label>O/C</label><input id="oc" class="w140" /></div>
+      <div><label>Carpeta</label><input id="carpeta" class="w140" /></div>
+      <div><label>Pedido Trasla</label><input id="pedidoTrasla" class="w160" /></div>
+      <div><label>Sucurs</label><input id="sucurs" class="w110" /></div>
+      <div><label>Fecha (dd/mm/yyyy)</label><input id="fecha" class="w160" /></div>
+      <div><label>Hora (hh:mm)</label><input id="horaCarga" class="w110" /></div>
+      <div>
+        <label>Cumplido</label>
+        <select id="cumplido" class="w140">
+          <option value="SIN REALIZAR">SIN REALIZAR</option>
+          <option value="SI">SI</option>
+          <option value="NO">NO</option>
+        </select>
+      </div>
+      <button id="addBtn" class="primary" type="button">Agregar</button>
+    </div>
+
+    <div id="msg" class="muted"></div>
+    <div id="toast" class="toast"></div>
+  </div>
+
+  <div class="tableWrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Caja</th>
+          <th>Material</th>
+          <th>Cantidad pack</th>
+          <th>Cantid</th>
+          <th>Descripcion</th>
+          <th>Comentario</th>
+          <th>O/C</th>
+          <th>Carpeta</th>
+          <th>Pedido Trasla</th>
+          <th>Sucurs</th>
+          <th>Fecha</th>
+          <th>Hora de carga</th>
+          <th>Cumplido</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="footer"><b>INTERAGROVIAL S.A</b></div>
+
   <script type="module">
-    // =========================
-    // FIREBASE (Firestore realtime + Auth anónimo)
-    // =========================
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
     import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
     import {
-      getFirestore,
-      collection,
-      doc,
-      addDoc,
-      updateDoc,
-      deleteDoc,
-      onSnapshot,
-      query,
-      orderBy,
-      serverTimestamp,
-      getDocs,
-      writeBatch,
-      limit
+      getFirestore, collection, addDoc, doc, updateDoc, deleteDoc,
+      serverTimestamp, query, orderBy, onSnapshot
     } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -435,20 +555,42 @@ tbody td[contenteditable="true"]:focus{
       measurementId: "G-S05S1H4XZ0"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+    const COLLECTION = "reservas";
 
-    const columns = [
+    const FIELDS = [
       "caja","material","cantidadPack","cantid","descripcion","comentario",
       "oc","carpeta","pedidoTrasla","sucurs","fecha","horaCarga","cumplido"
     ];
 
-    const tbody = document.getElementById("tbody");
-    const search = document.getElementById("search");
-    const filterCumplido = document.getElementById("filterCumplido");
-    const rowCount = document.getElementById("rowCount");
-    const syncStatus = document.getElementById("syncStatus");
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const $ = (id) => document.getElementById(id);
+    const tbody = $("tbody");
+    const msgEl = $("msg");
+    const toastEl = $("toast");
+
+    let cache = [];
+    let view = [];
+    let editingRowId = null;
+
+    function showToast(text, isError=false){
+      toastEl.textContent = text;
+      toastEl.classList.toggle("err", isError);
+      toastEl.style.display = "block";
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => toastEl.style.display = "none", 4000);
+    }
+
+    function escapeHtml(s){
+      return String(s ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"','&quot;')
+        .replaceAll("'","&#039;");
+    }
 
     function pad2(n){ return String(n).padStart(2,"0"); }
 
@@ -462,381 +604,306 @@ tbody td[contenteditable="true"]:focus{
       return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
     }
 
-    function seedData(){
-      return [{
-        caja:"SBKM5D",
-        material:"KK25029",
-        cantidadPack:"4",
-        cantid:"2",
-        descripcion:"APOYO",
-        comentario:"",
-        oc:"1200021702",
-        carpeta:"88789",
-        pedidoTrasla:"1601220470",
-        sucurs:"S002",
-        fecha:"27/11/2025",
-        horaCarga:"08:30",
-        cumplido:"SIN REALIZAR"
-      }];
+    function toCumplido(v){
+      const s = String(v || "").trim().toUpperCase();
+      if(s === "SI" || s === "SÍ") return "SI";
+      if(s === "NO") return "NO";
+      return "SIN REALIZAR";
     }
 
-    let data = [];
-
-    const reservasCol = collection(db, "reservas");
-    const reservasQuery = query(reservasCol, orderBy("createdAt", "desc"));
-
-    function matchesFilters(row){
-      const q = search.value.trim().toLowerCase();
-      const f = filterCumplido.value;
-
-      const haystack = columns.map(k => (row[k] ?? "").toString().toLowerCase()).join(" | ");
-      const okSearch = !q || haystack.includes(q);
-
-      let okCumplido = true;
-      if(f !== "all"){
-        const v = (row.cumplido ?? "").toString().trim().toLowerCase();
-        const isYes = (v === "si" || v === "sí");
-        const isNo = (v === "no");
-        const isPending = (v === "sin realizar" || v === "");
-        if(f === "si") okCumplido = isYes;
-        if(f === "no") okCumplido = isNo;
-        if(f === "sin realizar") okCumplido = isPending;
-      }
-
-      return okSearch && okCumplido;
+    function matchesText(row, q){
+      if(!q) return true;
+      const hay = FIELDS.map(k => (row[k] || "").toString().toLowerCase()).join(" |");
+      return hay.includes(q);
     }
 
-    function render(){
-      tbody.innerHTML = "";
+    function applyFilters(){
+      const q = ($("q").value || "").trim().toLowerCase();
+      const fc = ($("fCumplido").value || "").trim();
 
-      const visible = data
-        .map((row, idx) => ({row, idx}))
-        .filter(({row}) => matchesFilters(row));
+      view = cache.filter(x => {
+        const r = x.data;
+        if(!matchesText(r, q)) return false;
+        if(fc && toCumplido(r.cumplido) !== fc) return false;
+        return true;
+      });
 
-      rowCount.textContent = visible.length;
+      draw();
+    }
 
-      for(const {row, idx} of visible){
-        const tr = document.createElement("tr");
+    function clearAddForm(){
+      FIELDS.forEach(k => {
+        if(!$(k)) return;
+        if(k === "cumplido") $(k).value = "SIN REALIZAR";
+        else $(k).value = "";
+      });
+    }
 
-        for(const key of columns){
-          const td = document.createElement("td");
-          td.setAttribute("data-key", key);
-          td.setAttribute("data-idx", idx);
+    function renderReadRow(id, r){
+      return `
+        <tr data-id="${id}">
+          <td><div class="cellInner">${escapeHtml(r.caja)}</div></td>
+          <td><div class="cellInner">${escapeHtml(r.material)}</div></td>
+          <td><div class="cellInner">${escapeHtml(r.cantidadPack)}</div></td>
+          <td><div class="cellInner">${escapeHtml(r.cantid)}</div></td>
+          <td><div class="cellInner">${escapeHtml(r.descripcion)}</div></td>
+          <td><div class="cellInner">${escapeHtml(r.comentario)}</div></td>
+          <td><div class="cellInner">${escapeHtml(r.oc)}</div></td>
+          <td><div class="cellInner">${escapeHtml(r.carpeta)}</div></td>
+          <td><div class="cellInner">${escapeHtml(r.pedidoTrasla)}</div></td>
+          <td><div class="cellInner">${escapeHtml(r.sucurs)}</div></td>
+          <td><div class="cellInner">${escapeHtml(r.fecha)}</div></td>
+          <td><div class="cellInner">${escapeHtml(r.horaCarga)}</div></td>
+          <td><div class="cellInner">${escapeHtml(toCumplido(r.cumplido))}</div></td>
+          <td>
+            <div class="cellInner">
+              <div class="actions">
+                <button class="small" data-action="edit">Editar</button>
+                <button class="small danger" data-action="delete">Eliminar</button>
+              </div>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
 
-          if(key === "cumplido"){
-            const current = (row[key] ?? "SIN REALIZAR").toString().trim().toUpperCase();
-            const normalized = (current === "" ? "SIN REALIZAR" : current);
+    function renderEditRow(id, r){
+      const row = {
+        caja: r.caja || "",
+        material: r.material || "",
+        cantidadPack: r.cantidadPack || "",
+        cantid: r.cantid || "",
+        descripcion: r.descripcion || "",
+        comentario: r.comentario || "",
+        oc: r.oc || "",
+        carpeta: r.carpeta || "",
+        pedidoTrasla: r.pedidoTrasla || "",
+        sucurs: r.sucurs || "",
+        fecha: r.fecha || "",
+        horaCarga: r.horaCarga || "",
+        cumplido: toCumplido(r.cumplido)
+      };
 
-            td.innerHTML = `
-              <select class="jd-select" data-idx="${idx}" data-key="cumplido" aria-label="Cumplido">
-                <option value="SIN REALIZAR" ${normalized === "SIN REALIZAR" ? "selected" : ""}>SIN REALIZAR</option>
-                <option value="SI" ${normalized === "SI" ? "selected" : ""}>SI</option>
-                <option value="NO" ${normalized === "NO" ? "selected" : ""}>NO</option>
+      return `
+        <tr data-id="${id}">
+          <td><div class="cellInner"><input class="cell-input w140" data-field="caja" value="${escapeHtml(row.caja)}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w160" data-field="material" value="${escapeHtml(row.material)}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w140" data-field="cantidadPack" value="${escapeHtml(row.cantidadPack)}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w110" data-field="cantid" value="${escapeHtml(row.cantid)}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w220" data-field="descripcion" value="${escapeHtml(row.descripcion)}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w220" data-field="comentario" value="${escapeHtml(row.comentario)}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w140" data-field="oc" value="${escapeHtml(row.oc)}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w140" data-field="carpeta" value="${escapeHtml(row.carpeta)}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w160" data-field="pedidoTrasla" value="${escapeHtml(row.pedidoTrasla)}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w110" data-field="sucurs" value="${escapeHtml(row.sucurs)}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w160" data-field="fecha" value="${escapeHtml(row.fecha)}"></div></td>
+          <td><div class="cellInner"><input class="cell-input w110" data-field="horaCarga" value="${escapeHtml(row.horaCarga)}"></div></td>
+          <td>
+            <div class="cellInner">
+              <select class="cell-input w140" data-field="cumplido">
+                <option value="SIN REALIZAR" ${row.cumplido === "SIN REALIZAR" ? "selected" : ""}>SIN REALIZAR</option>
+                <option value="SI" ${row.cumplido === "SI" ? "selected" : ""}>SI</option>
+                <option value="NO" ${row.cumplido === "NO" ? "selected" : ""}>NO</option>
               </select>
-            `;
-          }else{
-            td.textContent = row[key] ?? "";
-            td.contentEditable = "true";
-          }
-
-          tr.appendChild(td);
-        }
-
-        const tdA = document.createElement("td");
-        tdA.className = "col-xs";
-        tdA.innerHTML = `
-          <div class="row-actions">
-            <button class="icon-btn" title="Duplicar" data-action="dup" data-idx="${idx}">⎘</button>
-            <button class="icon-btn danger" title="Eliminar" data-action="del" data-idx="${idx}">✕</button>
-          </div>
-        `;
-        tr.appendChild(tdA);
-
-        tbody.appendChild(tr);
-      }
+            </div>
+          </td>
+          <td>
+            <div class="cellInner">
+              <div class="actions">
+                <button class="small primary" data-action="save">Guardar</button>
+                <button class="small" data-action="cancel">Cancelar</button>
+                <button class="small danger" data-action="delete">Eliminar</button>
+              </div>
+            </div>
+          </td>
+        </tr>
+      `;
     }
 
-    async function ensureSeedIfEmpty(){
-      const q1 = query(reservasCol, limit(1));
-      const snap = await getDocs(q1);
-      if(snap.size > 0) return;
+    function draw(){
+      if(view.length === 0){
+        tbody.innerHTML = `<tr><td colspan="14" style="padding:24px;text-align:center;color:#5f6b67;font-size:14px;font-weight:700;">Sin datos para mostrar.</td></tr>`;
+        return;
+      }
 
-      const seed = seedData();
-      for(const row of seed){
-        await addDoc(reservasCol, {
+      tbody.innerHTML = view.map(x => {
+        const r = x.data;
+        if(editingRowId === x.id) return renderEditRow(x.id, r);
+        return renderReadRow(x.id, r);
+      }).join("");
+    }
+
+    function rowsForExport(){
+      return view.map(x => {
+        const r = x.data;
+        return {
+          "Caja": r.caja || "",
+          "Material": r.material || "",
+          "Cantidad pack": r.cantidadPack || "",
+          "Cantid": r.cantid || "",
+          "Descripcion": r.descripcion || "",
+          "Comentario": r.comentario || "",
+          "O/C": r.oc || "",
+          "Carpeta": r.carpeta || "",
+          "Pedido Trasla": r.pedidoTrasla || "",
+          "Sucurs": r.sucurs || "",
+          "Fecha": r.fecha || "",
+          "Hora de carga": r.horaCarga || "",
+          "Cumplido": toCumplido(r.cumplido)
+        };
+      });
+    }
+
+    function exportXlsx(){
+      const data = rowsForExport();
+      if(!data.length){
+        alert("No hay datos para exportar.");
+        return;
+      }
+
+      const ws = XLSX.utils.json_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Reservas");
+
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth()+1).padStart(2,"0");
+      const dd = String(now.getDate()).padStart(2,"0");
+      XLSX.writeFile(wb, `reservas_importaciones_${yyyy}-${mm}-${dd}.xlsx`);
+    }
+
+    $("q").addEventListener("input", applyFilters);
+    $("fCumplido").addEventListener("change", applyFilters);
+    $("clearFiltersBtn").addEventListener("click", () => {
+      $("q").value = "";
+      $("fCumplido").value = "";
+      applyFilters();
+    });
+    $("exportXlsxBtn").addEventListener("click", exportXlsx);
+
+    $("addBtn").addEventListener("click", async () => {
+      const row = {
+        caja: $("caja").value.trim(),
+        material: $("material").value.trim(),
+        cantidadPack: $("cantidadPack").value.trim(),
+        cantid: $("cantid").value.trim(),
+        descripcion: $("descripcion").value.trim(),
+        comentario: $("comentario").value.trim(),
+        oc: $("oc").value.trim(),
+        carpeta: $("carpeta").value.trim(),
+        pedidoTrasla: $("pedidoTrasla").value.trim(),
+        sucurs: $("sucurs").value.trim(),
+        fecha: $("fecha").value.trim() || nowDateStr(),
+        horaCarga: $("horaCarga").value.trim() || nowTimeStr(),
+        cumplido: toCumplido($("cumplido").value)
+      };
+
+      const empty = !row.caja && !row.material && !row.oc && !row.descripcion;
+      if(empty){
+        alert("Ingresa al menos un dato para agregar.");
+        return;
+      }
+
+      msgEl.textContent = "Guardando...";
+      try{
+        await addDoc(collection(db, COLLECTION), {
           ...row,
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp()
         });
-      }
-    }
-
-    async function startRealtime(){
-      try{
-        syncStatus.textContent = "Autenticando…";
-        await signInAnonymously(auth);
-
-        syncStatus.textContent = "Cargando…";
-        await ensureSeedIfEmpty();
-
-        syncStatus.textContent = "En vivo ✅";
-
-        onSnapshot(reservasQuery, (snap) => {
-          data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-          render();
-        }, (err) => {
-          console.error(err);
-          syncStatus.textContent = "Error 🔴";
-          alert("Error de sincronización. Revisá reglas de Firestore/credenciales.");
-        });
-
+        clearAddForm();
+        showToast("Fila agregada con exito");
       }catch(err){
         console.error(err);
-        syncStatus.textContent = "Error 🔴";
-        alert("No se pudo conectar a Firebase. Revisá firebaseConfig y reglas.");
-      }
-    }
-
-    tbody.addEventListener("focusout", async (e) => {
-      const td = e.target.closest("td");
-      if(!td || !td.dataset.key) return;
-
-      const idx = Number(td.dataset.idx);
-      const key = td.dataset.key;
-
-      if(!Number.isFinite(idx) || !data[idx]) return;
-      if(key === "cumplido") return;
-
-      const rowId = data[idx].id;
-      const value = td.innerText.trim();
-
-      try{
-        await updateDoc(doc(db, "reservas", rowId), {
-          [key]: value,
-          updatedAt: serverTimestamp()
-        });
-      }catch(err){
-        console.error(err);
-        alert("No se pudo guardar el cambio (Firestore).");
-      }
-    });
-
-    tbody.addEventListener("keydown", (e) => {
-      if(e.key === "Enter"){
-        e.preventDefault();
-        e.target.blur();
-      }
-    });
-
-    tbody.addEventListener("change", async (e) => {
-      const sel = e.target.closest("select.jd-select");
-      if(!sel) return;
-
-      const idx = Number(sel.dataset.idx);
-      if(!Number.isFinite(idx) || !data[idx]) return;
-
-      const rowId = data[idx].id;
-
-      try{
-        await updateDoc(doc(db, "reservas", rowId), {
-          cumplido: sel.value,
-          updatedAt: serverTimestamp()
-        });
-      }catch(err){
-        console.error(err);
-        alert("No se pudo guardar 'Cumplido'.");
+        showToast("No se pudo agregar la fila", true);
+      }finally{
+        msgEl.textContent = "";
       }
     });
 
     tbody.addEventListener("click", async (e) => {
-      const btn = e.target.closest("button[data-action]");
+      const btn = e.target.closest("[data-action]");
       if(!btn) return;
 
+      const tr = e.target.closest("tr[data-id]");
+      if(!tr) return;
+
+      const id = tr.dataset.id;
       const action = btn.dataset.action;
-      const idx = Number(btn.dataset.idx);
-      if(!Number.isFinite(idx) || !data[idx]) return;
 
-      const row = data[idx];
-
-      if(action === "del"){
-        if(!confirm("¿Eliminar esta fila?")) return;
-        try{
-          await deleteDoc(doc(db, "reservas", row.id));
-        }catch(err){
-          console.error(err);
-          alert("No se pudo eliminar.");
-        }
+      if(action === "edit"){
+        editingRowId = id;
+        draw();
+        return;
       }
 
-      if(action === "dup"){
-        const copy = structuredClone(row);
-        delete copy.id;
-        delete copy.createdAt;
-        delete copy.updatedAt;
+      if(action === "cancel"){
+        editingRowId = null;
+        draw();
+        return;
+      }
+
+      if(action === "save"){
+        const fields = tr.querySelectorAll("[data-field]");
+        const updated = {};
+
+        fields.forEach(el => {
+          updated[el.dataset.field] = (el.value || "").toString().trim();
+        });
+        updated.cumplido = toCumplido(updated.cumplido);
 
         try{
-          await addDoc(reservasCol, {
-            ...copy,
-            createdAt: serverTimestamp(),
+          btn.disabled = true;
+          await updateDoc(doc(db, COLLECTION, id), {
+            ...updated,
             updatedAt: serverTimestamp()
           });
+          editingRowId = null;
+          showToast("Fila actualizada");
         }catch(err){
           console.error(err);
-          alert("No se pudo duplicar.");
+          showToast("No se pudo guardar", true);
+        }finally{
+          btn.disabled = false;
+        }
+        return;
+      }
+
+      if(action === "delete"){
+        if(!confirm("Seguro que quieres eliminar esta fila?")) return;
+        try{
+          btn.disabled = true;
+          await deleteDoc(doc(db, COLLECTION, id));
+          if(editingRowId === id) editingRowId = null;
+          showToast("Fila eliminada");
+        }catch(err){
+          console.error(err);
+          showToast("No se pudo eliminar", true);
+        }finally{
+          btn.disabled = false;
         }
       }
     });
 
-    document.getElementById("addRow").addEventListener("click", async () => {
-      const empty = Object.fromEntries(columns.map(c => [c, ""]));
-      empty.cumplido = "SIN REALIZAR";
-      empty.fecha = nowDateStr();
-      empty.horaCarga = nowTimeStr();
-
+    async function startRealtime(){
       try{
-        await addDoc(reservasCol, {
-          ...empty,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp()
-        });
+        await signInAnonymously(auth);
       }catch(err){
+        console.warn("Auth anonima fallo, se intenta igual", err);
+      }
+
+      const qSnap = query(collection(db, COLLECTION), orderBy("createdAt", "desc"));
+      onSnapshot(qSnap, (snap) => {
+        cache = [];
+        snap.forEach(d => cache.push({ id: d.id, data: d.data() }));
+        applyFilters();
+      }, (err) => {
         console.error(err);
-        alert("No se pudo agregar la fila.");
-      }
-    });
-
-    document.getElementById("clearAll").addEventListener("click", async () => {
-      if(!confirm("¿Seguro que querés vaciar toda la tabla? (se borra para TODOS)")) return;
-
-      try{
-        syncStatus.textContent = "Vaciando…";
-
-        const snap = await getDocs(reservasCol);
-        const docs = snap.docs;
-
-        const CHUNK = 500;
-        for(let i=0; i<docs.length; i+=CHUNK){
-          const batch = writeBatch(db);
-          const chunk = docs.slice(i, i+CHUNK);
-          for(const d of chunk){
-            batch.delete(d.ref);
-          }
-          await batch.commit();
-        }
-
-        syncStatus.textContent = "En vivo ✅";
-      }catch(err){
-        console.error(err);
-        syncStatus.textContent = "Error 🔴";
-        alert("No se pudo vaciar. Revisá reglas/permisos.");
-      }
-    });
-
-    search.addEventListener("input", render);
-    filterCumplido.addEventListener("change", render);
-
-    function parseDateDMY(s){
-      const str = (s ?? "").toString().trim();
-      const m = str.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-      if(!m) return null;
-      const dd = Number(m[1]), mm = Number(m[2]), yyyy = Number(m[3]);
-      const d = new Date(yyyy, mm-1, dd);
-      return Number.isFinite(d.getTime()) ? d : null;
+        alert("No se pudo leer Firestore. Revisa credenciales o reglas.");
+      });
     }
-
-    function parseTimeHMToExcel(s){
-      const str = (s ?? "").toString().trim();
-      const m = str.match(/^(\d{1,2}):(\d{2})$/);
-      if(!m) return null;
-      const hh = Number(m[1]), mi = Number(m[2]);
-      if(hh < 0 || hh > 23 || mi < 0 || mi > 59) return null;
-      return (hh * 3600 + mi * 60) / 86400;
-    }
-
-    function autoColsFromAOA(aoa){
-      const colCount = Math.max(...aoa.map(r => r.length));
-      const maxLen = new Array(colCount).fill(0);
-
-      for(const row of aoa){
-        for(let c=0; c<colCount; c++){
-          const v = row[c];
-          let len = 0;
-
-          if(v == null) len = 0;
-          else if(v instanceof Date) len = 10;
-          else if(typeof v === "number") len = 5;
-          else len = String(v).length;
-
-          if(len > maxLen[c]) maxLen[c] = len;
-        }
-      }
-
-      return maxLen.map(n => ({
-        wch: Math.min(40, Math.max(10, n + 2))
-      }));
-    }
-
-    document.getElementById("exportXlsx").addEventListener("click", () => {
-      const rows = data.filter(matchesFilters);
-
-      const header = [
-        "Caja","Material","Cantidad pack","Cantid","Descripción","Comentario",
-        "O/C","Carpeta","Pedido Trasla","Sucurs","Fecha","Hora de carga","Cumplido"
-      ];
-
-      const aoa = [
-        header,
-        ...rows.map(r => ([
-          r.caja ?? "",
-          r.material ?? "",
-          r.cantidadPack ?? "",
-          r.cantid ?? "",
-          r.descripcion ?? "",
-          r.comentario ?? "",
-          r.oc ?? "",
-          r.carpeta ?? "",
-          r.pedidoTrasla ?? "",
-          r.sucurs ?? "",
-          parseDateDMY(r.fecha) ?? "",
-          parseTimeHMToExcel(r.horaCarga) ?? "",
-          r.cumplido ?? ""
-        ]))
-      ];
-
-      const wb = XLSX.utils.book_new();
-      const ws = XLSX.utils.aoa_to_sheet(aoa, { cellDates: true });
-
-      const range = XLSX.utils.decode_range(ws["!ref"]);
-      for(let R = range.s.r + 1; R <= range.e.r; R++){
-        const dateCellAddr = XLSX.utils.encode_cell({ r:R, c:10 });
-        const timeCellAddr = XLSX.utils.encode_cell({ r:R, c:11 });
-
-        const dc = ws[dateCellAddr];
-        if(dc && dc.v instanceof Date){
-          dc.t = "d";
-          dc.z = "dd/mm/yyyy";
-        }
-
-        const tc = ws[timeCellAddr];
-        if(tc && typeof tc.v === "number"){
-          tc.t = "n";
-          tc.z = "hh:mm";
-        }
-      }
-
-      ws["!freeze"] = { xSplit: 0, ySplit: 1 };
-      ws["!autofilter"] = { ref: ws["!ref"] };
-      ws["!cols"] = autoColsFromAOA(aoa);
-
-      XLSX.utils.book_append_sheet(wb, ws, "Reservas");
-
-      const d = new Date();
-      const fileName = `reservas_importaciones_${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}.xlsx`;
-      XLSX.writeFile(wb, fileName);
-    });
 
     startRealtime();
   </script>
 </body>
 </html>
-
