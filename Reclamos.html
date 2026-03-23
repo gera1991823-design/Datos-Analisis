@@ -4,325 +4,920 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Reclamos - Interagrovial</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
-  <!-- XLSX (SheetJS) -->
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.19.3/dist/xlsx.full.min.js"></script>
+  <!-- flatpickr range picker -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
+  <!-- Spanish locale for flatpickr -->
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/es.js"></script>
+
+  <!-- ✅ XLSX (SheetJS) para exportar a Excel -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <style>
     :root{
-      --green:#367C2B;
-      --yellow:#FFDE00;
+      /* ✅ Paleta John Deere (aprox) */
+      --jd-green:#184f13;
+      --jd-green-dark:#0f3a0f;
+      --jd-green-900:#0b2210;
+      --jd-green-800:#0f2d16;
+      --jd-green-light:#3aa14a;
+      --jd-yellow:#ffde00;
 
-      --bg1:#eef2f5;
-      --bg2:#e6edf2;
-      --panel:#ffffff;
-      --panel2:#f8fbfd;
+      /* UI */
+      --bg:#f6faf6;
+      --surface:#ffffff;
+      --surface-2:#fbfffb;
+      --text:#071217;
+      --muted:#5f6b67;
+      --row-text:#274939;
 
-      --text:#0b1220;
-      --muted:#5a6876;
+      --border:#e7efe7;
+      --border-strong:#d6e5d6;
 
-      --line:rgba(10,40,20,.12);
+      --shadow:0 18px 48px rgba(10,16,12,.10);
+      --shadow2:0 10px 22px rgba(10,16,12,.08);
       --radius:16px;
-      --shadow: 0 14px 34px rgba(0,0,0,.10);
-      --shadow2: 0 8px 18px rgba(0,0,0,.08);
 
-      --sans: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      --accent-gradient: linear-gradient(90deg, var(--jd-green), var(--jd-green-dark));
     }
 
-    *{ box-sizing:border-box; }
+    *{box-sizing:border-box}
+    html { scrollbar-gutter: stable; }
     body{
+      font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
       margin:0;
-      font-family:var(--sans);
-      color:var(--text);
+      padding:18px 18px 90px;
       background:
-        radial-gradient(900px 600px at 15% 0%, rgba(54,124,43,.12), transparent 60%),
-        radial-gradient(700px 500px at 85% 10%, rgba(255,222,0,.10), transparent 55%),
-        linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 100%);
+        radial-gradient(1200px 600px at 15% 0%, rgba(46,125,50,.06), transparent 55%),
+        radial-gradient(1200px 600px at 85% 0%, rgba(255,222,0,.03), transparent 55%),
+        var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
     }
 
-    .wrap{ width:100%; padding:16px; }
-
+    /* =========================
+       ✅ TOP APP HEADER (ENTERPRISE JD)
+    ========================= */
     .topbar{
+      position: sticky;
+      top: 0;
+      z-index: 50;
       display:flex;
       align-items:center;
       justify-content:space-between;
+      gap:14px;
       flex-wrap:wrap;
-      gap:12px;
-      padding:14px 16px;
-      border-radius:18px;
-      background:linear-gradient(90deg, rgba(54,124,43,.16), rgba(255,222,0,.10));
-      border:1px solid rgba(54,124,43,.18);
-      box-shadow:var(--shadow2);
-      margin-bottom:14px;
+      margin: 0 0 18px 0;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, #0f1b12 0%, #101f14 100%);
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: 0 18px 50px rgba(0,0,0,.22);
+      backdrop-filter: blur(8px);
     }
-    .titleRow{
+
+    .title{
+      position: static;
+      transform: none;
+      margin: 0 auto;
+      background: transparent;
+      box-shadow: none;
+      border: none;
+      padding: 0;
+      font-size: 34px;
+      font-weight: 900;
+      color: #ffffff;
+      letter-spacing: .03em;
+      text-transform: none;
       display:flex;
       align-items:center;
-      gap:10px;
+      gap:14px;
     }
-    h1{
-      margin:0;
-      font-size:26px;
-      letter-spacing:.2px;
-    }
-    .subpill{
-      font-size:12px;
-      border:1px solid rgba(54,124,43,.22);
-      border-radius:999px;
-      padding:6px 12px;
-      color:var(--muted);
-      background:rgba(255,255,255,.65);
-    }
-
-    .card{
-      background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(248,251,253,.92));
-      border:1px solid rgba(10,40,20,.10);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      padding:14px;
-      margin-bottom:14px;
-    }
-    .cardHeader{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      flex-wrap:wrap;
-      gap:10px;
-      margin-bottom:12px;
-    }
-    .cardHeader h3{
-      margin:0;
-      font-size:14px;
-      letter-spacing:.12em;
-      text-transform:uppercase;
-      color:#0b1a12;
-    }
-
-    label{
-      display:block;
-      font-size:12px;
-      color:var(--muted);
-      margin-bottom:6px;
-    }
-    .row{
-      display:flex;
-      flex-wrap:wrap;
-      gap:12px;
-      align-items:flex-end;
-    }
-    .row-add{
-      align-items:flex-end;
-    }
-
-    input, select{
-      height:40px;
-      padding:10px 12px;
-      border-radius:12px;
-      border:1px solid rgba(10,40,20,.14);
-      background:rgba(255,255,255,.92);
-      outline:none;
-      box-shadow: inset 0 0 0 1px rgba(54,124,43,.08);
-      font-size:13px;
-      color:var(--text);
-    }
-    input::placeholder{ color:rgba(90,104,118,.55); }
-    input:focus, select:focus{
-      border-color:rgba(54,124,43,.40);
-      box-shadow:0 0 0 4px rgba(54,124,43,.12);
-    }
-
-    .w110{ width:110px; }
-    .w140{ width:140px; }
-    .w160{ width:160px; }
-    .w200{ width:200px; }
-    .w220{ width:220px; }
-
-    button{
-      border:0;
-      cursor:pointer;
-      user-select:none;
-      font-family:var(--sans);
-    }
-    .primary, .secondary, .danger{
-      height:40px;
-      border-radius:12px;
-      padding:0 14px;
-      font-size:13px;
-      font-weight:600;
-      border:1px solid rgba(10,40,20,.14);
-      box-shadow: var(--shadow2);
-      transition:.15s ease;
+    .titleIcon{
+      width: 52px;
+      height: 52px;
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      gap:8px;
-      white-space:nowrap;
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(255,222,0,.18), rgba(255,255,255,.08));
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.18), 0 8px 20px rgba(0,0,0,.16);
+      flex: 0 0 auto;
     }
-    .primary{
-      background:linear-gradient(135deg, rgba(54,124,43,.92), rgba(54,124,43,.72));
-      color:#fff;
-      border-color:rgba(54,124,43,.35);
+    .titleIcon svg{
+      width: 28px;
+      height: 28px;
+      display:block;
     }
-    .secondary{
-      background:rgba(255,255,255,.92);
-      color:var(--text);
+    .titleText{
+      display:flex;
+      flex-direction:column;
+      align-items:flex-start;
+      line-height:1;
     }
-    .danger{
-      background:linear-gradient(135deg, rgba(180,40,40,.22), rgba(255,255,255,.92));
-      border-color:rgba(180,40,40,.30);
-      color:#8a1d1d;
+    .titleText small{
+      margin-top: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.64);
     }
-    .primary:hover, .secondary:hover, .danger:hover{
-      transform:translateY(-1px);
-      box-shadow: 0 12px 26px rgba(0,0,0,.12);
-    }
-    .primary:disabled{ opacity:.65; cursor:not-allowed; transform:none; }
-
-    .muted{ color:var(--muted); font-size:12px; margin-top:8px; }
-    .toast{
-      display:none;
-      margin-top:10px;
-      padding:10px 12px;
-      border-radius:12px;
-      border:1px solid rgba(54,124,43,.22);
-      background:rgba(54,124,43,.10);
-      color:#0b1a12;
-      font-size:13px;
-    }
-    .toast.err{
-      border-color:rgba(180,40,40,.35);
-      background:rgba(180,40,40,.10);
-      color:#6b1414;
+    .title::after{
+      content:"";
+      display:block;
+      height: 3px;
+      width: 110px;
+      margin: 10px auto 0;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--jd-yellow), rgba(255,222,0,.15));
     }
 
-    .tableCard{
-      padding:0;
+    .subpill{
+      display:inline-flex;align-items:center;gap:8px;
+      border:1px solid rgba(255,255,255,.12);
+      padding:8px 12px;border-radius:999px;
+      background: rgba(255,255,255,.06);
+      font-size:12px;color: rgba(255,255,255,.85);
+      box-shadow: none;
+    }
+    .subpill b{color: var(--jd-yellow)}
+
+    @media (max-width: 720px){
+      .topbar{padding:12px 12px}
+      .title{font-size:28px}
+    }
+
+    /* =========================
+       ✅ CARDS (enterprise)
+    ========================= */
+    .card{
+      background: linear-gradient(180deg, var(--surface), var(--surface-2));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      box-shadow: var(--shadow);
+      margin-bottom: 14px;
       overflow:hidden;
+      position:relative;
+      padding-left: 20px;
     }
-    .tableWrap{
-      width:100%;
-      overflow:auto;
-      max-height: calc(100vh - 340px);
-      background:transparent;
+    .accentBar{
+      position:absolute;left:0;top:0;height:100%;width:10px;
+      background: var(--accent-gradient);
+      border-top-left-radius:var(--radius);border-bottom-left-radius:var(--radius);
+      box-shadow: 0 10px 22px rgba(24,79,19,.10);
+      display:block;
     }
+
+    .cardHeader{
+      display:flex;align-items:center;justify-content:flex-start;
+      gap:10px;margin-bottom:12px;position:relative;min-height:56px;padding-right:12px;
+      border-bottom:1px solid var(--border);
+      padding-bottom:14px;
+      margin-bottom:18px;
+    }
+    .cardHeader .row{ margin-left:auto; display:flex; gap:8px; align-items:center }
+
+    .cardHeader h3{
+      position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+      font-size:12px;padding:10px 18px;border-radius:14px;
+      background: linear-gradient(90deg, rgba(255,222,0,.12), rgba(46,125,50,.06));
+      color: var(--jd-green-dark);
+      font-weight:900;text-transform:uppercase;letter-spacing:.12em;
+      border:1px solid rgba(46,125,50,.12);
+      box-shadow: 0 10px 22px rgba(24,79,19,.08);
+      z-index:2;
+    }
+
+    .card > h3{
+      margin:6px auto 12px;
+      font-size:12px;padding:10px 18px;border-radius:14px;
+      background: linear-gradient(90deg, rgba(255,222,0,.10), rgba(255,222,0,.04));
+      color: var(--jd-green-dark);
+      font-weight:900;text-transform:uppercase;letter-spacing:.10em;
+      border:1px solid rgba(46,125,50,.10);
+      box-shadow: 0 10px 22px rgba(24,79,19,.08);
+      text-align:center;display:block;
+    }
+
+    @media (max-width:720px){
+      .cardHeader h3{position:static;transform:none;margin:0 auto 10px}
+      .card > h3{margin:6px 12px 12px}
+    }
+
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+
+    label{
+      font-size:12px;color:var(--muted);display:block;margin-bottom:8px;
+      font-weight:800;text-align:center;
+    }
+
+    .card .row > div,
+    .card .row-add > div{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      min-width:0;
+    }
+
+    input,select{
+      padding:10px 12px;
+      border:1px solid var(--border-strong);
+      border-radius:14px;
+      font-size:14px;
+      font-family: inherit;
+      min-width:160px;
+      background: rgba(10,16,12,.03);
+      color: var(--text);
+      outline:none;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.65);
+      height: auto;
+      line-height: 1.4;
+    }
+    input::placeholder{color:var(--muted)}
+    input:focus,select:focus{
+      border-color: rgba(24,79,19,.9);
+      box-shadow: 0 0 0 6px rgba(24,79,19,.14);
+    }
+    input[type="date"]{min-width:170px}
+
+    /* Stepper de proceso */
+    .stepper-container{
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .stepper-step{
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      user-select: none;
+      padding: 8px;
+      border-radius: 12px;
+      transition: all 0.2s ease;
+    }
+    .stepper-step:hover{
+      background: rgba(54, 124, 43, 0.08);
+      transform: scale(1.05);
+    }
+    .stepper-badge{
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #e8e8e8;
+      color: #666;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 16px;
+      border: 2px solid transparent;
+      transition: all 0.2s ease;
+    }
+    .stepper-step[data-value="SI"] .stepper-badge{
+      background: var(--jd-green);
+      color: #fff;
+      border-color: var(--jd-yellow);
+      box-shadow: 0 0 0 3px rgba(54, 124, 43, 0.2);
+    }
+    .stepper-label{
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Stepper compacto para celdas de tabla */
+    .stepper-cell {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      padding: 4px 6px;
+      border-radius: 3px;
+      transition: background-color 0.2s;
+    }
+    .stepper-cell[data-row-id] {
+      cursor: pointer;
+    }
+    .stepper-cell[data-row-id]:hover {
+      background-color: #f0f0f0;
+    }
+    .stepper-badge-cell {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background-color: #e0e0e0;
+      color: #666;
+      font-weight: 900;
+      font-size: 12px;
+      flex-shrink: 0;
+      transition: background-color 0.2s;
+    }
+    .stepper-cell[data-value="SI"] .stepper-badge-cell {
+      background-color: var(--jd-green);
+      color: white;
+    }
+    /* NO estado: gris neutro en lugar de rojo */
+    .stepper-cell[data-value="NO"] .stepper-badge-cell {
+      background-color: #bbb;
+      color: #444;
+    }
+    .stepper-connector{
+      width: 24px;
+      height: 2px;
+      background: #ddd;
+      flex-shrink: 0;
+    }
+
+    /* Semaphore for status */
+    .semaphore {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      margin: 0 auto;
+      border: 2px solid #ccc;
+    }
+    .semaphore[data-status="Realizado"] {
+      background-color: var(--jd-green);
+      border-color: var(--jd-green);
+    }
+    .semaphore[data-status="Parcial"] {
+      background-color: var(--jd-yellow);
+      border-color: var(--jd-yellow);
+    }
+    .semaphore[data-status="No realizado"] {
+      background-color: #b22222;
+      border-color: #b22222;
+    }
+
+    /* =========================
+       ✅ BUTTONS (enterprise)
+    ========================= */
+    button{
+      padding:10px 12px;
+      border:1px solid var(--border-strong);
+      background: rgba(10,16,12,.03);
+      border-radius:14px;
+      cursor:pointer;
+      transition:.12s ease;
+      font-weight:900;
+      color: var(--text);
+      box-shadow: var(--shadow2);
+    }
+    button:hover{transform: translateY(-1px)}
+    button.primary{
+      background: linear-gradient(135deg, var(--jd-green), var(--jd-green-dark));
+      border-color: rgba(15,64,18,.95);
+      color:#fff;
+      box-shadow: 0 16px 34px rgba(24,79,19,.22);
+    }
+    button.primary:hover{ transform: translateY(-2px); filter:brightness(.98) }
+    button.secondary{
+      background: linear-gradient(135deg, var(--jd-yellow), #ffd600);
+      border-color: rgba(255,222,0,.55);
+      color: #0b1a10;
+      box-shadow: 0 10px 20px rgba(255,222,0,.12);
+      font-weight:900;
+    }
+    button.secondary:hover{ filter:brightness(.98) }
+    button.danger{
+      color:#ffd7dc;border-color:#5a2731;background: rgba(176,0,32,.16);
+    }
+    button.small{
+      padding:6px 10px;
+      border-radius:10px;
+      font-size:11px;
+      box-shadow:none;
+      font-weight:800;
+      flex: 1 1 auto;
+      white-space:nowrap;
+      min-width: auto;
+      max-width: none;
+    }
+    button[disabled]{opacity:.6;cursor:not-allowed;transform:none}
+
+    .muted{color:var(--muted);font-size:12px;margin-top:8px}
+    .toast{margin-top:10px;font-size:13px;color:#2f7e2c;display:none;font-weight:900}
+    .toast.err{color:#ff2d2d}
+
+    /* =========================
+       ✅ TABLE (enterprise JD)
+    ========================= */
     table{
       width:100%;
-      min-width:1300px;
       border-collapse:separate;
-      border-spacing:0;
-      font-size:13px;
+        border-spacing:4px 12px;
+      background: transparent;
+        border:1px solid var(--border-strong);
+      border-radius: var(--radius);
+      overflow:visible;
+      box-shadow: var(--shadow);
     }
+
     thead th{
-      position:sticky;
-      top:0;
-      z-index:5;
-      background:linear-gradient(180deg, rgba(54,124,43,.90), rgba(30,90,30,.90));
-      color:#fff;
-      padding:11px 10px;
-      border-bottom:2px solid var(--yellow);
-      white-space:nowrap;
-      font-weight:800;
+      background: linear-gradient(180deg, rgba(24,79,19,.95), rgba(15,58,15,.95));
+      position:sticky;top:84px;z-index:10; /* debajo del header sticky */
       text-align:center;
+      color: rgba(255,255,255,.92);
+      border-bottom: 1px solid rgba(255,255,255,.14);
+      box-shadow: inset 0 -1px 0 rgba(255,255,255,.08);
     }
-    tbody td{
-      padding:10px 10px;
-      border-bottom:1px solid rgba(10,40,20,.08);
-      background:rgba(255,255,255,.82);
-      white-space:nowrap;
+
+    th,td{
+      border-bottom: none;
+      padding:0;
+      font-size:14px;
       vertical-align:middle;
+      white-space:nowrap;
       text-align:center;
+      font-weight:600;
+      background-clip: padding-box;
     }
-    tbody tr:nth-child(even) td{ background:rgba(248,251,253,.92); }
-    tbody tr:hover td{ background:rgba(54,124,43,.08); }
+
+    th{
+      font-size:12px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      padding:12px 10px;
+    }
+
+    tbody tr{
+      transition: background .12s ease;
+      box-shadow: 0 8px 18px rgba(10,16,12,.06);
+      border-radius:12px;
+    }
+    tbody tr td{background:transparent}
 
     .cellInner{
-      width:100%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      min-height:22px;
+      display:flex;align-items:center;justify-content:center;
+      padding:14px 10px;border-radius:12px;
+      height:48px;
+      width:100%;box-sizing:border-box;
+      font-weight:700;
+      color: var(--row-text);
+      border:1px solid rgba(24,79,19,.12);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.45), 0 6px 14px rgba(24,79,19,.04);
+      background: linear-gradient(180deg, #f1f6f0, #e8f0e6);
+    }
+    tbody tr:nth-child(odd) .cellInner{
+      background: linear-gradient(180deg, #f0f5ef, #e6eee4);
+      border-color: rgba(24,79,19,.10);
+    }
+    tbody tr:nth-child(even) .cellInner{
+      background: linear-gradient(180deg, #e4ece2, #dae5d8);
+      border-color: rgba(24,79,19,.14);
+    }
+    tbody tr:hover .cellInner{
+      background: linear-gradient(180deg, #dde8db, #d2e0cf);
+      border-color: rgba(24,79,19,.20);
     }
 
+    /* inputs dentro de celdas */
+    .cellInner .cell-input{
+      width:100%;
+      box-sizing:border-box;
+      background:#fff;
+      border:1px solid rgba(24,79,19,.16);
+      padding:6px 10px;
+      height: 36px;
+      max-height: 36px;
+      font-size: 14px;
+      font-weight: 700;
+      font-family: inherit;
+      margin: 0;
+      border-radius:10px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 6px 14px rgba(10,16,12,.05);
+      transition: border-color .12s ease, box-shadow .12s ease, transform .06s ease;
+      text-align:center;
+    }
+
+    .cellInner input.cell-input:focus,
+    .cellInner select.cell-input:focus {
+      border-color: rgba(24,79,19,.95);
+      box-shadow: 0 10px 22px rgba(24,79,19,.14);
+      outline: none;
+      transform: translateY(-1px);
+    }
+
+    /* Acciones */
+    td:last-child { min-width: 120px; }
+    td:last-child .cellInner {
+      height: 48px;
+      flex-wrap: wrap;
+      align-content: center;
+      padding: 4px 2px;
+      overflow: hidden;
+      justify-content:center;
+    }
     .actions{
       display:flex;
+      gap:6px;
+      flex-wrap:nowrap;
+      justify-content:center;
+      width: 100%;
+    }
+
+    /* enlaces adjuntos */
+    .attLinks{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center}
+    a{color:var(--jd-green);font-weight:800}
+
+    .pillX{
+      display:inline-flex;align-items:center;justify-content:center;
+      width:22px;height:22px;border-radius:999px;
+      border:1px solid rgba(161,0,26,.18);
+      background: rgba(161,0,26,.12);
+      color:#7f0014;font-weight:900;
+      cursor:pointer;
+    }
+
+    /* Botoncitos dentro de tabla */
+    button.small.secondary{
+      border-color: rgba(24,79,19,.65);
+      color: #fff;
+      background: rgba(24,79,19,.78);
+      box-shadow: 0 8px 16px rgba(24,79,19,.12);
+      font-weight: 900;
+      padding: 6px 12px;
+    }
+    button.small.secondary:hover{ background: rgba(24,79,19,.92); }
+    button.small.primary{box-shadow: 0 10px 18px rgba(24,79,19,.14)}
+    .actions button{color:#0b1a10 !important; font-weight:900}
+
+    /* tamaños */
+    .w220{min-width:220px}
+    .w200{min-width:200px}
+    .w160{min-width:160px}
+    .w140{min-width:140px}
+    .w110{min-width:110px}
+
+    .row-add{
+      display:flex;
+      flex-wrap: wrap;
+      gap:10px;
+      align-items:flex-end;
+    }
+    .row-add > div{flex:0 1 auto; min-width:0;}
+    .row-add input, .row-add select{min-width:120px;}
+    .row-add .w200{min-width:160px}
+    .row-add .w140{min-width:120px}
+    .row-add input[type="date"]{min-width:140px}
+
+    @media (max-width: 1200px){
+      .row-add > div{flex: 1 1 210px;}
+      .row-add button#addBtn{flex: 0 0 auto;}
+    }
+
+    /* =========================
+       ✅ AVISO GRANDE ARRIBO
+    ========================= */
+    .arrivalNotice{
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 9999;
+      display: none;
+      width: min(460px, calc(100vw - 32px));
+      border-radius: 18px;
+      background: #ffffff;
+      border: 3px solid var(--jd-green);
+      box-shadow: 0 18px 50px rgba(0,0,0,.22);
+      overflow: hidden;
+      animation: popIn .18s ease-out;
+    }
+    @keyframes popIn{
+      from{ transform: translateY(-6px); opacity: .7; }
+      to{ transform: translateY(0px); opacity: 1; }
+    }
+    .arrivalHeader{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:12px 14px;
+      background: linear-gradient(90deg, rgba(24,79,19,.98), rgba(15,58,15,.92));
+      color:#fff;
+      font-weight:900;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+    }
+    .arrivalHeader img{
+      width:36px;height:36px;
+      border-radius:12px;
+      background:#fff;
+      padding:4px;
+      object-fit:contain;
+    }
+    .arrivalBody{
+      padding:12px 14px 14px;
+      border-top: 6px solid var(--jd-yellow);
+      color: #071218;
+    }
+    .arrivalTitle{
+      font-size:16px;
+      font-weight:900;
+      margin:0 0 8px;
+    }
+    .arrivalBody p{
+      margin: 5px 0;
+      font-size: 14px;
+      line-height: 1.25;
+    }
+    .arrivalBody b{
+      font-weight: 900;
+      color: #000;
+    }
+    .arrivalActions{
+      margin-top: 10px;
+      display:flex;
+      justify-content:flex-end;
       gap:8px;
+    }
+    .arrivalActions button{
+      padding:8px 10px;
+      border-radius:12px;
+      border:1px solid var(--border-strong);
+      cursor:pointer;
+      font-weight:900;
+      background: rgba(0,0,0,.04);
+    }
+    .arrivalActions button.primary{
+      background: rgba(24,79,19,.92);
+      border-color: rgba(24,79,19,.92);
+      color: white;
+    }
+
+    /* =========================
+       ✅ CENTRO DE NOTIFICACIONES (campana)
+    ========================= */
+    .notifWrap{ position:relative; overflow: visible; }
+    .notifBell{
+      position:relative;
+      min-width:auto;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      font-weight:900;
+      color:#fff;
+      box-shadow: none;
+      cursor:pointer;
+    }
+    .notifBell:hover{ background: rgba(255,255,255,.10); }
+    .notifBadge{
+      position:absolute;
+      top:-6px;
+      right:-6px;
+      background: var(--jd-yellow);
+      color:#000;
+      border:2px solid rgba(255,255,255,.55);
+      min-width:22px;
+      height:22px;
+      padding:0 6px;
+      border-radius:999px;
+      font-size:12px;
+      display:inline-flex;
       align-items:center;
       justify-content:center;
+      font-weight:900;
+      box-shadow: 0 10px 20px rgba(0,0,0,.18);
     }
-    .small{
-      height:34px;
-      border-radius:10px;
-      padding:0 12px;
-      font-size:12px;
-      border:1px solid rgba(10,40,20,.14);
-      box-shadow: 0 8px 16px rgba(0,0,0,.08);
-      background:rgba(255,255,255,.92);
-    }
-    .small.primary{
-      background:linear-gradient(135deg, rgba(54,124,43,.92), rgba(54,124,43,.72));
-      color:#fff;
-      border-color:rgba(54,124,43,.35);
-    }
-    .small.danger{
-      background:rgba(180,40,40,.10);
-      border-color:rgba(180,40,40,.30);
-      color:#8a1d1d;
-    }
-
-    .cell-input{
-      height:34px;
-      border-radius:10px;
-      padding:8px 10px;
-      width:100%;
-      border:1px solid rgba(10,40,20,.14);
-      background:rgba(255,255,255,.92);
-      font-size:12px;
-    }
-
-    .footer{
-      margin-top:14px;
-      padding:12px 14px;
+    .notifPanel{
+      position:absolute;
+      top: calc(100% + 10px);
+      left: 50%;
+      transform: translateX(-50%);
+      right: auto;
+      width: min(420px, calc(100vw - 44px));
+      max-width: calc(100vw - 44px);
+      max-height: 70vh;
+      overflow:auto;
+      background:#fff;
+      border:2px solid var(--jd-green);
       border-radius:16px;
-      border:1px solid rgba(10,40,20,.10);
-      background:rgba(255,255,255,.70);
-      color:var(--muted);
-      font-size:12px;
+      box-shadow: 0 18px 50px rgba(0,0,0,.18);
+      z-index: 9998;
+    }
+
+    @media (max-width: 600px){
+      .notifPanel{
+        position:fixed;
+        top:64px;
+        left:16px;
+        right:16px;
+        transform:none;
+        width:auto;
+        max-width: calc(100vw - 32px);
+        max-height: calc(100vh - 120px);
+      }
+      thead th{ top: 80px; }
+    }
+
+    @media (min-width: 601px){
+      .notifPanel{
+        position: fixed;
+        top: 78px;
+        left: auto;
+        right: auto;
+        transform: none;
+        width: min(420px, calc(100vw - 56px));
+        max-height: calc(100vh - 120px);
+        overflow:auto;
+        z-index: 10001;
+      }
+    }
+
+    .notifHeader{
+      position:sticky;
+      top:0;
+      background: linear-gradient(90deg, rgba(24,79,19,.98), rgba(15,58,15,.90));
+      border-bottom:2px solid var(--jd-green);
+      padding:14px 16px;
       display:flex;
+      align-items:center;
       justify-content:space-between;
       gap:10px;
-      flex-wrap:wrap;
+      color: #fff;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      font-size: 13px;
+    }
+    .notifActions{ display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+    .notifItem{
+      padding:14px 16px;
+      border-bottom:1px solid var(--border);
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+      transition: all .12s ease;
+      position: relative;
+    }
+    .notifItem:last-child{ border-bottom: none; }
+    .notifMain{ flex:1 1 auto; min-width:0; }
+    .notifMain .t{
+      font-weight:900;
+      color:#000;
+      margin:0 0 6px;
+      font-size: 14px;
+      letter-spacing: .02em;
+    }
+    .notifMain .d{
+      margin:0;
+      color: var(--row-text);
+      font-size:13px;
+      line-height:1.4;
+      font-weight: 700;
+    }
+    .notifMain .meta{
+      margin-top:8px;
+      font-size:12px;
+      color: var(--muted);
+      font-weight:800;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .notifItem.unread{
+      background: linear-gradient(90deg, rgba(24,79,19,.14) 0%, rgba(24,79,19,.05) 100%);
+      border-left: 5px solid var(--jd-green);
+      padding-left: 11px;
+    }
+    .notifItem.read{
+      background: rgba(0,0,0,.02);
+      opacity: 0.92;
+    }
+    .notifCheckmark{
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--jd-green);
+      color: #fff;
+      font-weight: 900;
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
     }
 
-    @media (max-width: 900px){
-      .w110,.w140,.w160,.w200,.w220{ width:100%; }
-      .row > div{ width:100%; }
-      .primary, .secondary, .danger{ width:100%; }
-      table{ min-width:1200px; }
+    /* Botones del panel */
+    #notifCloseBtn{
+      border-color: rgba(255,255,255,.35) !important;
+      background: rgba(255,255,255,.14) !important;
+      color: #fff !important;
+      font-weight: 900 !important;
+      box-shadow: none !important;
     }
+
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+    /* ✅ Resaltado al ir a una fila desde notificaciones */
+    tr.rowHighlight .cellInner{
+      border: 2px solid var(--jd-yellow) !important;
+      box-shadow: 0 0 0 4px rgba(255,222,0,.35), 0 14px 22px rgba(10,16,12,.14) !important;
+    }
+
+    /* Footer */
+    .footer{
+      position:fixed;left:16px;bottom:12px;font-size:12px;
+      color: #0b1a10;
+      background: rgba(255,255,255,.98);
+      border:1px solid var(--border);
+      border-left:7px solid var(--jd-green);
+      padding:9px 12px;border-radius:14px;
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(6px);
+    }
+    .footer b{color:var(--jd-green)}
   </style>
 </head>
 
 <body>
-  <div class="wrap">
-    <div class="topbar">
-      <div class="titleRow">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <rect x="1" y="3" width="22" height="18" rx="2" stroke="currentColor" stroke-width="1.2" fill="#fff" />
-          <path d="M6 8h6M6 12h12M6 16h6" stroke="#367c2b" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <div class="topbar">
+    <span class="companyName">INTERAGROVIAL S.A</span>
+    <h1 class="title">
+      <span class="titleIcon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M7 4.75H17C18.2426 4.75 19.25 5.75736 19.25 7V13.25C19.25 14.4926 18.2426 15.5 17 15.5H11.3L8.15 18.35C7.41979 19.0107 6.25 18.4925 6.25 17.5068V15.5H7C5.75736 15.5 4.75 14.4926 4.75 13.25V7C4.75 5.75736 5.75736 4.75 7 4.75Z" stroke="#FFDE00" stroke-width="1.6" fill="rgba(255,255,255,0.06)"/>
+          <path d="M8.5 8.75H15.5" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M8.5 11.75H13.5" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round"/>
+          <circle cx="16.9" cy="15.9" r="3.1" fill="#FFDE00"/>
+          <path d="M16.9 14.4V16.15" stroke="#184F13" stroke-width="1.7" stroke-linecap="round"/>
+          <circle cx="16.9" cy="17.25" r="0.55" fill="#184F13"/>
         </svg>
-        <h1>Reclamos</h1>
+      </span>
+      <span class="titleText">
+        Reclamos
+        <small>Seguimiento</small>
+      </span>
+    </h1>
+
+    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+      <div class="subpill"><b>Notificaciones</b></div>
+
+      <!-- ✅ Campana notificaciones -->
+      <div class="notifWrap">
+        <button id="notifBell" class="notifBell" type="button" title="Notificaciones">
+          🔔
+          <span id="notifBadge" class="notifBadge" style="display:none;">0</span>
+        </button>
+
+        <div id="notifPanel" class="notifPanel" style="display:none;">
+          <div class="notifHeader">
+            <div><b>Notificaciones</b></div>
+            <div class="notifActions">
+              <button id="notifFilterUnread" class="small secondary" type="button" style="background: linear-gradient(135deg, #e67e22, #d35400) !important;">No leídas</button>
+              <button id="notifFilterRead" class="small secondary" type="button">Leídas</button>
+              <button id="notifCloseBtn" class="small" type="button">Cerrar</button>
+            </div>
+          </div>
+
+          <div id="notifList">
+            <div class="muted" style="padding:16px; text-align:center; font-size:14px;">Sin notificaciones por el momento</div>
+          </div>
+        </div>
       </div>
-      <div class="subpill">Estilo <b>Interagrovial</b></div>
     </div>
+  </div>
+
+  <!-- ✅ AVISO GRANDE ARRIBO/LLEGADA -->
+  <div id="arrivalNotice" class="arrivalNotice">
+    <div class="arrivalHeader">
+      <img id="arrivalLogo" alt="Logo John Deere">
+      <div>ARRIBO / LLEGADA</div>
+    </div>
+    <div class="arrivalBody">
+      <p class="arrivalTitle"><b id="arrivalTitle">✅ ARRIBO / LLEGADA CONFIRMADA</b></p>
+      <p id="arrivalLine1"></p>
+      <p id="arrivalLine2"></p>
+      <p id="arrivalLine3"></p>
+
+      <div class="arrivalActions">
+        <button id="arrivalCloseBtn">Cerrar</button>
+        <button id="arrivalOkBtn" class="primary">OK</button>
+      </div>
+    </div>
+  </div>
 
     <div class="card">
+      <div class="accentBar"></div>
       <div class="cardHeader">
         <h3>Filtros</h3>
         <div class="row" style="gap:8px">
           <button id="clearFiltersBtn" class="secondary" type="button">Limpiar filtros</button>
           <button id="importBtn" class="secondary" type="button">Importar XLSX</button>
+          <button id="exportXlsxBtn" class="secondary" type="button">Descargar XLSX</button>
         </div>
       </div>
 
@@ -343,49 +938,48 @@
     </div>
 
     <div class="card">
-      <div class="cardHeader">
-        <h3>Agregar fila</h3>
-      </div>
+      <div class="accentBar"></div>
+      <h3>Agregar fila</h3>
 
       <div class="row row-add">
         <div>
           <label>Material</label>
-          <input id="material" class="w200" placeholder="Ej: RE504836" />
+          <input id="material" class="w200" placeholder="" />
         </div>
 
         <div>
           <label>Cantidad</label>
-          <input id="cantidad" class="w140" inputmode="numeric" placeholder="Ej: 100" />
+          <input id="cantidad" class="w140" inputmode="numeric" placeholder="" />
         </div>
 
         <div>
           <label>OC</label>
-          <input id="oc" class="w140" placeholder="Ej: 12004566" />
+          <input id="oc" class="w140" placeholder="" />
         </div>
 
         <div>
           <label>Caja</label>
-          <input id="caja" class="w140" placeholder="Ej: Caja A" />
+          <input id="caja" class="w140" placeholder="" />
         </div>
 
         <div>
           <label>MONTO UNITARIO</label>
-          <input id="monto_unitario" class="w140" inputmode="decimal" placeholder="Ej 1" />
+          <input id="monto_unitario" class="w140" inputmode="decimal" placeholder="" />
         </div>
 
         <div>
           <label>MONTO TOTAL</label>
-          <input id="monto_total" class="w140" inputmode="decimal" placeholder="Ej 1" />
+          <input id="monto_total" class="w140" inputmode="decimal" placeholder="" />
         </div>
 
         <div>
           <label>FACTURA</label>
-          <input id="factura" class="w140" placeholder="Ej: 456222" />
+          <input id="factura" class="w140" placeholder="" />
         </div>
 
         <div>
           <label>Nº de reclamo</label>
-          <input id="nro_reclamo" class="w140" placeholder="Ej: R-1234" />
+          <input id="nro_reclamo" class="w140" placeholder="" />
         </div>
 
         <div>
@@ -413,6 +1007,15 @@
           <input id="unidad" class="w110" placeholder="AGRO / CONS / FORE" />
         </div>
 
+        <div>
+          <label>Estado</label>
+          <select id="estado">
+            <option value="No realizado">No realizado</option>
+            <option value="Parcial">Parcial</option>
+            <option value="Realizado">Realizado</option>
+          </select>
+        </div>
+
         <button id="addBtn" class="primary" type="button">Agregar</button>
       </div>
 
@@ -420,37 +1023,31 @@
       <div id="toast" class="toast"></div>
     </div>
 
-    <div class="card tableCard">
-      <div class="tableWrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Material</th>
-              <th>Cantidad</th>
-              <th>OC</th>
-              <th>Caja</th>
-              <th>MONTO UNITARIO</th>
-              <th>MONTO TOTAL</th>
-              <th>FACTURA</th>
-              <th>Nº de reclamo</th>
-              <th>Fecha de reclamo</th>
-              <th>Respuesta de fabrica</th>
-              <th>Fecha de respuesta</th>
-              <th>Observacion</th>
-              <th>UNIDAD</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody id="tbody"></tbody>
-        </table>
-      </div>
-    </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Material</th>
+        <th>Cantidad</th>
+        <th>OC</th>
+        <th>Caja</th>
+        <th>MONTO UNITARIO</th>
+        <th>MONTO TOTAL</th>
+        <th>FACTURA</th>
+        <th>Nº de reclamo</th>
+        <th>Fecha de reclamo</th>
+        <th>Respuesta de fabrica</th>
+        <th>Fecha de respuesta</th>
+        <th>Observacion</th>
+        <th>UNIDAD</th>
+        <th>Estado</th>
+        <th>Fecha carga</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
 
-    <div class="footer">
-      <div><b>INTERAGROVIAL S.A</b></div>
-      <div>Back-end: <code style="font-family:var(--mono)">Firebase Firestore</code></div>
-    </div>
-  </div>
+  <div class="footer"><b>INTERAGROVIAL S.A</b></div>
 
   <input id="importXls" type="file" accept=".xls,.xlsx" style="display:none" />
 
@@ -482,6 +1079,31 @@
     const msgEl = $("msg");
     const toastEl = $("toast");
     const addBtn = $("addBtn");
+
+    // ✅ John Deere logo
+    const JD_LOGO_URL = "https://upload.wikimedia.org/wikipedia/commons/2/2e/John_Deere_logo.svg";
+
+    // ✅ ARRIBO/LLEGADA UI (aviso grande)
+    const arrivalNotice = $("arrivalNotice");
+    const arrivalLogo = $("arrivalLogo");
+    const arrivalTitle = $("arrivalTitle");
+    const arrivalLine1 = $("arrivalLine1");
+    const arrivalLine2 = $("arrivalLine2");
+    const arrivalLine3 = $("arrivalLine3");
+    const arrivalCloseBtn = $("arrivalCloseBtn");
+    const arrivalOkBtn = $("arrivalOkBtn");
+    arrivalLogo.src = JD_LOGO_URL;
+
+    // ✅ Centro de notificaciones UI
+    const notifBell = $("notifBell");
+    const notifBadge = $("notifBadge");
+    const notifPanel = $("notifPanel");
+    const notifList = $("notifList");
+    const notifCloseBtn = $("notifCloseBtn");
+    const notifFilterUnread = $("notifFilterUnread");
+    const notifFilterRead = $("notifFilterRead");
+
+    let notifFilterMode = "unread"; // "unread" o "read"
 
     let editingRowId = null;
     let cache = [];
@@ -530,6 +1152,7 @@
       $("fecha_respuesta").value = "";
       $("observacion").value = "";
       $("unidad").value = "";
+      $("estado").value = "No realizado";
     }
 
     function matchesText(row, q){
@@ -537,7 +1160,8 @@
       const hay = [
         row.material, row.cantidad, row.oc, row.caja, row.monto_unitario, row.monto_total,
         row.factura, row.nro_reclamo, row.fecha_reclamo, row.respuesta_fabrica,
-        row.fecha_respuesta, row.observacion, row.unidad
+        row.fecha_respuesta, row.observacion, row.unidad, row.estado,
+        formatDateVal(row.createdAt?.toDate ? row.createdAt.toDate() : null)
       ].map(s=> (s||"").toString().toLowerCase()).join(" |");
       return hay.includes(q);
     }
@@ -667,6 +1291,7 @@
         fecha_respuesta: $("fecha_respuesta").value || "",
         observacion: $("observacion").value.trim(),
         unidad: $("unidad").value.trim(),
+        estado: $("estado").value,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       };
@@ -709,6 +1334,8 @@
             <td><div class="cellInner">${escapeHtml(formatDateVal(r.fecha_respuesta))}</div></td>
             <td><div class="cellInner">${escapeHtml(r.observacion)}</div></td>
             <td><div class="cellInner">${escapeHtml(r.unidad)}</div></td>
+            <td><div class="cellInner"><div class="semaphore" data-status="${escapeHtml(r.estado || 'No realizado')}"></div></div></td>
+            <td><div class="cellInner">${escapeHtml(formatDateVal(r.createdAt?.toDate ? r.createdAt.toDate() : null))}</div></td>
             <td>
               <div class="cellInner">
                 <div class="actions">
@@ -734,6 +1361,7 @@
       const fecha_respuesta = escapeHtml(r.fecha_respuesta||'');
       const observacion = escapeHtml(r.observacion||'');
       const unidad = escapeHtml(r.unidad||'');
+      const estado = escapeHtml(r.estado || 'No realizado');
 
       return `
         <tr data-id="${id}">
@@ -750,6 +1378,12 @@
           <td><div class="cellInner"><input class="cell-input w160" type="date" data-field="fecha_respuesta" value="${fecha_respuesta}"></div></td>
           <td><div class="cellInner"><input class="cell-input w200" data-field="observacion" value="${observacion}"></div></td>
           <td><div class="cellInner"><input class="cell-input w110" data-field="unidad" value="${unidad}"></div></td>
+          <td><div class="cellInner"><select class="cell-input" data-field="estado">
+            <option value="No realizado" ${estado === 'No realizado' ? 'selected' : ''}>No realizado</option>
+            <option value="Parcial" ${estado === 'Parcial' ? 'selected' : ''}>Parcial</option>
+            <option value="Realizado" ${estado === 'Realizado' ? 'selected' : ''}>Realizado</option>
+          </select></div></td>
+          <td><div class="cellInner">${escapeHtml(formatDateVal(r.createdAt?.toDate ? r.createdAt.toDate() : null))}</div></td>
           <td>
             <div class="cellInner">
               <div class="actions">
@@ -767,6 +1401,55 @@
       const dataToDraw = (view.length ? view : cache);
       tbody.innerHTML = dataToDraw.map(x => renderRow(x.id, x.data)).join('');
     }
+
+    function rowsForExport(){
+      const dataToExport = (view.length ? view : cache);
+
+      return dataToExport.map(x => {
+        const r = x.data;
+        const created = r.createdAt?.toDate ? r.createdAt.toDate() : null;
+
+        return {
+          "ID": x.id,
+          "Fecha carga": created ? formatDateVal(created) : "",
+          "Material": r.material || "",
+          "Cantidad": r.cantidad || "",
+          "OC": r.oc || "",
+          "Caja": r.caja || "",
+          "MONTO UNITARIO": r.monto_unitario || "",
+          "MONTO TOTAL": r.monto_total || "",
+          "FACTURA": r.factura || "",
+          "Nº de reclamo": r.nro_reclamo || "",
+          "Fecha de reclamo": formatDateVal(r.fecha_reclamo || ""),
+          "Respuesta de fabrica": r.respuesta_fabrica || "",
+          "Fecha de respuesta": formatDateVal(r.fecha_respuesta || ""),
+          "Observacion": r.observacion || "",
+          "UNIDAD": r.unidad || "",
+          "Estado": r.estado || "No realizado"
+        };
+      });
+    }
+
+    function exportXlsx(){
+      const data = rowsForExport();
+      if (!data.length){
+        alert("No hay datos para exportar.");
+        return;
+      }
+
+      const ws = XLSX.utils.json_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Datos");
+
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth()+1).padStart(2,'0');
+      const dd = String(now.getDate()).padStart(2,'0');
+      const filename = `reclamos_datos_${yyyy}-${mm}-${dd}.xlsx`;
+
+      XLSX.writeFile(wb, filename);
+    }
+    $("exportXlsxBtn").addEventListener("click", exportXlsx);
 
     // ✅ LISTEN (colección reclamos)
     const qSnap = query(collection(db, COLLECTION), orderBy('createdAt','desc'));
