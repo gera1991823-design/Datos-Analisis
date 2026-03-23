@@ -934,6 +934,15 @@
           <label>Fecha hasta</label>
           <input id="fDateTo" type="date" />
         </div>
+        <div>
+          <label>Estado</label>
+          <select id="fEstado" class="w160">
+            <option value="">Todos</option>
+            <option value="No realizado">No realizado</option>
+            <option value="Parcial">Parcial</option>
+            <option value="Realizado">Realizado</option>
+          </select>
+        </div>
       </div>
     </div>
 
@@ -1179,11 +1188,13 @@
       const q = ($("q").value||"").toString().trim().toLowerCase();
       const from = $("fDateFrom").value || "";
       const to = $("fDateTo").value || "";
+      const est = ($("fEstado").value||"").trim();
 
       view = cache.filter(x => {
         const r = x.data;
         if(!matchesText(r,q)) return false;
         if(!inDateRange(r, from, to)) return false;
+        if(est && (r.estado||"No realizado") !== est) return false;
         return true;
       });
       draw();
@@ -1192,8 +1203,9 @@
     $("q").addEventListener("input", applyFilters);
     $("fDateFrom").addEventListener("change", applyFilters);
     $("fDateTo").addEventListener("change", applyFilters);
+    $("fEstado").addEventListener("change", applyFilters);
     $("clearFiltersBtn").addEventListener("click", ()=>{
-      $("q").value = ""; $("fDateFrom").value = ""; $("fDateTo").value = "";
+      $("q").value = ""; $("fDateFrom").value = ""; $("fDateTo").value = ""; $("fEstado").value = "";
       applyFilters();
     });
 
@@ -1398,12 +1410,17 @@
     }
 
     function draw(){
-      const dataToDraw = (view.length ? view : cache);
-      tbody.innerHTML = dataToDraw.map(x => renderRow(x.id, x.data)).join('');
+      if(view.length === 0){
+        const hasFilter = ($('q').value||'').trim() || $('fDateFrom').value || $('fDateTo').value || $('fEstado').value;
+        const cols = tbody.closest('table').querySelectorAll('thead th').length || 14;
+        tbody.innerHTML = `<tr><td colspan="${cols}" style="padding:32px;text-align:center;color:#5f6b67;font-size:14px;font-weight:700;">${hasFilter ? '⚠️ Sin resultados para el filtro aplicado.' : 'Sin datos.'}</td></tr>`;
+      } else {
+        tbody.innerHTML = view.map(x => renderRow(x.id, x.data)).join('');
+      }
     }
 
     function rowsForExport(){
-      const dataToExport = (view.length ? view : cache);
+      const dataToExport = view;
 
       return dataToExport.map(x => {
         const r = x.data;
