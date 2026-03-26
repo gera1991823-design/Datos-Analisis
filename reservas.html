@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="es">
 <head>
   <meta charset="utf-8"/>
@@ -486,14 +486,14 @@
     <div class="row row-add">
       <div><label>Caja</label><input id="caja" class="w140" /></div>
       <div><label>Material</label><input id="material" class="w160" /></div>
-      <div><label>Cantidad pack</label><input id="Packing" class="w140" /></div>
-      <div><label>Cantid</label><input id="cantidad" class="w110" /></div>
+      <div><label>Cantidad pack</label><input id="cantidadPack" class="w140" /></div>
+      <div><label>Cantid</label><input id="cantid" class="w110" /></div>
       <div><label>Descripcion</label><input id="descripcion" class="w220" /></div>
       <div><label>Comentario</label><input id="comentario" class="w220" /></div>
       <div><label>O/C</label><input id="oc" class="w140" /></div>
       <div><label>Carpeta</label><input id="carpeta" class="w140" /></div>
-      <div><label>Pedido Trasla</label><input id="pedidoTraslado" class="w160" /></div>
-      <div><label>Sucurs</label><input id="sucursal" class="w110" /></div>
+      <div><label>Pedido Trasla</label><input id="pedidoTrasla" class="w160" /></div>
+      <div><label>Sucurs</label><input id="sucurs" class="w110" /></div>
       <div><label>Fecha (dd/mm/yyyy)</label><input id="fecha" class="w160" /></div>
       <div><label>Hora (hh:mm)</label><input id="horaCarga" class="w110" /></div>
       <div>
@@ -574,6 +574,7 @@
     let cache = [];
     let view = [];
     let editingRowId = null;
+    let authReadyPromise = null;
 
     function showToast(text, isError=false){
       toastEl.textContent = text;
@@ -581,6 +582,14 @@
       toastEl.style.display = "block";
       clearTimeout(showToast._t);
       showToast._t = setTimeout(() => toastEl.style.display = "none", 4000);
+    }
+
+    function getErrorMessage(err){
+      const code = err?.code || "";
+      if(code === "permission-denied") return "Firestore rechazo la operacion. Revisa autenticacion anonima o reglas del proyecto.";
+      if(code === "unauthenticated") return "No hay sesion iniciada en Firebase. Espera un momento e intenta de nuevo.";
+      if(code === "unavailable") return "Firebase no esta disponible en este momento. Intenta nuevamente.";
+      return err?.message || "Ocurrio un error inesperado.";
     }
 
     function escapeHtml(s){
@@ -609,6 +618,19 @@
       if(s === "SI" || s === "SÍ") return "SI";
       if(s === "NO") return "NO";
       return "SIN REALIZAR";
+    }
+
+    async function ensureAuth(){
+      if(auth.currentUser) return auth.currentUser;
+      if(!authReadyPromise){
+        authReadyPromise = signInAnonymously(auth)
+          .then(() => auth.currentUser)
+          .catch((err) => {
+            authReadyPromise = null;
+            throw err;
+          });
+      }
+      return authReadyPromise;
     }
 
     function matchesText(row, q){
@@ -806,6 +828,7 @@
 
       msgEl.textContent = "Guardando...";
       try{
+        await ensureAuth();
         await addDoc(collection(db, COLLECTION), {
           ...row,
           createdAt: serverTimestamp(),
@@ -815,7 +838,7 @@
         showToast("Fila agregada con exito");
       }catch(err){
         console.error(err);
-        showToast("No se pudo agregar la fila", true);
+        showToast(`No se pudo agregar la fila. ${getErrorMessage(err)}`, true);
       }finally{
         msgEl.textContent = "";
       }
@@ -854,6 +877,7 @@
 
         try{
           btn.disabled = true;
+          await ensureAuth();
           await updateDoc(doc(db, COLLECTION, id), {
             ...updated,
             updatedAt: serverTimestamp()
@@ -862,7 +886,7 @@
           showToast("Fila actualizada");
         }catch(err){
           console.error(err);
-          showToast("No se pudo guardar", true);
+          showToast(`No se pudo guardar. ${getErrorMessage(err)}`, true);
         }finally{
           btn.disabled = false;
         }
@@ -873,12 +897,13 @@
         if(!confirm("Seguro que quieres eliminar esta fila?")) return;
         try{
           btn.disabled = true;
+          await ensureAuth();
           await deleteDoc(doc(db, COLLECTION, id));
           if(editingRowId === id) editingRowId = null;
           showToast("Fila eliminada");
         }catch(err){
           console.error(err);
-          showToast("No se pudo eliminar", true);
+          showToast(`No se pudo eliminar. ${getErrorMessage(err)}`, true);
         }finally{
           btn.disabled = false;
         }
@@ -887,7 +912,7 @@
 
     async function startRealtime(){
       try{
-        await signInAnonymously(auth);
+        await ensureAuth();
       }catch(err){
         console.warn("Auth anonima fallo, se intenta igual", err);
       }
