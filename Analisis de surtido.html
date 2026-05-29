@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stock por Centro - Firebase</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <style>
+    :root{
+      --green:#184f13;
+      --green-dark:#0f3a0f;
+      --green-deep:#0b2210;
+      --green-soft:#eaf5ec;
+      --yellow:#ffde00;
+      --bg:#f3f8f4;
+      --surface:#ffffff;
+      --surface-2:#fbfffb;
+      --text:#071217;
+      --muted:#5f6b67;
+      --border:#dceadd;
+      --shadow:0 18px 48px rgba(10,16,12,.10);
+      --radius:18px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:"Inter",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+      background:radial-gradient(1200px 600px at 15% 0%,rgba(46,125,50,.06),transparent 55%),var(--bg);
+      color:var(--text);
+      padding-bottom:80px;
+    }
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:50;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding:18px 28px;
+      background:linear-gradient(180deg,#0f1b12 0%,#101f14 100%);
+      box-shadow:0 18px 50px rgba(0,0,0,.22);
+    }
+
+    .company{color:#fff;font-weight:900;font-size:14px;letter-spacing:.04em}
+    .title{margin:0;color:#fff;font-size:24px;font-weight:900;text-align:center}
+    .title span{display:inline-block;border-bottom:3px solid var(--yellow);padding-bottom:8px}
+
+    .btn{
+      border:1px solid rgba(24,79,19,.35);
+      border-radius:999px;
+      padding:11px 18px;
+      background:linear-gradient(135deg,var(--yellow),#ffd600);
+      color:#0b1a10;
+      font-weight:900;
+      cursor:pointer;
+      box-shadow:0 10px 20px rgba(255,222,0,.12);
+      transition:.15s ease;
+      white-space:nowrap;
+    }
+    .btn:hover{transform:translateY(-1px);filter:brightness(.98)}
+    .btn.primary{background:linear-gradient(135deg,var(--green),var(--green-dark));color:#fff;border-color:var(--green-dark)}
+    .btn.secondary{background:#fff;color:var(--green);border-color:rgba(24,79,19,.20);box-shadow:none}
+    .btn.danger{background:#fff4f4;color:#a02121;border-color:#f0caca;box-shadow:none}
+    .btn.small{padding:7px 10px;border-radius:12px;font-size:12px}
+
+    .container{padding:24px 28px;max-width:none;margin:0 auto}
+    .card{
+      position:relative;
+      background:linear-gradient(180deg,var(--surface),var(--surface-2));
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:22px;
+      margin-bottom:18px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:8px;background:linear-gradient(180deg,var(--green),var(--green-dark))}
+    .panel-title{
+      text-align:center;
+      background:linear-gradient(90deg,rgba(255,222,0,.10),rgba(46,125,50,.07));
+      border:1px solid rgba(46,125,50,.10);
+      border-radius:999px;
+      padding:12px 18px;
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:.14em;
+      color:var(--green-dark);
+      text-transform:uppercase;
+      margin-bottom:20px;
+    }
+
+    .grid{display:grid;grid-template-columns:1.6fr 1fr;gap:22px;align-items:stretch}
+    .filters{display:grid;grid-template-columns:repeat(4,minmax(180px,1fr));gap:14px}
+    label{display:block;margin-bottom:8px;font-size:12px;font-weight:900;color:#244c34;text-align:left}
+    input,select,textarea{
+      width:100%;
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:11px 12px;
+      background:rgba(10,16,12,.03);
+      font:inherit;
+      font-size:14px;
+      color:var(--text);
+      outline:none;
+    }
+    textarea{min-height:54px;resize:vertical}
+    input:focus,select:focus,textarea:focus{border-color:var(--green);box-shadow:0 0 0 5px rgba(24,79,19,.12);background:#fff}
+
+    .upload-box{
+      position:relative;
+      min-height:148px;
+      display:grid;
+      place-items:center;
+      text-align:center;
+      border:2px dashed rgba(24,79,19,.28);
+      border-radius:18px;
+      background:rgba(234,245,236,.7);
+      padding:22px;
+      color:#1d4f37;
+    }
+    .upload-box input{position:absolute;inset:0;opacity:0;cursor:pointer}
+    .upload-icon{font-size:30px;display:block;margin-bottom:8px}
+    .instructions{margin-top:12px;color:var(--muted);font-size:13px;line-height:1.6}
+    .status{min-height:20px;margin-top:10px;font-size:13px;color:#0f6b36;font-weight:900}
+    .status.err{color:#b00020}
+
+    .toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+    .row-count{background:rgba(24,79,19,.08);border:1px solid rgba(24,79,19,.13);color:var(--green-dark);font-weight:900;border-radius:999px;padding:9px 14px;font-size:13px}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+
+    .table-wrapper{overflow:auto;border-radius:18px;box-shadow:var(--shadow);border:1px solid var(--border);background:#fff}
+    table{width:100%;border-collapse:separate;border-spacing:0;min-width:2200px;background:#fff}
+    thead th{
+      position:sticky;top:0;z-index:5;
+      background:linear-gradient(180deg,rgba(24,79,19,.98),rgba(15,58,15,.98));
+      color:#fff;
+      padding:13px 10px;
+      text-transform:uppercase;
+      font-size:12px;
+      letter-spacing:.07em;
+      text-align:center;
+      white-space:nowrap;
+    }
+    tbody td{border-bottom:1px solid var(--border);border-right:1px solid rgba(24,79,19,.07);padding:10px;background:#fbfffb;vertical-align:middle}
+    tbody tr:nth-child(even) td{background:#eef6ef}
+    tbody tr:hover td{background:#e8f3e9}
+    tbody input,tbody select,tbody textarea{height:38px;min-width:74px;background:#fff;text-align:center;font-weight:700;padding:8px 10px}
+    tbody textarea{height:auto;min-height:46px;text-align:left;min-width:240px;font-weight:600}
+    .material-input{min-width:160px}
+    .center-select{min-width:110px;color:var(--green);font-weight:900;background:#e5f6e9}
+    .classification-select{min-width:180px}
+    .date-input{min-width:145px}
+    .comment-cell{min-width:270px}
+    .stock-input{width:70px;min-width:70px}
+    .footer{position:fixed;left:16px;bottom:12px;background:#fff;border:1px solid var(--border);border-left:7px solid var(--green);padding:9px 12px;border-radius:14px;box-shadow:0 10px 22px rgba(10,16,12,.08);font-size:12px;font-weight:800}
+    .footer b{color:var(--green)}
+
+    @media(max-width:1100px){.grid{grid-template-columns:1fr}.filters{grid-template-columns:1fr 1fr}.topbar{flex-wrap:wrap}.title{order:3;width:100%}}
+    @media(max-width:700px){.container{padding:16px}.filters{grid-template-columns:1fr}.topbar{padding:14px 16px}}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="company">INTERAGROVIAL S.A</div>
+    <h1 class="title"><span>Stock por Centro</span></h1>
+    <button id="exportBtn" class="btn" type="button">Descargar XLSX</button>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <div class="panel-title">Filtros y carga CSV</div>
+      <div class="grid">
+        <div>
+          <div class="filters">
+            <div><label>Centro</label><input id="centerFilter" type="text" placeholder="Buscar centro..."></div>
+            <div><label>Material</label><input id="materialFilter" type="text" placeholder="Buscar material..."></div>
+            <div><label>Comentario</label><input id="commentFilter" type="text" placeholder="Buscar comentario..."></div>
+            <div><label>Clasificación</label><input id="classFilter" type="text" placeholder="Buscar clasificación..."></div>
+          </div>
+        </div>
+        <div>
+          <label>Cargar archivo CSV</label>
+          <div class="upload-box">
+            <div>
+              <span class="upload-icon">⬆</span>
+              <strong>Arrastra y suelta tu archivo aquí</strong><br>
+              <span>o selecciona un archivo CSV</span>
+            </div>
+            <input id="csvFile" type="file" accept=".csv,text/csv">
+          </div>
+          <div class="instructions">
+            El sistema toma los materiales desde la segunda fila del CSV. El nombre del archivo se usa como centro. Ejemplo: <b>S004.csv</b> carga el centro <b>S004</b>.
+          </div>
+          <div id="csvStatus" class="status"></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="toolbar">
+      <div id="rowCount" class="row-count">0 filas cargadas</div>
+      <div class="actions">
+        <button id="addRowBtn" class="btn secondary" type="button">Agregar fila manual</button>
+        <button id="clearFiltersBtn" class="btn secondary" type="button">Limpiar filtros</button>
+        <button id="saveAllBtn" class="btn primary" type="button">Guardar cambios</button>
+      </div>
+    </div>
+
+    <section class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Material</th>
+            <th>Centro</th>
+            <th>Comentario</th>
+            <th>Clasificación</th>
+            <th>S001</th><th>S002</th><th>S003</th><th>S004</th><th>S005</th><th>S006</th><th>S007</th><th>S008</th><th>S009</th><th>S010</th><th>S011</th><th>S013</th><th>S014</th><th>S015</th><th>S016</th><th>S017</th><th>S018</th><th>S019</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <div class="footer"><b>INTERAGROVIAL S.A</b></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+    import {
+      getFirestore, collection, addDoc, doc, updateDoc, deleteDoc,
+      serverTimestamp, query, orderBy, onSnapshot, writeBatch
+    } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDIGkNekvGn0XrqGvDAuutCBSglod03644",
+      authDomain: "carpetas-17846.firebaseapp.com",
+      projectId: "carpetas-17846",
+      storageBucket: "carpetas-17846.firebasestorage.app",
+      messagingSenderId: "513234224676",
+      appId: "1:513234224676:web:a61b7ab9685594d1b5bab1",
+      measurementId: "G-8Z18FTM0L6"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const COLLECTION_NAME = "stock_centro";
+
+    const centers = ["S001","S002","S003","S004","S005","S006","S007","S008","S009","S010","S011","S013","S014","S015","S016","S017","S018","S019"];
+    const stockFields = [...centers];
+    const classifications = ["STKID","XDISTRI","RESERVA","TRANSFER","/TRNSF","STK+DIS","VTAESP","VTA>STKID","MANGUERA","STKMD","POP","ERR.AN","<S4","DEMPED","ERR","VTA","INGR","FLT","PENDTRF","COMPRA","+DEMAND"];
+
+    const $ = (id) => document.getElementById(id);
+    const tbody = $("tbody");
+    const statusEl = $("csvStatus");
+    let cache = [];
+    let view = [];
+
+    function todayISO(){ return new Date().toISOString().slice(0,10); }
+    function cleanFileCenter(name){ return (name || "").replace(/\.csv$/i, "").trim().toUpperCase(); }
+    function escapeHtml(s){ return String(s ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;"); }
+    function setStatus(text, isError=false){ statusEl.textContent = text; statusEl.classList.toggle("err", isError); }
+
+    function parseCsv(text){
+      const delimiter = text.includes(";") && !text.includes(",") ? ";" : ",";
+      const lines = text.replace(/\r\n/g,"\n").replace(/\r/g,"\n").split("\n");
+      return lines.map(line => {
+        const values = [];
+        let current = "";
+        let inQuotes = false;
+        for(let i=0;i<line.length;i++){
+          const char = line[i];
+          if(char === '"'){
+            if(inQuotes && line[i+1] === '"'){ current += '"'; i++; }
+            else inQuotes = !inQuotes;
+          } else if(char === delimiter && !inQuotes){
+            values.push(current.trim()); current = "";
+          } else current += char;
+        }
+        values.push(current.trim());
+        return values;
+      }).filter(row => row.some(cell => cell !== ""));
+    }
+
+    function makeOption(value, selected){ return `<option value="${escapeHtml(value)}" ${value === selected ? "selected" : ""}>${escapeHtml(value)}</option>`; }
+
+    function defaultRow(){
+      const row = { fecha: todayISO(), material:"", centro:"S001", comentario:"", clasificacion:"STKID" };
+      stockFields.forEach(f => row[f] = "");
+      return row;
+    }
+
+    function csvRow(material, centro){
+      return { ...defaultRow(), material, centro, source:"csv", createdAt: serverTimestamp(), updatedAt: serverTimestamp() };
+    }
+
+    function rowTemplate(item){
+      const id = item.id || "";
+      const r = item.data || item;
+      return `
+        <tr data-id="${escapeHtml(id)}">
+          <td><input class="date-input" type="date" data-field="fecha" value="${escapeHtml(r.fecha || todayISO())}"></td>
+          <td><input class="material-input" type="text" data-field="material" value="${escapeHtml(r.material || "")}" placeholder="Material" maxlength="30"></td>
+          <td><select class="center-select" data-field="centro">
+            ${centers.map(c => makeOption(c, r.centro || "S001")).join("")}
+            ${r.centro && !centers.includes(r.centro) ? makeOption(r.centro, r.centro) : ""}
+          </select></td>
+          <td class="comment-cell"><textarea data-field="comentario" placeholder="Comentario">${escapeHtml(r.comentario || "")}</textarea></td>
+          <td><select class="classification-select" data-field="clasificacion">
+            ${classifications.map(c => makeOption(c, r.clasificacion || "STKID")).join("")}
+            ${r.clasificacion && !classifications.includes(r.clasificacion) ? makeOption(r.clasificacion, r.clasificacion) : ""}
+          </select></td>
+          ${stockFields.map(f => `<td><input class="stock-input" type="text" data-field="${f}" value="${escapeHtml(r[f] || "")}"></td>`).join("")}
+          <td><button class="btn danger small" type="button" data-action="delete">Eliminar</button></td>
+        </tr>
+      `;
+    }
+
+    function getRowData(tr){
+      const data = {};
+      tr.querySelectorAll("[data-field]").forEach(el => data[el.dataset.field] = (el.value ?? "").toString().trim());
+      return data;
+    }
+
+    function applyFilters(){
+      const center = $("centerFilter").value.trim().toLowerCase();
+      const material = $("materialFilter").value.trim().toLowerCase();
+      const comment = $("commentFilter").value.trim().toLowerCase();
+      const cls = $("classFilter").value.trim().toLowerCase();
+      view = cache.filter(x => {
+        const r = x.data;
+        return (!center || String(r.centro || "").toLowerCase().includes(center)) &&
+               (!material || String(r.material || "").toLowerCase().includes(material)) &&
+               (!comment || String(r.comentario || "").toLowerCase().includes(comment)) &&
+               (!cls || String(r.clasificacion || "").toLowerCase().includes(cls));
+      });
+      draw();
+    }
+
+    function draw(){
+      tbody.innerHTML = view.map(rowTemplate).join("");
+      $("rowCount").textContent = `${view.length} filas cargadas`;
+    }
+
+    async function importCsv(file){
+      if(!file.name.toLowerCase().endsWith(".csv")){
+        setStatus("El archivo debe ser CSV.", true);
+        return;
+      }
+      setStatus("Cargando CSV...");
+      const text = await file.text();
+      const rows = parseCsv(text);
+      const centro = cleanFileCenter(file.name);
+      const materials = rows.slice(1).map(r => (r[0] || "").trim()).filter(Boolean);
+      if(!materials.length){
+        setStatus("No se encontraron materiales desde la segunda fila.", true);
+        return;
+      }
+
+      try{
+        const batch = writeBatch(db);
+        materials.forEach(material => {
+          const ref = doc(collection(db, COLLECTION_NAME));
+          batch.set(ref, csvRow(material, centro));
+        });
+        await batch.commit();
+        setStatus(`Cargado con éxito: ${materials.length} materiales para el centro ${centro}.`);
+        $("csvFile").value = "";
+      }catch(err){
+        console.error(err);
+        setStatus(`Error al guardar en Firebase: ${err.message || err}`, true);
+      }
+    }
+
+    async function saveAll(){
+      const rows = Array.from(tbody.querySelectorAll("tr"));
+      if(!rows.length){ alert("No hay filas para guardar."); return; }
+      const btn = $("saveAllBtn");
+      btn.disabled = true;
+      try{
+        const batch = writeBatch(db);
+        rows.forEach(tr => {
+          const id = tr.dataset.id;
+          const data = { ...getRowData(tr), updatedAt: serverTimestamp() };
+          if(id){
+            batch.update(doc(db, COLLECTION_NAME, id), data);
+          } else {
+            const ref = doc(collection(db, COLLECTION_NAME));
+            batch.set(ref, { ...data, createdAt: serverTimestamp() });
+          }
+        });
+        await batch.commit();
+        setStatus("Cambios guardados correctamente.");
+      }catch(err){
+        console.error(err);
+        setStatus(`Error al guardar cambios: ${err.message || err}`, true);
+      }finally{
+        btn.disabled = false;
+      }
+    }
+
+    function addManualRow(){
+      tbody.insertAdjacentHTML("afterbegin", rowTemplate(defaultRow()));
+      $("rowCount").textContent = `${tbody.querySelectorAll("tr").length} filas cargadas`;
+    }
+
+    async function deleteRow(tr){
+      const id = tr.dataset.id;
+      if(!confirm("¿Seguro que querés eliminar esta fila?")) return;
+      try{
+        if(id) await deleteDoc(doc(db, COLLECTION_NAME, id));
+        tr.remove();
+        setStatus("Fila eliminada.");
+      }catch(err){
+        console.error(err);
+        setStatus(`Error al eliminar: ${err.message || err}`, true);
+      }
+    }
+
+    function exportXlsx(){
+      const data = Array.from(tbody.querySelectorAll("tr")).map(tr => getRowData(tr));
+      if(!data.length){ alert("No hay datos para exportar."); return; }
+      const ws = XLSX.utils.json_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Stock por centro");
+      XLSX.writeFile(wb, `stock_por_centro_${todayISO()}.xlsx`);
+    }
+
+    ["centerFilter","materialFilter","commentFilter","classFilter"].forEach(id => $(id).addEventListener("input", applyFilters));
+    $("clearFiltersBtn").addEventListener("click", () => {
+      ["centerFilter","materialFilter","commentFilter","classFilter"].forEach(id => $(id).value = "");
+      applyFilters();
+    });
+    $("csvFile").addEventListener("change", e => { const f = e.target.files?.[0]; if(f) importCsv(f); });
+    $("saveAllBtn").addEventListener("click", saveAll);
+    $("addRowBtn").addEventListener("click", addManualRow);
+    $("exportBtn").addEventListener("click", exportXlsx);
+    tbody.addEventListener("click", e => {
+      const btn = e.target.closest("[data-action='delete']");
+      if(btn) deleteRow(btn.closest("tr"));
+    });
+
+    const qRows = query(collection(db, COLLECTION_NAME), orderBy("createdAt", "desc"));
+    onSnapshot(qRows, snap => {
+      cache = [];
+      snap.forEach(d => cache.push({ id:d.id, data:d.data() }));
+      applyFilters();
+    }, err => {
+      console.error(err);
+      setStatus(`No se pudo leer Firebase: ${err.message || err}`, true);
+    });
+  </script>
+</body>
+</html>
