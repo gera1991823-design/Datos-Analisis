@@ -134,7 +134,7 @@
     .row-count{background:rgba(24,79,19,.08);border:1px solid rgba(24,79,19,.13);color:var(--green-dark);font-weight:900;border-radius:999px;padding:9px 14px;font-size:13px}
     .actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
 
-    .table-wrapper{overflow:auto;border-radius:18px;box-shadow:var(--shadow);border:1px solid var(--border);background:#fff}
+    .table-wrapper{overflow:auto;border-radius:18px;box-shadow:var(--shadow);border:1px solid var(--border);background:#fff;max-height:50vh;min-height:220px}
     table{width:100%;border-collapse:separate;border-spacing:0;min-width:2200px;background:#fff}
     thead th{
       position:sticky;top:0;z-index:5;
@@ -150,6 +150,7 @@
     tbody td{border-bottom:1px solid var(--border);border-right:1px solid rgba(24,79,19,.07);padding:10px;background:#fbfffb;vertical-align:middle}
     tbody tr:nth-child(even) td{background:#eef6ef}
     tbody tr:hover td{background:#e8f3e9}
+    tbody tr.selected-row td{background:#d6efaf}
     tbody input,tbody select,tbody textarea{height:38px;min-width:74px;background:#fff;text-align:center;font-weight:700;padding:8px 10px}
     tbody textarea{height:auto;min-height:46px;text-align:left;min-width:240px;font-weight:600}
     .material-input{min-width:160px}
@@ -179,9 +180,10 @@
         <div>
           <div class="filters">
             <div><label>Centro</label><input id="centerFilter" type="text" placeholder="Buscar centro..."></div>
+            <div><label>Fecha</label><input id="dateFilter" type="date"></div>
             <div><label>Material</label><input id="materialFilter" type="text" placeholder="Buscar material..."></div>
             <div><label>Comentario</label><input id="commentFilter" type="text" placeholder="Buscar comentario..."></div>
-            <div><label>Clasificación</label><input id="classFilter" type="text" placeholder="Buscar clasificación..."></div>
+            <div><label>Clasificación</label><select id="classFilter"><option value="">Todas</option></select></div>
           </div>
         </div>
         <div>
@@ -206,6 +208,7 @@
       <div id="rowCount" class="row-count">0 filas cargadas</div>
       <div class="actions">
         <button id="addRowBtn" class="btn secondary" type="button">Agregar fila manual</button>
+        <button id="deleteSelectedBtn" class="btn danger" type="button">Eliminar seleccionadas</button>
         <button id="clearFiltersBtn" class="btn secondary" type="button">Limpiar filtros</button>
         <button id="saveAllBtn" class="btn primary" type="button">Guardar cambios</button>
       </div>
@@ -215,6 +218,7 @@
       <table>
         <thead>
           <tr>
+            <th><input id="selectAllRows" type="checkbox" aria-label="Seleccionar todas las filas"></th>
             <th>Fecha</th>
             <th>Material</th>
             <th>Centro</th>
@@ -254,9 +258,15 @@
 
     const centers = ["S001","S002","S003","S004","S005","S006","S007","S008","S009","S010","S011","S013","S014","S015","S016","S017","S018","S019"];
     const stockFields = [...centers];
-    const classifications = ["STKID","XDISTRI","RESERVA","TRANSFER","/TRNSF","STK+DIS","VTAESP","VTA>STKID","MANGUERA","STKMD","POP","ERR.AN","<S4","DEMPED","ERR","VTA","INGR","FLT","PENDTRF","COMPRA","+DEMAND"];
+    const classifications = ["STKID","XDISTRI","RESERVA","TRANSFER","/TRNSF","STK+DIS","VTAESP","VTA>STKID","MANGUERA","STKMD","POP","ERR.AN","<S4","DEMPED","ERR","VTA","INGR","FLT","PENDTRF","COMPRA","+DEMAND","MRKRPM];
 
     const $ = (id) => document.getElementById(id);
+    function populateClassificationFilter(){
+      const select = $("classFilter");
+      if(!select) return;
+      select.innerHTML = '<option value="">Todas</option>' + classifications.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join("");
+    }
+    populateClassificationFilter();
     const tbody = $("tbody");
     const statusEl = $("csvStatus");
     let cache = [];
@@ -296,8 +306,8 @@
       return row;
     }
 
-    function csvRow(material, centro){
-      return { ...defaultRow(), material, centro, source:"csv", createdAt: serverTimestamp(), updatedAt: serverTimestamp() };
+    function csvRow(material, centro, createdAt, csvOrder){
+      return { ...defaultRow(), material, centro, source:"csv", createdAt, updatedAt: createdAt, csvOrder };
     }
 
     function rowTemplate(item){
@@ -305,6 +315,7 @@
       const r = item.data || item;
       return `
         <tr data-id="${escapeHtml(id)}">
+          <td><input class="row-select" type="checkbox" data-action="select-row"></td>
           <td><input class="date-input" type="date" data-field="fecha" value="${escapeHtml(r.fecha || todayISO())}"></td>
           <td><input class="material-input" type="text" data-field="material" value="${escapeHtml(r.material || "")}" placeholder="Material" maxlength="30"></td>
           <td><select class="center-select" data-field="centro">
@@ -328,14 +339,39 @@
       return data;
     }
 
+    function getTimestampMs(value){
+      if(!value) return 0;
+      if(typeof value.toMillis === "function") return value.toMillis();
+      const date = new Date(value);
+      return isNaN(date.getTime()) ? 0 : date.getTime();
+    }
+
+    function setRowSelectedState(tr, selected){
+      const cb = tr.querySelector(".row-select");
+      if(!cb) return;
+      cb.checked = selected;
+      tr.classList.toggle("selected-row", selected);
+    }
+
+    function updateSelectAllState(){
+      const checkboxes = Array.from(tbody.querySelectorAll(".row-select"));
+      if(!checkboxes.length){
+        $("selectAllRows").checked = false;
+        return;
+      }
+      $("selectAllRows").checked = checkboxes.every(cb => cb.checked);
+    }
+
     function applyFilters(){
       const center = $("centerFilter").value.trim().toLowerCase();
+      const date = $("dateFilter").value;
       const material = $("materialFilter").value.trim().toLowerCase();
       const comment = $("commentFilter").value.trim().toLowerCase();
       const cls = $("classFilter").value.trim().toLowerCase();
       view = cache.filter(x => {
         const r = x.data;
         return (!center || String(r.centro || "").toLowerCase().includes(center)) &&
+               (!date || String(r.fecha || "").startsWith(date)) &&
                (!material || String(r.material || "").toLowerCase().includes(material)) &&
                (!comment || String(r.comentario || "").toLowerCase().includes(comment)) &&
                (!cls || String(r.clasificacion || "").toLowerCase().includes(cls));
@@ -346,6 +382,7 @@
     function draw(){
       tbody.innerHTML = view.map(rowTemplate).join("");
       $("rowCount").textContent = `${view.length} filas cargadas`;
+      $("selectAllRows").checked = false;
     }
 
     async function importCsv(file){
@@ -365,9 +402,10 @@
 
       try{
         const batch = writeBatch(db);
-        materials.forEach(material => {
+        const baseTime = Date.now();
+        materials.forEach((material, index) => {
           const ref = doc(collection(db, COLLECTION_NAME));
-          batch.set(ref, csvRow(material, centro));
+          batch.set(ref, csvRow(material, centro, new Date(baseTime + index), index));
         });
         await batch.commit();
         setStatus(`Cargado con éxito: ${materials.length} materiales para el centro ${centro}.`);
@@ -417,6 +455,8 @@
         if(id) await deleteDoc(doc(db, COLLECTION_NAME, id));
         tr.remove();
         setStatus("Fila eliminada.");
+        $("selectAllRows").checked = false;
+        $("rowCount").textContent = `${tbody.querySelectorAll("tr").length} filas cargadas`;
       }catch(err){
         console.error(err);
         setStatus(`Error al eliminar: ${err.message || err}`, true);
@@ -432,24 +472,73 @@
       XLSX.writeFile(wb, `stock_por_centro_${todayISO()}.xlsx`);
     }
 
-    ["centerFilter","materialFilter","commentFilter","classFilter"].forEach(id => $(id).addEventListener("input", applyFilters));
+    ["centerFilter","dateFilter","materialFilter","commentFilter","classFilter"].forEach(id => $(id).addEventListener("input", applyFilters));
     $("clearFiltersBtn").addEventListener("click", () => {
-      ["centerFilter","materialFilter","commentFilter","classFilter"].forEach(id => $(id).value = "");
+      ["centerFilter","dateFilter","materialFilter","commentFilter","classFilter"].forEach(id => $(id).value = "");
       applyFilters();
     });
     $("csvFile").addEventListener("change", e => { const f = e.target.files?.[0]; if(f) importCsv(f); });
     $("saveAllBtn").addEventListener("click", saveAll);
     $("addRowBtn").addEventListener("click", addManualRow);
+    $("deleteSelectedBtn").addEventListener("click", deleteSelectedRows);
     $("exportBtn").addEventListener("click", exportXlsx);
+    $("selectAllRows").addEventListener("change", e => {
+      const checked = e.target.checked;
+      tbody.querySelectorAll("tr").forEach(tr => setRowSelectedState(tr, checked));
+    });
+    tbody.addEventListener("change", e => {
+      if(e.target.matches(".row-select")){
+        const tr = e.target.closest("tr");
+        if(tr) tr.classList.toggle("selected-row", e.target.checked);
+        updateSelectAllState();
+      }
+    });
     tbody.addEventListener("click", e => {
       const btn = e.target.closest("[data-action='delete']");
-      if(btn) deleteRow(btn.closest("tr"));
+      if(btn) return deleteRow(btn.closest("tr"));
+      if(e.target.closest("input") || e.target.closest("select") || e.target.closest("textarea") || e.target.closest("button")) return;
+      const tr = e.target.closest("tr");
+      if(tr){
+        const cb = tr.querySelector(".row-select");
+        if(cb){
+          const selected = !cb.checked;
+          setRowSelectedState(tr, selected);
+          updateSelectAllState();
+        }
+      }
     });
 
-    const qRows = query(collection(db, COLLECTION_NAME), orderBy("createdAt", "desc"));
+    async function deleteSelectedRows(){
+      const selected = Array.from(tbody.querySelectorAll(".row-select:checked")).map(cb => cb.closest("tr")).filter(Boolean);
+      if(!selected.length){ alert("No hay filas seleccionadas."); return; }
+      if(!confirm(`¿Seguro que querés eliminar ${selected.length} fila(s) seleccionada(s)?`)) return;
+      try{
+        const deletes = selected.map(async tr => {
+          const id = tr.dataset.id;
+          if(id) await deleteDoc(doc(db, COLLECTION_NAME, id));
+          tr.remove();
+        });
+        await Promise.all(deletes);
+        $("selectAllRows").checked = false;
+        setStatus(`${selected.length} fila(s) eliminada(s).`);
+        $("rowCount").textContent = `${tbody.querySelectorAll("tr").length} filas cargadas`;
+      }catch(err){
+        console.error(err);
+        setStatus(`Error al eliminar filas seleccionadas: ${err.message || err}`, true);
+      }
+    }
+
+    const qRows = query(collection(db, COLLECTION_NAME), orderBy("createdAt", "asc"));
     onSnapshot(qRows, snap => {
-      cache = [];
-      snap.forEach(d => cache.push({ id:d.id, data:d.data() }));
+      const rows = [];
+      snap.forEach(d => rows.push({ id:d.id, data:d.data() }));
+      rows.sort((a, b) => {
+        const aOrder = a.data.csvOrder ?? Number.MAX_SAFE_INTEGER;
+        const bOrder = b.data.csvOrder ?? Number.MAX_SAFE_INTEGER;
+        if(aOrder !== bOrder) return aOrder - bOrder;
+        return getTimestampMs(a.data.createdAt) - getTimestampMs(b.data.createdAt);
+      });
+      cache = rows;
       applyFilters();
     }, err => {
       console.error(err);
