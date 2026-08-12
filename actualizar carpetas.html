@@ -486,25 +486,98 @@
     return "";
   }
   function repairOcrChars(s){
-    const a = [...String(s).toUpperCase()];
+    let out = String(s ?? "").toUpperCase();
+    // Typical OCR confusions only when a letter is surrounded by digits.
+    const map = {O:"0",Q:"0",I:"1",L:"1",S:"5",B:"8",Z:"2",G:"6"};
+    const a = [...out];
     for (let i=0;i<a.length;i++){
       const prev = a[i-1] || "";
       const next = a[i+1] || "";
-      if ((a[i] === "O" || a[i] === "Q") && /\d/.test(prev) && /\d/.test(next)) a[i] = "0";
-      if ((a[i] === "I" || a[i] === "L") && /\d/.test(prev) && /\d/.test(next)) a[i] = "1";
+      if (map[a[i]] && /\d/.test(prev) && /\d/.test(next)) a[i] = map[a[i]];
     }
     return a.join("");
   }
+
+  function compactDigitSpaces(s){
+    let out = String(s ?? "");
+    // Tesseract sometimes inserts spaces inside long invoice numbers.
+    for (let i=0;i<3;i++) out = out.replace(/(\d)\s+(?=\d)/g,"$1");
+    return out;
+  }
+
   function extractInvoiceTokens(text){
-    const clean = repairOcrChars(text).replace(/[—–_]/g,"-").replace(/\s*([/+])\s*/g,"$1");
+    const clean = compactDigitSpaces(repairOcrChars(text))
+      .replace(/[—–_]/g,"-")
+      .replace(/\s*([/+])\s*/g,"$1");
     const matches = clean.match(/D\d{5,}|\d{6,}/g) || [];
     return [...new Set(matches.map(canon).filter(Boolean))];
   }
+
   function extractDlrInvoice(text){
-    const clean = repairOcrChars(text).replace(/[—–_]/g,"-");
+    const clean = compactDigitSpaces(repairOcrChars(text)).replace(/[—–_]/g,"-");
     const m = clean.match(/\b([A-Z]?\d{3,})\s*-?\s*D[L1I]R\b/i);
     return m ? canon(m[1]) : "";
   }
+
+  function knownInvoiceSet(){
+    const set = new Set();
+    for (const row of cache){
+      for (const f of splitStoredInvoices(row.data.factura)) set.add(canon(f));
+    }
+    return set;
+  }
+
+  function reconcileInvoiceToken(raw){
+    const token = canon(raw);
+    if (!token) return "";
+    const known = knownInvoiceSet();
+    if (!known.size || known.has(token)) return token;
+
+    // Safe exact repairs: missing D, one extra edge character, or one OCR substitution.
+    const exactVariants = new Set([token]);
+    if (/^\d{5,8}$/.test(token)) exactVariants.add("D"+token);
+    if (/^0\d{5,8}$/.test(token)) exactVariants.add("D"+token.slice(1));
+    if (token.length > 6){
+      exactVariants.add(token.slice(1));
+      exactVariants.add(token.slice(0,-1));
+    }
+    for (const v of exactVariants) if (known.has(v)) return v;
+
+    const edgeMatches=[...known].filter(k=>
+      Math.abs(k.length-token.length)===1 &&
+      (k.endsWith(token)||k.startsWith(token)||token.endsWith(k)||token.startsWith(k))
+    );
+    if(edgeMatches.length===1) return edgeMatches[0];
+
+    let best = null;
+    let second = null;
+    for (const k of known){
+      if (Math.abs(k.length-token.length) > 1) continue;
+      const d = levenshtein(token,k);
+      if (!best || d < best.d){ second = best; best = {k,d}; }
+      else if (!second || d < second.d){ second = {k,d}; }
+    }
+    if (best && best.d === 1 && (!second || second.d >= 2)) return best.k;
+    return token;
+  }
+
+  function levenshtein(a,b){
+    a=String(a); b=String(b);
+    const prev=new Array(b.length+1);
+    const cur=new Array(b.length+1);
+    for (let j=0;j<=b.length;j++) prev[j]=j;
+    for (let i=1;i<=a.length;i++){
+      cur[0]=i;
+      for (let j=1;j<=b.length;j++) cur[j]=Math.min(cur[j-1]+1,prev[j]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));
+      for (let j=0;j<=b.length;j++) prev[j]=cur[j];
+    }
+    return prev[b.length];
+  }
+
+  function normalizeOcrInvoices(tokens){
+    return [...new Set(tokens.map(reconcileInvoiceToken).filter(Boolean))];
+  }
+
   function parseTextLine(line){
     const raw = String(line ?? "").trim();
     if (!raw) return [];
@@ -611,66 +684,74 @@
     return a.length%2 ? a[m] : (a[m-1]+a[m])/2;
   }
 
-  // Detecta separadores horizontales por CAMBIO DE COLOR, no por un color fijo.
-  // Funciona con fondos claros, oscuros, verdes, amarillos, grises, etc.
+  function clusterPositions(values,maxGap=3,minGap=8){
+    const clusters=[];
+    for (const v of values){
+      const last=clusters[clusters.length-1];
+      if (!last || v>last[last.length-1]+maxGap) clusters.push([v]);
+      else last.push(v);
+    }
+    return clusters
+      .map(c=>Math.round(c.reduce((a,b)=>a+b,0)/c.length))
+      .filter((v,i,a)=>i===0 || v-a[i-1]>=minGap);
+  }
+
+  // Color-independent line detection based on RGB transition energy.
   function findHorizontalLines(canvas){
     const ctx=canvas.getContext("2d",{willReadFrequently:true});
     const {width:w,height:h}=canvas;
     if (w<2 || h<2) return [];
     const data=ctx.getImageData(0,0,w,h).data;
-    const rowScores=[];
-
+    const scores=[];
+    const step=Math.max(1,Math.floor(w/1400));
     for (let y=1;y<h;y++){
-      let sum=0;
-      // Muestreo adaptativo para no volver lento el navegador en imágenes grandes.
-      const step=Math.max(1,Math.floor(w/1400));
-      let n=0;
+      let sum=0,n=0;
       for (let x=0;x<w;x+=step){
-        const i=(y*w+x)*4;
-        const j=((y-1)*w+x)*4;
-        sum+=colorDistance(data[i],data[i+1],data[i+2],data[j],data[j+1],data[j+2]);
+        const i=(y*w+x)*4,j=((y-1)*w+x)*4;
+        sum+=colorDistance(data[i],data[i+1],data[i+2],data[j],data[j+1],data[j+2]); n++;
+      }
+      scores.push(sum/Math.max(1,n));
+    }
+    const base=median(scores),mad=median(scores.map(v=>Math.abs(v-base)));
+    const threshold=base+Math.max(8,5*mad);
+    const candidates=[];
+    scores.forEach((s,i)=>{if(s>threshold)candidates.push(i+1);});
+    return clusterPositions(candidates,3,8);
+  }
+
+  function findVerticalLines(canvas,y1=0,y2=canvas.height){
+    const ctx=canvas.getContext("2d",{willReadFrequently:true});
+    const {width:w,height:h}=canvas;
+    if (w<2 || h<2) return [];
+    const data=ctx.getImageData(0,0,w,h).data;
+    const sy=Math.max(0,Math.floor(y1)),ey=Math.min(h,Math.ceil(y2));
+    const step=Math.max(1,Math.floor((ey-sy)/800));
+    const candidates=[];
+    for (let x=1;x<w;x++){
+      let hits=0,n=0;
+      for (let y=sy;y<ey;y+=step){
+        const i=(y*w+x)*4,j=(y*w+x-1)*4;
+        const d=colorDistance(data[i],data[i+1],data[i+2],data[j],data[j+1],data[j+2]);
+        if(d>18) hits++;
         n++;
       }
-      rowScores.push(sum/Math.max(1,n));
+      // A real table separator continues through most of the table height.
+      if(hits/Math.max(1,n)>.72) candidates.push(x);
     }
-
-    const base=median(rowScores);
-    const mad=median(rowScores.map(v=>Math.abs(v-base)));
-    const threshold=base + Math.max(8,5*mad);
-    const candidates=[];
-    rowScores.forEach((score,idx)=>{ if (score>threshold) candidates.push(idx+1); });
-
-    // Une los dos bordes/antialiasing de una misma línea en un solo separador.
-    const clusters=[];
-    for (const y of candidates){
-      const last=clusters[clusters.length-1];
-      if (!last || y>last[last.length-1]+3) clusters.push([y]);
-      else last.push(y);
-    }
-
-    return clusters
-      .map(c=>Math.round(c.reduce((a,b)=>a+b,0)/c.length))
-      .filter((y,i,a)=>i===0 || y-a[i-1]>=8);
+    return clusterPositions(candidates,3,12);
   }
 
   function dominantColor(data){
-    // Cuantiza RGB y toma el color que ocupa más superficie: normalmente el fondo de la celda.
     const bins=new Map();
     const step=Math.max(4,Math.floor(data.length/(4*70000)));
     for (let px=0;px<data.length/4;px+=step){
-      const i=px*4;
-      const r=data[i]>>4,g=data[i+1]>>4,b=data[i+2]>>4;
+      const i=px*4,r=data[i]>>4,g=data[i+1]>>4,b=data[i+2]>>4;
       const key=(r<<8)|(g<<4)|b;
       bins.set(key,(bins.get(key)||0)+1);
     }
     let bestKey=0,bestCount=-1;
-    for (const [key,count] of bins){
-      if (count>bestCount){bestCount=count;bestKey=key;}
-    }
-    const r=((bestKey>>8)&15)*16+8;
-    const g=((bestKey>>4)&15)*16+8;
-    const b=(bestKey&15)*16+8;
-    return {r,g,b};
+    for (const [key,count] of bins) if (count>bestCount){bestCount=count;bestKey=key;}
+    return {r:((bestKey>>8)&15)*16+8,g:((bestKey>>4)&15)*16+8,b:(bestKey&15)*16+8};
   }
 
   function otsuThresholdFromHistogram(hist,total){
@@ -678,148 +759,169 @@
     for (let i=0;i<256;i++) sum+=i*hist[i];
     let sumB=0,wB=0,maxVar=-1,threshold=0;
     for (let t=0;t<256;t++){
-      wB+=hist[t];
-      if (!wB) continue;
-      const wF=total-wB;
-      if (!wF) break;
+      wB+=hist[t]; if(!wB)continue;
+      const wF=total-wB; if(!wF)break;
       sumB+=t*hist[t];
-      const mB=sumB/wB;
-      const mF=(sum-sumB)/wF;
+      const mB=sumB/wB,mF=(sum-sumB)/wF;
       const between=wB*wF*(mB-mF)*(mB-mF);
-      if (between>maxVar){maxVar=between;threshold=t;}
+      if(between>maxVar){maxVar=between;threshold=t;}
     }
     return threshold;
   }
 
   function makeContrastMask(octx,width,height){
-    const img=octx.getImageData(0,0,width,height);
-    const d=img.data;
-    const bg=dominantColor(d);
-    const hist=new Uint32Array(256);
-    const distances=new Uint8Array(width*height);
-
-    for (let p=0;p<width*height;p++){
-      const i=p*4;
-      const dist=colorDistance(d[i],d[i+1],d[i+2],bg.r,bg.g,bg.b);
+    const img=octx.getImageData(0,0,width,height),d=img.data,bg=dominantColor(d);
+    const hist=new Uint32Array(256),distances=new Uint8Array(width*height);
+    for(let p=0;p<width*height;p++){
+      const i=p*4,dist=colorDistance(d[i],d[i+1],d[i+2],bg.r,bg.g,bg.b);
       const v=Math.max(0,Math.min(255,Math.round(dist/441.673*255)));
-      distances[p]=v;
-      hist[v]++;
+      distances[p]=v; hist[v]++;
     }
-
-    let threshold=otsuThresholdFromHistogram(hist,width*height);
-    threshold=Math.max(4,threshold);
-    let foreground=0;
-    for (let p=0;p<distances.length;p++) if (distances[p]>threshold) foreground++;
-    let ratio=foreground/Math.max(1,distances.length);
-
-    // Si el fondo no es suficientemente uniforme, usa el canal RGB/luminancia
-    // con mejor separación estadística y vuelve a dejar el texto negro sobre blanco.
-    if (ratio<0.002 || ratio>0.58){
-      const channels=[
-        p=>d[p*4],
-        p=>d[p*4+1],
-        p=>d[p*4+2],
-        p=>Math.round(.299*d[p*4]+.587*d[p*4+1]+.114*d[p*4+2])
-      ];
-      let best=null;
-      for (const getValue of channels){
-        const h=new Uint32Array(256);
-        let sum=0,sum2=0;
-        for (let p=0;p<width*height;p++){
-          const v=getValue(p); h[v]++; sum+=v; sum2+=v*v;
-        }
-        const mean=sum/(width*height);
-        const variance=sum2/(width*height)-mean*mean;
-        const t=otsuThresholdFromHistogram(h,width*height);
-        let low=0;
-        for (let v=0;v<=t;v++) low+=h[v];
-        const minorityLow=low <= (width*height-low);
-        const score=variance;
-        if (!best || score>best.score) best={getValue,t,minorityLow,score};
-      }
-      for (let p=0;p<width*height;p++){
-        const v=best.getValue(p);
-        const isForeground=best.minorityLow ? v<=best.t : v>best.t;
-        const out=isForeground?0:255;
-        const i=p*4; d[i]=d[i+1]=d[i+2]=out; d[i+3]=255;
-      }
-    } else {
-      // Fondo dominante -> blanco; todo lo que contraste con él -> negro.
-      for (let p=0;p<width*height;p++){
-        const out=distances[p]>threshold?0:255;
-        const i=p*4; d[i]=d[i+1]=d[i+2]=out; d[i+3]=255;
-      }
+    const threshold=Math.max(4,otsuThresholdFromHistogram(hist,width*height));
+    for(let p=0;p<distances.length;p++){
+      const out=distances[p]>threshold?0:255,i=p*4;
+      d[i]=d[i+1]=d[i+2]=out; d[i+3]=255;
     }
-
     octx.putImageData(img,0,0);
   }
 
-  function buildCropCanvas(sourceCanvas,y1,y2,xRatio1=0,xRatio2=1,scale=4){
+  function buildCropCanvas(sourceCanvas,y1,y2,xRatio1=0,xRatio2=1,scale=4,mode="original"){
     const pad=3;
     const sx=Math.max(0,Math.floor(sourceCanvas.width*xRatio1)+pad);
     const ex=Math.min(sourceCanvas.width,Math.ceil(sourceCanvas.width*xRatio2)-pad);
-    const sy=Math.max(0,Math.floor(y1)+2);
-    const ey=Math.min(sourceCanvas.height,Math.ceil(y2)-2);
-    const sw=Math.max(1,ex-sx);
-    const sh=Math.max(1,ey-sy);
+    const sy=Math.max(0,Math.floor(y1)+2),ey=Math.min(sourceCanvas.height,Math.ceil(y2)-2);
+    const sw=Math.max(1,ex-sx),sh=Math.max(1,ey-sy);
+    const safeScale=Math.max(1,Math.min(scale,Math.floor(3600/Math.max(1,sw))||1));
     const out=document.createElement("canvas");
-    out.width=sw*scale;
-    out.height=sh*scale;
+    out.width=sw*safeScale; out.height=sh*safeScale;
     const octx=out.getContext("2d",{willReadFrequently:true});
-    octx.imageSmoothingEnabled=false;
+    octx.imageSmoothingEnabled=true; octx.imageSmoothingQuality="high";
     octx.drawImage(sourceCanvas,sx,sy,sw,sh,0,0,out.width,out.height);
-    makeContrastMask(octx,out.width,out.height);
+    if(mode==="contrast") makeContrastMask(octx,out.width,out.height);
+    return out;
+  }
+
+  async function recognizeCanvas(worker,canvas,whitelist="",psm="7"){
+    await worker.setParameters({
+      tessedit_char_whitelist:whitelist,
+      tessedit_pageseg_mode:psm,
+      preserve_interword_spaces:"1"
+    });
+    const r=await worker.recognize(canvas);
+    return {text:r.data.text||"",confidence:Number(r.data.confidence||0)};
+  }
+
+  function scoreInvoiceCandidate(tokens,confidence=0){
+    const known=knownInvoiceSet();
+    const normalized=normalizeOcrInvoices(tokens);
+    let exact=0,valid=0;
+    for(const t of normalized){
+      if(known.has(t)) exact++;
+      if(/^D\d{5,}$/.test(t)||/^\d{6,}$/.test(t)) valid++;
+    }
+    return {tokens:normalized,score:exact*1000+valid*100+normalized.length*25+Math.max(0,confidence)};
+  }
+
+  async function bestInvoiceRead(worker,source,y1,y2,x1,x2){
+    const variants=[];
+    for(const mode of ["original","contrast"]){
+      const canvas=buildCropCanvas(source,y1,y2,x1,x2,5,mode);
+      const r=await recognizeCanvas(worker,canvas,"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/ -","7");
+      const scored=scoreInvoiceCandidate(extractInvoiceTokens(r.text),r.confidence);
+      variants.push({...scored,text:r.text});
+      if(scored.tokens.length && scored.tokens.every(t=>knownInvoiceSet().has(t))) break;
+    }
+    variants.sort((a,b)=>b.score-a.score);
+    return variants[0]||{tokens:[],score:0,text:""};
+  }
+
+  async function bestDivisionRead(worker,source,y1,y2,x1,x2){
+    const original=buildCropCanvas(source,y1,y2,x1,x2,5,"original");
+    const r1=await recognizeCanvas(worker,original,"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz. ","7");
+    let division=normalizeDivisionValue(r1.text);
+    if(division) return division;
+    const contrast=buildCropCanvas(source,y1,y2,x1,x2,5,"contrast");
+    const r2=await recognizeCanvas(worker,contrast,"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz. ","7");
+    return normalizeDivisionValue(r2.text);
+  }
+
+  function pairsFromOcrText(text){
+    const out=[];
+    for(const line of String(text||"").split(/\r?\n/)){
+      const raw=line.trim(); if(!raw)continue;
+      const division=normalizeDivisionValue(raw);
+      const dlr=extractDlrInvoice(raw);
+      const invoices=dlr?[dlr]:extractInvoiceTokens(raw);
+      normalizeOcrInvoices(invoices).forEach(invoice=>out.push({invoice,division}));
+    }
     return out;
   }
 
   async function readImagePairs(file){
     const img=await imageFromFile(file);
     const source=document.createElement("canvas");
-    source.width=img.naturalWidth||img.width;
-    source.height=img.naturalHeight||img.height;
+    source.width=img.naturalWidth||img.width; source.height=img.naturalHeight||img.height;
     source.getContext("2d").drawImage(img,0,0);
 
     const lines=findHorizontalLines(source);
     const rowRanges=[];
-    if (lines.length>=2){
-      for (let i=0;i<lines.length-1;i++) if (lines[i+1]-lines[i]>=10) rowRanges.push([lines[i],lines[i+1]]);
+    if(lines.length>=2){
+      for(let i=0;i<lines.length-1;i++) if(lines[i+1]-lines[i]>=10) rowRanges.push([lines[i],lines[i+1]]);
     }
 
     const progress=$("progress"),bar=$("progressBar");
     progress.style.display="block"; bar.style.width="2%";
     const worker=await Tesseract.createWorker("eng",1,{logger:m=>{
-      if (m.status==="recognizing text" && !rowRanges.length) bar.style.width=`${Math.max(5,Math.round((m.progress||0)*100))}%`;
+      if(m.status==="recognizing text"&&!rowRanges.length) bar.style.width=`${Math.max(5,Math.round((m.progress||0)*100))}%`;
     }});
 
     const pairs=[];
-    if (rowRanges.length>=2){
-      // Formato tabla: OCR separado de la columna izquierda y de la derecha.
-      for (let i=0;i<rowRanges.length;i++){
-        const [y1,y2]=rowRanges[i];
-        await worker.setParameters({tessedit_char_whitelist:"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/ -",tessedit_pageseg_mode:"7",preserve_interword_spaces:"1"});
-        const leftCanvas=buildCropCanvas(source,y1,y2,0,0.48,4);
-        const leftText=(await worker.recognize(leftCanvas)).data.text || "";
-        const invoices=extractInvoiceTokens(leftText);
+    try{
+      if(rowRanges.length>=2){
+        const tableTop=rowRanges[0][0],tableBottom=rowRanges[rowRanges.length-1][1];
+        const v=findVerticalLines(source,tableTop,tableBottom).filter(x=>x>source.width*.08&&x<source.width*.95);
+        let leftEnd=.48,rightStart=.68;
+        if(v.length){
+          const first=v.find(x=>x>source.width*.16&&x<source.width*.65);
+          const last=[...v].reverse().find(x=>x>source.width*.55&&x<source.width*.95);
+          if(first) leftEnd=Math.min(.60,Math.max(.22,first/source.width));
+          if(last) rightStart=Math.min(.92,Math.max(.55,last/source.width));
+        }
 
-        await worker.setParameters({tessedit_char_whitelist:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz. ",tessedit_pageseg_mode:"7",preserve_interword_spaces:"1"});
-        const rightCanvas=buildCropCanvas(source,y1,y2,0.68,1,4);
-        const rightText=(await worker.recognize(rightCanvas)).data.text || "";
-        const division=normalizeDivisionValue(rightText);
-        invoices.forEach(invoice=>pairs.push({invoice,division}));
-        bar.style.width=`${Math.round(((i+1)/rowRanges.length)*100)}%`;
+        for(let i=0;i<rowRanges.length;i++){
+          const [y1,y2]=rowRanges[i];
+          const left=await bestInvoiceRead(worker,source,y1,y2,0,leftEnd);
+          const division=await bestDivisionRead(worker,source,y1,y2,rightStart,1);
+          left.tokens.forEach(invoice=>pairs.push({invoice,division}));
+          bar.style.width=`${Math.round(((i+1)/rowRanges.length)*92)}%`;
+        }
+
+        // One full-image pass recovers text if a row crop was unusual.
+        const full=buildCropCanvas(source,0,source.height,0,1,3,"original");
+        const fullRead=await recognizeCanvas(worker,full,"","6");
+        const known=knownInvoiceSet();
+        for(const p of pairsFromOcrText(fullRead.text)){
+          const invoice=reconcileInvoiceToken(p.invoice);
+          if(known.has(invoice)) pairs.push({invoice,division:p.division});
+        }
+      }else{
+        const full=buildCropCanvas(source,0,source.height,0,1,3,"original");
+        const r1=await recognizeCanvas(worker,full,"","6");
+        pairs.push(...pairsFromOcrText(r1.text));
+        if(!pairs.length){
+          const contrast=buildCropCanvas(source,0,source.height,0,1,3,"contrast");
+          const r2=await recognizeCanvas(worker,contrast,"","6");
+          pairs.push(...pairsFromOcrText(r2.text));
+        }
       }
-    } else {
-      // Formato lista: 29945-DLR- Rep. Forestales
-      await worker.setParameters({tessedit_pageseg_mode:"6",preserve_interword_spaces:"1"});
-      const full=buildCropCanvas(source,0,source.height,0,1,3);
-      const fullText=(await worker.recognize(full)).data.text || "";
-      fullText.split(/\r?\n/).forEach(line=>parseTextLine(line).forEach(p=>pairs.push(p)));
+    }finally{
+      await worker.terminate();
     }
-    await worker.terminate();
     bar.style.width="100%";
     setTimeout(()=>{progress.style.display="none";bar.style.width="0";},500);
-    return mergePairs(pairs);
+    return mergePairs(pairs.map(p=>({invoice:reconcileInvoiceToken(p.invoice),division:p.division})));
   }
+
 
   $("readBtn").addEventListener("click",async()=>{
     if (!currentImageFile){
