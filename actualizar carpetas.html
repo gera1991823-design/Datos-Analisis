@@ -599,27 +599,161 @@
       img.src = url;
     });
   }
-  function isDark(r,g,b){ return r<105 && g<105 && b<105; }
+  function colorDistance(r1,g1,b1,r2,g2,b2){
+    const dr=r1-r2,dg=g1-g2,db=b1-b2;
+    return Math.sqrt(dr*dr+dg*dg+db*db);
+  }
+
+  function median(values){
+    if (!values.length) return 0;
+    const a=[...values].sort((x,y)=>x-y);
+    const m=Math.floor(a.length/2);
+    return a.length%2 ? a[m] : (a[m-1]+a[m])/2;
+  }
+
+  // Detecta separadores horizontales por CAMBIO DE COLOR, no por un color fijo.
+  // Funciona con fondos claros, oscuros, verdes, amarillos, grises, etc.
   function findHorizontalLines(canvas){
-    const ctx = canvas.getContext("2d",{willReadFrequently:true});
-    const {width:w,height:h} = canvas;
-    const data = ctx.getImageData(0,0,w,h).data;
-    const candidates = [];
-    for (let y=0;y<h;y++){
-      let dark=0;
-      for (let x=0;x<w;x++){
+    const ctx=canvas.getContext("2d",{willReadFrequently:true});
+    const {width:w,height:h}=canvas;
+    if (w<2 || h<2) return [];
+    const data=ctx.getImageData(0,0,w,h).data;
+    const rowScores=[];
+
+    for (let y=1;y<h;y++){
+      let sum=0;
+      // Muestreo adaptativo para no volver lento el navegador en imágenes grandes.
+      const step=Math.max(1,Math.floor(w/1400));
+      let n=0;
+      for (let x=0;x<w;x+=step){
         const i=(y*w+x)*4;
-        if (isDark(data[i],data[i+1],data[i+2])) dark++;
+        const j=((y-1)*w+x)*4;
+        sum+=colorDistance(data[i],data[i+1],data[i+2],data[j],data[j+1],data[j+2]);
+        n++;
       }
-      if (dark/w > 0.50) candidates.push(y);
+      rowScores.push(sum/Math.max(1,n));
     }
+
+    const base=median(rowScores);
+    const mad=median(rowScores.map(v=>Math.abs(v-base)));
+    const threshold=base + Math.max(8,5*mad);
+    const candidates=[];
+    rowScores.forEach((score,idx)=>{ if (score>threshold) candidates.push(idx+1); });
+
+    // Une los dos bordes/antialiasing de una misma línea en un solo separador.
     const clusters=[];
     for (const y of candidates){
       const last=clusters[clusters.length-1];
-      if (!last || y>last[last.length-1]+1) clusters.push([y]); else last.push(y);
+      if (!last || y>last[last.length-1]+3) clusters.push([y]);
+      else last.push(y);
     }
-    return clusters.map(c=>Math.round(c.reduce((a,b)=>a+b,0)/c.length));
+
+    return clusters
+      .map(c=>Math.round(c.reduce((a,b)=>a+b,0)/c.length))
+      .filter((y,i,a)=>i===0 || y-a[i-1]>=8);
   }
+
+  function dominantColor(data){
+    // Cuantiza RGB y toma el color que ocupa más superficie: normalmente el fondo de la celda.
+    const bins=new Map();
+    const step=Math.max(4,Math.floor(data.length/(4*70000)));
+    for (let px=0;px<data.length/4;px+=step){
+      const i=px*4;
+      const r=data[i]>>4,g=data[i+1]>>4,b=data[i+2]>>4;
+      const key=(r<<8)|(g<<4)|b;
+      bins.set(key,(bins.get(key)||0)+1);
+    }
+    let bestKey=0,bestCount=-1;
+    for (const [key,count] of bins){
+      if (count>bestCount){bestCount=count;bestKey=key;}
+    }
+    const r=((bestKey>>8)&15)*16+8;
+    const g=((bestKey>>4)&15)*16+8;
+    const b=(bestKey&15)*16+8;
+    return {r,g,b};
+  }
+
+  function otsuThresholdFromHistogram(hist,total){
+    let sum=0;
+    for (let i=0;i<256;i++) sum+=i*hist[i];
+    let sumB=0,wB=0,maxVar=-1,threshold=0;
+    for (let t=0;t<256;t++){
+      wB+=hist[t];
+      if (!wB) continue;
+      const wF=total-wB;
+      if (!wF) break;
+      sumB+=t*hist[t];
+      const mB=sumB/wB;
+      const mF=(sum-sumB)/wF;
+      const between=wB*wF*(mB-mF)*(mB-mF);
+      if (between>maxVar){maxVar=between;threshold=t;}
+    }
+    return threshold;
+  }
+
+  function makeContrastMask(octx,width,height){
+    const img=octx.getImageData(0,0,width,height);
+    const d=img.data;
+    const bg=dominantColor(d);
+    const hist=new Uint32Array(256);
+    const distances=new Uint8Array(width*height);
+
+    for (let p=0;p<width*height;p++){
+      const i=p*4;
+      const dist=colorDistance(d[i],d[i+1],d[i+2],bg.r,bg.g,bg.b);
+      const v=Math.max(0,Math.min(255,Math.round(dist/441.673*255)));
+      distances[p]=v;
+      hist[v]++;
+    }
+
+    let threshold=otsuThresholdFromHistogram(hist,width*height);
+    threshold=Math.max(4,threshold);
+    let foreground=0;
+    for (let p=0;p<distances.length;p++) if (distances[p]>threshold) foreground++;
+    let ratio=foreground/Math.max(1,distances.length);
+
+    // Si el fondo no es suficientemente uniforme, usa el canal RGB/luminancia
+    // con mejor separación estadística y vuelve a dejar el texto negro sobre blanco.
+    if (ratio<0.002 || ratio>0.58){
+      const channels=[
+        p=>d[p*4],
+        p=>d[p*4+1],
+        p=>d[p*4+2],
+        p=>Math.round(.299*d[p*4]+.587*d[p*4+1]+.114*d[p*4+2])
+      ];
+      let best=null;
+      for (const getValue of channels){
+        const h=new Uint32Array(256);
+        let sum=0,sum2=0;
+        for (let p=0;p<width*height;p++){
+          const v=getValue(p); h[v]++; sum+=v; sum2+=v*v;
+        }
+        const mean=sum/(width*height);
+        const variance=sum2/(width*height)-mean*mean;
+        const t=otsuThresholdFromHistogram(h,width*height);
+        let low=0;
+        for (let v=0;v<=t;v++) low+=h[v];
+        const minorityLow=low <= (width*height-low);
+        const score=variance;
+        if (!best || score>best.score) best={getValue,t,minorityLow,score};
+      }
+      for (let p=0;p<width*height;p++){
+        const v=best.getValue(p);
+        const isForeground=best.minorityLow ? v<=best.t : v>best.t;
+        const out=isForeground?0:255;
+        const i=p*4; d[i]=d[i+1]=d[i+2]=out; d[i+3]=255;
+      }
+    } else {
+      // Fondo dominante -> blanco; todo lo que contraste con él -> negro.
+      for (let p=0;p<width*height;p++){
+        const out=distances[p]>threshold?0:255;
+        const i=p*4; d[i]=d[i+1]=d[i+2]=out; d[i+3]=255;
+      }
+    }
+
+    octx.putImageData(img,0,0);
+  }
+
   function buildCropCanvas(sourceCanvas,y1,y2,xRatio1=0,xRatio2=1,scale=4){
     const pad=3;
     const sx=Math.max(0,Math.floor(sourceCanvas.width*xRatio1)+pad);
@@ -634,15 +768,7 @@
     const octx=out.getContext("2d",{willReadFrequently:true});
     octx.imageSmoothingEnabled=false;
     octx.drawImage(sourceCanvas,sx,sy,sw,sh,0,0,out.width,out.height);
-    const img=octx.getImageData(0,0,out.width,out.height);
-    const d=img.data;
-    for (let i=0;i<d.length;i+=4){
-      const r=d[i],g=d[i+1],b=d[i+2];
-      const gray=0.299*r+0.587*g+0.114*b;
-      const v=gray<175?0:255;
-      d[i]=d[i+1]=d[i+2]=v; d[i+3]=255;
-    }
-    octx.putImageData(img,0,0);
+    makeContrastMask(octx,out.width,out.height);
     return out;
   }
 
