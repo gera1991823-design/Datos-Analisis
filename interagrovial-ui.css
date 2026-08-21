@@ -1,0 +1,223 @@
+/* Interagrovial UI · sistema visual compartido */
+:root {
+  --ia-green:#2f7629;
+  --ia-green-strong:#245f21;
+  --ia-green-deep:#163d1b;
+  --ia-yellow:#ffde00;
+  --ia-bg:#f3f6f2;
+  --ia-surface:#fff;
+  --ia-soft:#f8faf7;
+  --ia-text:#18231b;
+  --ia-muted:#68746b;
+  --ia-line:#dfe6dc;
+  --ia-line-strong:#cfd9cc;
+  --ia-shadow-sm:0 4px 14px rgba(24,54,29,.06);
+  --ia-shadow:0 14px 38px rgba(24,54,29,.09);
+  --ia-shadow-lg:0 22px 60px rgba(15,46,23,.14);
+  --ia-radius:16px;
+  --ia-radius-lg:22px;
+}
+
+*{scrollbar-color:#b7c7b4 transparent;scrollbar-width:thin}
+*::-webkit-scrollbar{width:10px;height:10px}
+*::-webkit-scrollbar-track{background:transparent}
+*::-webkit-scrollbar-thumb{border:2px solid transparent;border-radius:999px;background:#b7c7b4;background-clip:padding-box}
+
+body.enterprise-ui{
+  --green:var(--ia-green);
+  --green-dark:var(--ia-green-deep);
+  --green-deep:#102d16;
+  --green-mid:var(--ia-green-strong);
+  --green-soft:#edf5eb;
+  --brand:var(--ia-green);
+  --brand-2:var(--ia-green-deep);
+  --brand-3:var(--ia-green-strong);
+  --jd-green:var(--ia-green);
+  --jd-green-dark:var(--ia-green-deep);
+  --jd-green-900:#102d16;
+  --jd-green-800:#19461f;
+  --jd-green-light:#4b9144;
+  --yellow:var(--ia-yellow);
+  --jd-yellow:var(--ia-yellow);
+  --bg:var(--ia-bg);
+  --surface:var(--ia-surface);
+  --surface-2:var(--ia-soft);
+  --surface-alt:var(--ia-soft);
+  --text:var(--ia-text);
+  --muted:var(--ia-muted);
+  --border:var(--ia-line);
+  --border-strong:var(--ia-line-strong);
+  --line:var(--ia-line);
+  --line-strong:var(--ia-line-strong);
+  --shadow:var(--ia-shadow-sm);
+  --shadow2:var(--ia-shadow-sm);
+  color:var(--ia-text);
+  background:radial-gradient(circle at 4% 0%,rgba(54,124,43,.08),transparent 25rem),linear-gradient(180deg,#f8faf7 0,var(--ia-bg) 28rem)
+}
+
+body.enterprise-ui :focus-visible{outline:3px solid rgba(255,222,0,.9);outline-offset:2px}
+body.enterprise-ui button,
+body.enterprise-ui input,
+body.enterprise-ui select,
+body.enterprise-ui textarea{font-family:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif}
+
+body.enterprise-ui input:not([type="checkbox"]):not([type="radio"]),
+body.enterprise-ui select,
+body.enterprise-ui textarea{
+  border-color:var(--ia-line-strong);
+  background-color:#fff;
+  color:var(--ia-text);
+  box-shadow:inset 0 1px 2px rgba(20,45,25,.025)
+}
+
+body.enterprise-ui input:not([type="checkbox"]):not([type="radio"]):hover,
+body.enterprise-ui select:hover,
+body.enterprise-ui textarea:hover{border-color:#aebda9}
+
+body.enterprise-ui input:not([type="checkbox"]):not([type="radio"]):focus,
+body.enterprise-ui select:focus,
+body.enterprise-ui textarea:focus{border-color:var(--ia-green);box-shadow:0 0 0 4px rgba(54,124,43,.12);outline:none}
+
+body.enterprise-ui label{color:#425047;font-weight:750;letter-spacing:.005em;text-align:left}
+body.enterprise-ui button{font-weight:750;letter-spacing:-.005em}
+
+body.enterprise-ui button.primary,
+body.enterprise-ui .btn.primary{
+  color:#fff;
+  border-color:var(--ia-green-strong);
+  background:linear-gradient(135deg,var(--ia-green),var(--ia-green-strong));
+  box-shadow:0 8px 18px rgba(47,118,41,.2)
+}
+
+body.enterprise-ui button.secondary,
+body.enterprise-ui .btn.secondary,
+body.enterprise-ui button.ghost,
+body.enterprise-ui .btn.ghost{color:var(--ia-green-deep);border-color:var(--ia-line-strong);background:#fff;box-shadow:var(--ia-shadow-sm)}
+
+body.enterprise-ui button:hover:not(:disabled),
+body.enterprise-ui .btn:hover:not(:disabled){transform:translateY(-1px);filter:none;box-shadow:0 10px 22px rgba(29,74,31,.14)}
+body.enterprise-ui button:active:not(:disabled),body.enterprise-ui .btn:active:not(:disabled){transform:translateY(0)}
+body.enterprise-ui button:disabled,body.enterprise-ui .btn:disabled{cursor:not-allowed;opacity:.52}
+
+body.enterprise-ui .card,
+body.enterprise-ui .tableCard,
+body.enterprise-ui .table-wrapper{border-color:var(--ia-line);background:rgba(255,255,255,.98);box-shadow:var(--ia-shadow-sm)}
+body.enterprise-ui .toast{border-radius:12px;box-shadow:var(--ia-shadow-lg)}
+
+/* Acceso al portal desde cada herramienta */
+.suite-home{min-height:40px;display:inline-flex;align-items:center;gap:9px;flex:0 0 auto;padding:0 13px;border:1px solid rgba(255,255,255,.16);border-radius:11px;color:#fff;background:rgba(255,255,255,.08);font-size:11px;font-weight:800;text-decoration:none;transition:background .15s ease,transform .15s ease}
+.suite-home:hover{color:#fff;background:rgba(255,255,255,.15);transform:translateY(-1px)}
+.suite-home svg{width:17px;height:17px}
+.suite-nav-home{text-decoration:none}
+
+/* Portal principal */
+body.page-portal{min-height:100vh;background:radial-gradient(circle at 10% -5%,rgba(54,124,43,.15),transparent 28rem),linear-gradient(180deg,#f8faf7,#eef3ec)}
+body.page-portal .header{position:sticky;top:0;z-index:30;background:linear-gradient(105deg,#143b1b 0%,#245f21 55%,#2f7629 100%);border-bottom:3px solid var(--ia-yellow);box-shadow:0 8px 28px rgba(13,50,21,.2)}
+body.page-portal .header-inner{width:min(1480px,calc(100% - 48px));min-height:82px}
+body.page-portal .logo-wrap{width:236px;height:52px;padding:5px 9px;border-radius:10px;box-shadow:0 5px 16px rgba(0,0,0,.18)}
+body.page-portal .header-copy strong{font-size:14px}
+body.page-portal .header-copy span{color:rgba(255,255,255,.68)}
+body.page-portal .main,body.page-portal .footer{width:min(1480px,calc(100% - 48px))}
+body.page-portal .main{padding:32px 0 42px}
+
+body.page-portal .intro{position:relative;align-items:center;overflow:hidden;min-height:152px;margin-bottom:20px;padding:30px 32px;border:1px solid var(--ia-line);border-left:6px solid var(--ia-green);border-radius:var(--ia-radius-lg);background:linear-gradient(105deg,rgba(255,255,255,.98),rgba(241,247,239,.96));box-shadow:var(--ia-shadow)}
+body.page-portal .intro::after{content:"";position:absolute;width:230px;height:230px;right:12%;top:-145px;border:36px solid rgba(54,124,43,.055);border-radius:50%;pointer-events:none}
+body.page-portal .intro small{margin-bottom:10px;color:var(--ia-green-strong);font-size:10px;letter-spacing:.13em}
+body.page-portal .intro h1{color:#17231a;font-size:clamp(32px,4vw,46px);letter-spacing:-.045em}
+body.page-portal .apps-count{z-index:1;min-height:38px;display:inline-flex;align-items:center;padding:0 14px;border-color:#cbd9c7;color:var(--ia-green-deep);background:rgba(255,255,255,.86);box-shadow:var(--ia-shadow-sm)}
+body.page-portal .grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+body.page-portal .card{min-height:216px;padding:22px;border:1px solid var(--ia-line);border-left:4px solid var(--module);border-top:1px solid var(--ia-line);border-radius:var(--ia-radius);background:linear-gradient(150deg,#fff 0 72%,var(--module-soft) 100%);box-shadow:var(--ia-shadow-sm)}
+body.page-portal .card.carpetas{border-left-color:#d1b800}
+body.page-portal .card:hover{transform:translateY(-4px);border-color:var(--module-border);box-shadow:var(--ia-shadow)}
+body.page-portal .icon{width:54px;height:54px;border-radius:13px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.55)}
+body.page-portal .icon svg{width:27px;height:27px}
+body.page-portal .code{padding:6px 9px;border:1px solid var(--ia-line);border-radius:999px;color:#7b877d;background:rgba(255,255,255,.7);font-size:9px}
+body.page-portal .card h2{margin-top:19px;color:#1b281e;font-size:20px;letter-spacing:-.03em}
+body.page-portal .module-line{width:42px;height:3px;margin-top:11px}
+body.page-portal .card-action{padding-top:22px}
+body.page-portal .tag{min-height:27px;font-size:8px}
+body.page-portal .enter{font-size:11px}
+body.page-portal .enter-icon{width:34px;height:34px;border-radius:10px}
+body.page-portal .footer{padding-bottom:24px;font-size:10px}
+
+/* Aplicaciones con barra lateral */
+body.page-carpetas,body.page-reservas,body.page-facturas{--sidebar:236px;--sidebar-w:236px;--topbar:68px;--topbar-h:68px}
+body.page-carpetas.navCollapsed,body.page-reservas.navCollapsed{--sidebar:76px}
+body.page-carpetas .sidebar,body.page-reservas .sidebar,body.page-facturas .sidebar{background:radial-gradient(circle at 12% 0%,rgba(255,222,0,.13),transparent 15rem),linear-gradient(180deg,#1f5b25 0%,#17491e 45%,#102f16 100%);border-right-color:rgba(255,255,255,.1);box-shadow:10px 0 28px rgba(16,48,22,.09)}
+body.page-carpetas .topbar,body.page-reservas .topbar,body.page-facturas .app-topbar{background:linear-gradient(105deg,#173f1c,#2f7629);border-bottom:3px solid var(--ia-yellow);box-shadow:0 7px 22px rgba(15,46,21,.14)}
+body.page-carpetas .sideNav,body.page-reservas .sideNav,body.page-facturas .side-nav{gap:5px}
+body.page-carpetas .navItem,body.page-reservas .navItem,body.page-facturas .nav-item{min-height:44px;border-radius:10px;color:rgba(255,255,255,.76)}
+body.page-carpetas .navItem.active,body.page-reservas .navItem.active,body.page-facturas .nav-item.active{color:#fff;background:rgba(255,255,255,.12);box-shadow:inset 3px 0 0 var(--ia-yellow)}
+body.page-carpetas .suite-nav-home,body.page-reservas .suite-nav-home,body.page-facturas .suite-nav-home{margin-bottom:8px;color:#fff;background:rgba(0,0,0,.08);border:1px solid rgba(255,255,255,.08)}
+body.page-carpetas .suite-nav-home svg,body.page-reservas .suite-nav-home svg{color:var(--ia-yellow)}
+body.page-facturas .content,body.page-carpetas .appMain,body.page-reservas .appMain{max-width:1700px}
+body.page-carpetas .appMain,body.page-reservas .appMain{padding-top:calc(var(--topbar) + 24px)}
+body.page-facturas .content{padding-top:26px}
+
+body.page-carpetas .pageHeader,body.page-reservas .pageHeader,body.page-facturas .page-head{padding:22px 24px;border:1px solid var(--ia-line);border-radius:var(--ia-radius);background:linear-gradient(110deg,#fff,#f3f8f1);box-shadow:var(--ia-shadow-sm)}
+body.page-carpetas .pageHeader h1,body.page-reservas .pageHeader h1,body.page-facturas .page-head h1{color:#17241a;font-size:28px;font-weight:800}
+body.page-carpetas .pageHeader p,body.page-reservas .pageHeader p{color:var(--ia-muted);font-size:12px}
+body.page-carpetas .statsGrid{gap:12px}
+body.page-carpetas .statCard{min-height:88px;border-radius:14px;background:#fff;box-shadow:var(--ia-shadow-sm)}
+body.page-carpetas .card,body.page-reservas .card,body.page-facturas .card,body.page-carpetas .tableCard,body.page-reservas .tableCard{border-radius:var(--ia-radius);box-shadow:var(--ia-shadow-sm)}
+body.page-carpetas .sectionHead,body.page-reservas .sectionHead,body.page-carpetas .tableHead,body.page-reservas .tableHead,body.page-facturas .card h2{background:linear-gradient(90deg,#fbfcfa,#f3f7f1)}
+body.page-carpetas .cardBody,body.page-reservas .cardBody{padding-top:20px;padding-bottom:20px}
+
+body.page-carpetas input:not([type="checkbox"]):not([type="radio"]),body.page-carpetas select,
+body.page-reservas input:not([type="checkbox"]):not([type="radio"]),body.page-reservas select,
+body.page-facturas input:not([type="checkbox"]):not([type="radio"]),body.page-facturas select{min-height:42px;border-radius:10px}
+body.page-carpetas .primary,body.page-reservas .primary,body.page-facturas .primary,
+body.page-carpetas .secondary,body.page-reservas .secondary,body.page-facturas .secondary,
+body.page-carpetas .ghost,body.page-facturas .ghost{min-height:42px;border-radius:10px}
+body.page-carpetas .tableWrap,body.page-reservas .tableWrap,body.page-facturas .table-wrap{border-top:1px solid var(--ia-line);background:#fff}
+body.page-carpetas thead th,body.page-reservas thead th,body.page-facturas thead th{background:#1f5726;color:#fff;border-color:rgba(255,255,255,.12);font-size:10px;letter-spacing:.035em}
+body.page-carpetas tbody tr:hover td,body.page-reservas tbody tr:hover td,body.page-facturas tbody tr:hover td{background:#f0f7ed}
+
+/* Aplicaciones operativas sin barra lateral */
+body.page-stock,body.page-reclamos,body.page-solicitudes{min-height:100vh;margin:0;padding:0 24px 82px}
+body.page-stock .topbar,body.page-reclamos .topbar,body.page-solicitudes .topbar{min-height:74px;margin:0 -24px 24px;padding:12px 24px;border:0;border-bottom:3px solid var(--ia-yellow);border-radius:0;background:linear-gradient(105deg,#163d1b,#2f7629);box-shadow:0 8px 28px rgba(14,47,20,.18)}
+body.page-stock .company,body.page-reclamos .companyName{color:rgba(255,255,255,.8);font-size:11px;letter-spacing:.08em}
+body.page-stock .title,body.page-reclamos .title,body.page-solicitudes .title{position:static;transform:none;order:initial;width:auto;margin:0 auto;padding:0;color:#fff;background:transparent;border:0;box-shadow:none;font-size:25px;letter-spacing:-.025em}
+body.page-stock .title span{border-bottom:0;padding-bottom:0}
+body.page-reclamos .title::after{display:none}
+body.page-reclamos .titleIcon{width:42px;height:42px;border-radius:11px}
+body.page-reclamos .titleIcon svg{width:23px;height:23px}
+body.page-reclamos .titleText small{margin-top:5px;font-size:9px}
+body.page-stock .container{padding:0;max-width:1700px}
+body.page-stock .card,body.page-reclamos .card,body.page-solicitudes .card{border:1px solid var(--ia-line);border-radius:var(--ia-radius);background:#fff;box-shadow:var(--ia-shadow-sm)}
+body.page-stock .card::before,body.page-reclamos .accentBar,body.page-solicitudes .accentBar{width:5px;background:var(--ia-green)}
+body.page-stock .panel-title,body.page-reclamos .card h3,body.page-solicitudes .card h3,body.page-reclamos .cardHeader h3,body.page-solicitudes .cardHeader h3{color:var(--ia-green-deep);background:#f1f7ef;border-color:#dce9d9;box-shadow:none}
+
+body.page-stock input:not([type="checkbox"]),body.page-stock select,body.page-stock textarea,
+body.page-reclamos input:not([type="checkbox"]),body.page-reclamos select,body.page-reclamos textarea,
+body.page-solicitudes input:not([type="checkbox"]),body.page-solicitudes select,body.page-solicitudes textarea{min-height:43px;border-radius:10px}
+body.page-stock .btn,body.page-reclamos button,body.page-solicitudes button{min-height:42px;border-radius:10px}
+body.page-stock .upload-box{border-radius:14px;background:#f3f8f1}
+body.page-stock .table-wrapper,body.page-reclamos>table,body.page-solicitudes>table{border:1px solid var(--ia-line);border-radius:var(--ia-radius);background:#fff;box-shadow:var(--ia-shadow-sm)}
+body.page-reclamos>table,body.page-solicitudes>table{width:100%;max-height:calc(100vh - 190px);overflow:auto}
+body.page-stock thead th,body.page-reclamos thead th,body.page-solicitudes thead th{background:#1f5726;color:#fff;border-color:rgba(255,255,255,.12);font-size:10px;letter-spacing:.035em}
+body.page-stock tbody tr:nth-child(even) td,body.page-reclamos tbody tr:nth-child(even) td,body.page-solicitudes tbody tr:nth-child(even) td{background:#f8faf7}
+body.page-stock tbody tr:hover td,body.page-reclamos tbody tr:hover td,body.page-solicitudes tbody tr:hover td{background:#eef6eb}
+body.page-stock .footer,body.page-reclamos .footer,body.page-solicitudes .footer{left:24px;bottom:16px;border:1px solid var(--ia-line);border-left:4px solid var(--ia-green);border-radius:10px;box-shadow:var(--ia-shadow-sm)}
+
+@media(max-width:1200px){body.page-portal .grid{grid-template-columns:repeat(2,minmax(0,1fr))}body.page-facturas{--sidebar-w:76px}}
+@media(max-width:980px){body.page-carpetas,body.page-reservas,body.page-facturas{--sidebar:236px;--sidebar-w:236px}body.page-carpetas .pageHeader,body.page-reservas .pageHeader,body.page-facturas .page-head{padding:19px}}
+
+@media(max-width:720px){
+  body.page-portal .header-inner,body.page-portal .main,body.page-portal .footer{width:calc(100% - 28px)}
+  body.page-portal .header-inner{min-height:72px}
+  body.page-portal .logo-wrap{width:194px;height:47px}
+  body.page-portal .main{padding-top:20px}
+  body.page-portal .intro{min-height:0;padding:24px 20px}
+  body.page-portal .intro h1{font-size:31px}
+  body.page-portal .grid{grid-template-columns:1fr;gap:12px}
+  body.page-portal .card{min-height:198px;padding:19px}
+  body.page-stock,body.page-reclamos,body.page-solicitudes{padding-right:14px;padding-left:14px}
+  body.page-stock .topbar,body.page-reclamos .topbar,body.page-solicitudes .topbar{min-height:66px;margin-right:-14px;margin-left:-14px;padding:10px 14px}
+  body.page-stock .title,body.page-reclamos .title,body.page-solicitudes .title{font-size:20px}
+  body.page-reclamos .titleIcon{display:none}
+  .suite-home span{display:none}
+  .suite-home{width:40px;justify-content:center;padding:0}
+}
+
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
