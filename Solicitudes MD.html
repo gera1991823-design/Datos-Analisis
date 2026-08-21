@@ -432,13 +432,18 @@
       color: var(--jd-green)
     }
   </style>
+  <link rel="stylesheet" href="interagrovial-ui.css">
 </head>
 
-<body>
+<body class="enterprise-ui page-solicitudes">
   <div class="topbar">
+    <a class="suite-home" href="index.html" aria-label="Volver al inicio">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m4 11 8-7 8 7"/><path d="M6.5 10v10h11V10M10 20v-6h4v6"/></svg>
+      <span>Inicio</span>
+    </a>
     <h1 class="title">Solicitudes</h1>
     <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-      <div class="subpill"><b>Firebase</b> · Firestore</div>
+      <div class="subpill"><b>Datos</b> · sincronizados</div>
     </div>
   </div>
 
@@ -479,7 +484,7 @@
           <option value="">(Todas)</option>
           <option value="Solicitar">Solicitar</option>
           <option value="No solicitar">No solicitar</option>
-          <option value="Solicitar camion">Solicitar camionr</option>
+          <option value="Solicitar camion">Solicitar camión</option>
           
         </select>
       </div>
