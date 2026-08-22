@@ -1942,3 +1942,202 @@ body.page-carpetas #tableSection .emptyRow td{position:static!important;width:au
   body.page-carpetas #tableSection tbody td:nth-child(1),
   body.page-carpetas #tableSection tbody td:nth-child(7){position:static;box-shadow:none}
 }
+
+/* ================================================================
+   CARPETAS · CONTRASTE ENTRE BUSQUEDA Y ALTA
+   ================================================================ */
+
+body.page-carpetas #filtersSection.modernFilters{
+  border:0;
+  background:
+    radial-gradient(circle at 96% -18%,rgba(255,222,0,.20),transparent 18rem),
+    linear-gradient(135deg,var(--ia-green-800),var(--ia-green-950));
+  box-shadow:0 20px 48px rgba(10,40,16,.19)
+}
+
+body.page-carpetas #filtersSection.modernFilters::after{
+  left:0;
+  width:100%;
+  height:4px;
+  border-radius:0;
+  background:linear-gradient(90deg,var(--ia-yellow) 0 14%,rgba(255,222,0,.18) 14% 100%);
+  box-shadow:none
+}
+
+body.page-carpetas #filtersSection.modernFilters .cardHeader{
+  min-height:76px;
+  padding:0 22px;
+  border-bottom:1px solid rgba(255,255,255,.10);
+  color:#fff;
+  background:transparent
+}
+
+body.page-carpetas #filtersSection.modernFilters .sectionIcon{
+  width:38px;
+  height:38px;
+  flex-basis:38px;
+  border:1px solid rgba(255,255,255,.22);
+  border-radius:11px;
+  color:var(--ia-green-950);
+  background:var(--ia-yellow);
+  box-shadow:0 8px 17px rgba(0,0,0,.14)
+}
+
+body.page-carpetas #filtersSection.modernFilters .sectionTitle{color:#fff;font-size:14px;letter-spacing:-.015em}
+body.page-carpetas #filtersSection.modernFilters .sectionSubtitle{margin-top:4px;color:rgba(255,255,255,.58);font-size:9px}
+
+body.page-carpetas #filtersSection.modernFilters .sectionMeta{
+  min-height:29px;
+  border-color:rgba(255,222,0,.25);
+  color:var(--ia-yellow);
+  background:
+    radial-gradient(circle at 13px 50%,var(--ia-yellow) 0 3px,rgba(255,222,0,.18) 3.5px 6px,transparent 6.5px),
+    rgba(255,222,0,.08)
+}
+
+body.page-carpetas #filtersSection.modernFilters .filtersBody{padding:17px 20px 18px;background:transparent}
+
+body.page-carpetas #filtersSection.modernFilters .filterField{
+  padding:9px;
+  border:1px solid rgba(255,255,255,.13);
+  background:rgba(255,255,255,.065);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.055)
+}
+
+body.page-carpetas #filtersSection.modernFilters .filterField:focus-within{
+  border-color:rgba(255,222,0,.55);
+  background:rgba(255,255,255,.11);
+  box-shadow:0 0 0 3px rgba(255,222,0,.10),0 10px 22px rgba(0,0,0,.10)
+}
+
+body.page-carpetas #filtersSection.modernFilters label{color:rgba(255,255,255,.64);font-size:7.5px}
+
+body.page-carpetas #filtersSection.modernFilters input:not([type="checkbox"]):not([type="radio"]),
+body.page-carpetas #filtersSection.modernFilters select{
+  min-height:41px;
+  border-color:rgba(255,255,255,.24);
+  color:#223027;
+  background-color:rgba(255,255,255,.97);
+  font-size:10px;
+  box-shadow:0 5px 12px rgba(0,0,0,.09)
+}
+
+body.page-carpetas #filtersSection.modernFilters input:focus,
+body.page-carpetas #filtersSection.modernFilters select:focus{border-color:var(--ia-yellow);box-shadow:0 0 0 3px rgba(255,222,0,.18)}
+
+body.page-carpetas #filtersSection.modernFilters .filterHelper{
+  border:1px solid rgba(255,255,255,.10);
+  color:rgba(255,255,255,.57);
+  background:rgba(0,0,0,.10)
+}
+
+body.page-carpetas #filtersSection.modernFilters .filterHelper svg{color:var(--ia-yellow)}
+body.page-carpetas #filtersSection.modernFilters .filterHelper b{color:var(--ia-yellow)}
+
+body.page-carpetas #addSection .statusSection{
+  border:1px solid #e4d990;
+  background:
+    radial-gradient(circle at 105% -12%,rgba(255,222,0,.24),transparent 11rem),
+    linear-gradient(145deg,#fffdf1,#f7f8ef);
+  box-shadow:0 7px 18px rgba(83,73,7,.06)
+}
+
+body.page-carpetas #addSection .statusSection .workspaceStep{
+  color:var(--ia-yellow);
+  background:var(--ia-green-900);
+  box-shadow:none
+}
+
+body.page-carpetas #addSection .statusSectionHead strong{color:#2f3b33}
+body.page-carpetas #addSection .statusSectionHead span{color:#7a7763}
+body.page-carpetas #addSection .statusGrid label{color:#625d3d}
+
+body.page-carpetas #addSection .statusGrid select{
+  border-color:#d8d4b1;
+  color:#28352d;
+  background-color:#fff;
+  box-shadow:0 2px 7px rgba(83,73,7,.05)
+}
+
+body.page-carpetas #addSection .statusGrid select:focus{border-color:var(--ia-green);box-shadow:0 0 0 3px rgba(54,124,43,.10)}
+
+/* Estado operativo: lectura en dos niveles, sin SI/NO visuales. */
+body.page-carpetas #tableSection .processGrid{gap:7px}
+
+body.page-carpetas #tableSection .statusBadge{
+  min-height:39px;
+  gap:8px;
+  padding:5px 8px 5px 6px;
+  border-radius:10px;
+  background:#fff;
+  box-shadow:0 2px 7px rgba(20,49,24,.035)
+}
+
+body.page-carpetas #tableSection .statusBadge.yes{border-color:#c4dfc8;color:#17603a;background:#f4faf6}
+body.page-carpetas #tableSection .statusBadge.no{border-color:#e4dba9;color:#655900;background:#fffdf3}
+body.page-carpetas #tableSection .statusBadge.empty{border-color:#dde4df;color:#77827a;background:#f8faf9}
+
+body.page-carpetas #tableSection .statusSymbol{
+  width:22px;
+  height:22px;
+  flex-basis:22px;
+  border-radius:7px
+}
+
+body.page-carpetas #tableSection .statusCopy{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:1px;
+  line-height:1.05
+}
+
+body.page-carpetas #tableSection .statusCopy small{
+  color:#7b867e;
+  font-size:6px;
+  font-weight:800;
+  letter-spacing:.065em;
+  text-transform:uppercase
+}
+
+body.page-carpetas #tableSection .statusCopy strong{
+  overflow:hidden;
+  max-width:100%;
+  color:currentColor;
+  font-size:8px;
+  font-weight:800;
+  text-overflow:ellipsis;
+  white-space:nowrap
+}
+
+body.page-carpetas #tableSection .status-llegada{
+  min-height:42px;
+  border-left-width:3px
+}
+
+@keyframes ia-saving-spin{to{transform:rotate(360deg)}}
+
+body.page-carpetas #tableSection .editActions button.isSaving{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  color:#fff;
+  background:var(--ia-green-700)
+}
+
+body.page-carpetas #tableSection .editActions button.isSaving::before{
+  content:"";
+  width:12px;
+  height:12px;
+  border:2px solid rgba(255,255,255,.42);
+  border-top-color:#fff;
+  border-radius:50%;
+  animation:ia-saving-spin .7s linear infinite
+}
+
+@media(max-width:720px){
+  body.page-carpetas #filtersSection.modernFilters .cardHeader{min-height:69px;padding:0 15px}
+  body.page-carpetas #filtersSection.modernFilters .filtersBody{padding:14px}
+}
