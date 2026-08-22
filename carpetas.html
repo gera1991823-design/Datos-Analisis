@@ -833,47 +833,47 @@
       <div class="cardBody filtersBody">
         <div class="filterRowWrap" aria-label="Filtros de búsqueda">
           <div class="filtersSingleRow">
-            <div class="filterField filterSearch">
+            <div class="filterField filterSearch filterIcon-search">
               <label>Buscar en cualquier campo</label>
               <input id="q" class="w220" placeholder="Factura, carpeta, transporte, DUA..." />
             </div>
-            <div class="filterField">
+            <div class="filterField filterIcon-order">
               <label>Orden de compra</label>
               <input id="fOC" class="w160" placeholder="Ej. 45001234" />
             </div>
-            <div class="filterField">
+            <div class="filterField filterIcon-division">
               <label>División</label>
               <select id="fDivision"><option value="">(Todas)</option></select>
             </div>
-            <div class="filterField">
+            <div class="filterField filterIcon-conditions">
               <label>Condiciones</label>
               <select id="fCond">
                 <option value="">Todos los estados</option><option value="__EMPTY__">Sin información</option><option value="SI">Cumplidas</option><option value="NO">Pendientes</option>
               </select>
             </div>
-            <div class="filterField">
+            <div class="filterField filterIcon-wis">
               <label>WIS</label>
               <select id="fWis">
                 <option value="">Todos los estados</option><option value="__EMPTY__">Sin información</option><option value="SI">Completado</option><option value="NO">Pendiente</option>
               </select>
             </div>
-            <div class="filterField">
+            <div class="filterField filterIcon-folder">
               <label>Cierre de carpeta</label>
               <select id="fCierre">
                 <option value="">Todos los estados</option><option value="__EMPTY__">Sin información</option><option value="SI">Cerrada</option><option value="NO">Abierta</option>
               </select>
             </div>
-            <div class="filterField">
+            <div class="filterField filterIcon-arrival">
               <label>Confirmación llegada</label>
               <select id="fConfirmacionLlegada">
                 <option value="">Todos los estados</option><option value="__EMPTY__">Sin información</option><option value="SI">Confirmada</option><option value="NO">Sin confirmar</option>
               </select>
             </div>
-            <div class="filterField filterDate">
+            <div class="filterField filterDate filterIcon-calendar">
               <label>Fecha estimada UY</label>
               <input id="fFechaRange" type="text" placeholder="DD/MM/YYYY - DD/MM/YYYY" />
             </div>
-            <div class="filterField filterDate">
+            <div class="filterField filterDate filterIcon-calendar">
               <label>Fecha depósito</label>
               <input id="fDepositoRange" type="text" placeholder="DD/MM/YYYY - DD/MM/YYYY" />
             </div>
@@ -1684,8 +1684,12 @@
       mode: "range",
       dateFormat: "d/m/Y",
       allowInput: true,
+      disableMobile: true,
+      monthSelectorType: "dropdown",
+      showMonths: 1,
+      position: "auto",
       onChange: function(selectedDates, dateStr){
-        if (dateStr) $("fFechaRange").value = dateStr.replace(" to ", " - ");
+        if (dateStr) $("fFechaRange").value = dateStr.replace(" to ", " - ").replace(" a ", " - ");
         applyFilters();
       }
     });
@@ -1694,18 +1698,12 @@
       mode: "range",
       dateFormat: "d/m/Y",
       allowInput: true,
+      disableMobile: true,
+      monthSelectorType: "dropdown",
+      showMonths: 1,
+      position: "auto",
       onChange: function(selectedDates, dateStr){
-        if (dateStr) $("fDepositoRange").value = dateStr.replace(" to ", " - ");
-        applyFilters();
-      }
-    });
-
-    flatpickr("#fDepositoRange", {
-      mode: "range",
-      dateFormat: "d/m/Y",
-      allowInput: true,
-      onChange: function(selectedDates, dateStr){
-        if (dateStr) $("fDepositoRange").value = dateStr.replace(" to ", " - ");
+        if (dateStr) $("fDepositoRange").value = dateStr.replace(" to ", " - ").replace(" a ", " - ");
         applyFilters();
       }
     });
