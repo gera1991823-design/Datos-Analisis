@@ -1118,17 +1118,17 @@
     function statusBadge(v, type="generic"){
       const value = (v ?? "").toString().trim().toUpperCase();
       const labels = {
-        wis: { SI:"WIS completado", NO:"WIS pendiente" },
-        distribuido: { SI:"Distribuido", NO:"Sin distribuir" },
-        cierre: { SI:"Carpeta cerrada", NO:"Carpeta abierta" },
-        cond: { SI:"Condiciones OK", NO:"Condiciones pendientes" },
-        llegada: { SI:"Llegada confirmada", NO:"Sin confirmar" },
-        generic: { SI:"Completado", NO:"Pendiente" }
+        wis: { name:"WIS", SI:"Completado", NO:"Pendiente" },
+        distribuido: { name:"Distribución", SI:"Distribuido", NO:"Sin distribuir" },
+        cierre: { name:"Carpeta", SI:"Cerrada", NO:"Abierta" },
+        cond: { name:"Condiciones", SI:"Cumplidas", NO:"Pendientes" },
+        llegada: { name:"Llegada", SI:"Confirmada", NO:"Sin confirmar" },
+        generic: { name:"Estado", SI:"Completado", NO:"Pendiente" }
       };
-      if (value !== "SI" && value !== "NO") return `<span class="statusBadge empty"><span class="statusSymbol">—</span><span>Sin datos</span></span>`;
+      const copy = labels[type] || labels.generic;
+      if (value !== "SI" && value !== "NO") return `<span class="statusBadge empty"><span class="statusSymbol">—</span><span class="statusCopy"><small>${copy.name}</small><strong>Sin datos</strong></span></span>`;
       const state = value === "SI" ? "yes" : "no";
-      const label = labels[type]?.[value] || labels.generic[value];
-      return `<span class="statusBadge ${state} status-${type}"><span class="statusSymbol">${value === "SI" ? "✓" : "○"}</span><span>${label}</span></span>`;
+      return `<span class="statusBadge ${state} status-${type}"><span class="statusSymbol">${value === "SI" ? "✓" : "○"}</span><span class="statusCopy"><small>${copy.name}</small><strong>${copy[value]}</strong></span></span>`;
     }
     function uid(){ return (crypto?.randomUUID ? crypto.randomUUID() : `${Date.now()}_${Math.random().toString(16).slice(2)}`); }
     function norm(s){ return (s ?? "").toString().trim().toLowerCase(); }
@@ -2264,6 +2264,8 @@
       }
 
       if (action === "save") {
+        if (btn.dataset.saving === "true") return;
+
         const fields = tr.querySelectorAll("[data-field]");
         const updated = {};
         fields.forEach(el => updated[el.dataset.field] = (el.value ?? "").toString().trim());
@@ -2275,7 +2277,10 @@
         updated.confirmacion_llegada = safeYesNo(updated.confirmacion_llegada);
 
         try {
+          btn.dataset.saving = "true";
           btn.disabled = true;
+          btn.classList.add("isSaving");
+          btn.textContent = "Guardando…";
 
           const beforeSnap = await getDoc(doc(db, "rows", id));
           const beforeData = beforeSnap.exists() ? beforeSnap.data() : null;
@@ -2284,6 +2289,12 @@
 
           await updateDoc(doc(db, "rows", id), { ...updated, updatedAt: serverTimestamp() });
 
+          const cachedRow = cache.find(x => x.id === id);
+          if (cachedRow) cachedRow.data = { ...cachedRow.data, ...updated };
+          editingRowId = null;
+          applyFilters();
+          showToast("Cambios guardados correctamente");
+
           await logAudit("update", id, beforeData, {
             ...(beforeData || {}),
             ...updated,
@@ -2291,28 +2302,34 @@
           });
 
           if (beforeVal !== "SI" && afterVal === "SI") {
-            const merged = { ...(beforeData || {}), ...updated };
-            await createNotificationForArrival(id, merged);
+            try {
+              const merged = { ...(beforeData || {}), ...updated };
+              await createNotificationForArrival(id, merged);
 
-            beep();
-            await browserNotifyArribo(merged);
+              beep();
+              await browserNotifyArribo(merged);
 
-            if (!document.hidden) {
-              showArrivalNotice(merged);
-            } else {
-              startTitleBlink();
-              showToast("🚜 ARRIBO/LLEGADA confirmada (ver pestaña)", false);
+              if (!document.hidden) {
+                showArrivalNotice(merged);
+              } else {
+                startTitleBlink();
+                showToast("🚜 ARRIBO/LLEGADA confirmada (ver pestaña)", false);
+              }
+            } catch (notificationError) {
+              console.warn("El registro se guardó, pero no se pudo generar el aviso de llegada:", notificationError);
             }
           }
-
-          editingRowId = null;
-          showToast("Modificado con éxito");
         } catch (err) {
           console.error(err);
           showToast(`Error: ${errText(err)}`, true);
           alert(errText(err));
         } finally {
-          btn.disabled = false;
+          if (btn.isConnected) {
+            btn.disabled = false;
+            btn.classList.remove("isSaving");
+            btn.dataset.saving = "false";
+            btn.textContent = "Guardar";
+          }
         }
         return;
       }
