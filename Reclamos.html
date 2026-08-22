@@ -4,7 +4,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Reclamos - Interagrovial</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- flatpickr range picker -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css">
@@ -841,11 +841,25 @@
     }
     .footer b{color:var(--jd-green)}
   </style>
+  <link rel="stylesheet" href="interagrovial-ui.css">
 </head>
 
-<body>
+<body class="enterprise-ui page-reclamos">
+  <aside class="suiteRail" aria-label="Navegación principal">
+    <a class="suiteRailBrand" href="index.html"><span class="suiteRailMark">IA</span><span><strong>INTERAGROVIAL</strong><small>Suite operativa</small></span></a>
+    <div class="suiteRailLabel">Navegación</div>
+    <nav>
+      <a class="suiteRailItem" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m4 11 8-7 8 7"/><path d="M6.5 10v10h11V10M10 20v-6h4v6"/></svg><span>Inicio</span></a>
+      <div class="suiteRailItem active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3 3.5 19h17L12 3Z"/><path d="M12 9v4"/><path d="M12 16h.01"/></svg><span>Reclamos</span></div>
+    </nav>
+    <div class="suiteRailSpace"></div>
+    <div class="suiteRailStatus"><span></span>Datos sincronizados</div>
+  </aside>
   <div class="topbar">
-    <span class="companyName">INTERAGROVIAL S.A</span>
+    <a class="suite-home" href="index.html" aria-label="Volver al inicio">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m4 11 8-7 8 7"/><path d="M6.5 10v10h11V10M10 20v-6h4v6"/></svg>
+      <span>Inicio</span>
+    </a>
     <h1 class="title">
       <span class="titleIcon" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -910,10 +924,10 @@
     </div>
   </div>
 
-    <div class="card">
+    <div class="card modernFilters">
       <div class="accentBar"></div>
       <div class="cardHeader">
-        <h3>Filtros</h3>
+        <h3>Filtros de búsqueda</h3>
         <div class="row" style="gap:8px">
           <button id="clearFiltersBtn" class="secondary" type="button">Limpiar filtros</button>
           <button id="importBtn" class="secondary" type="button">Importar XLSX</button>
@@ -922,7 +936,7 @@
       </div>
 
       <div class="row">
-        <div>
+        <div class="filterSearch">
           <label>Buscar (cualquier campo)</label>
           <input id="q" class="w220" placeholder="Ej: texto, factura, n° reclamo" />
         </div>

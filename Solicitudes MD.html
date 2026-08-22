@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Solicitudes - Interagrovial</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <style>
@@ -432,29 +432,44 @@
       color: var(--jd-green)
     }
   </style>
+  <link rel="stylesheet" href="interagrovial-ui.css">
 </head>
 
-<body>
+<body class="enterprise-ui page-solicitudes">
+  <aside class="suiteRail" aria-label="Navegación principal">
+    <a class="suiteRailBrand" href="index.html"><span class="suiteRailMark">IA</span><span><strong>INTERAGROVIAL</strong><small>Suite operativa</small></span></a>
+    <div class="suiteRailLabel">Navegación</div>
+    <nav>
+      <a class="suiteRailItem" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m4 11 8-7 8 7"/><path d="M6.5 10v10h11V10M10 20v-6h4v6"/></svg><span>Inicio</span></a>
+      <div class="suiteRailItem active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="6" y="4" width="12" height="16" rx="2"/><path d="M9 9h6M9 13h6M9 17h4"/></svg><span>Solicitudes MD</span></div>
+    </nav>
+    <div class="suiteRailSpace"></div>
+    <div class="suiteRailStatus"><span></span>Datos sincronizados</div>
+  </aside>
   <div class="topbar">
+    <a class="suite-home" href="index.html" aria-label="Volver al inicio">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m4 11 8-7 8 7"/><path d="M6.5 10v10h11V10M10 20v-6h4v6"/></svg>
+      <span>Inicio</span>
+    </a>
     <h1 class="title">Solicitudes</h1>
     <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-      <div class="subpill"><b>Firebase</b> · Firestore</div>
+      <div class="subpill"><b>Datos</b> · sincronizados</div>
     </div>
   </div>
 
   <!-- FILTROS -->
-  <div class="card">
+  <div class="card modernFilters">
     <div class="accentBar"></div>
     <div class="cardHeader">
-      <h3>Filtros</h3>
+      <h3>Filtros de búsqueda</h3>
       <div class="row" style="gap:8px">
-        <button id="clearFiltersBtn" class="secondary" type="button">Limpiar</button>
+        <button id="clearFiltersBtn" class="secondary" type="button">Limpiar filtros</button>
         <button id="exportXlsxBtn" class="secondary" type="button">Descargar XLSX</button>
       </div>
     </div>
 
     <div class="row">
-      <div>
+      <div class="filterSearch">
         <label>Buscar (cualquier campo)</label>
         <input id="q" class="w220" placeholder="Ej: RE504836 / S001 / Solicitar..." />
       </div>
@@ -479,7 +494,7 @@
           <option value="">(Todas)</option>
           <option value="Solicitar">Solicitar</option>
           <option value="No solicitar">No solicitar</option>
-          <option value="Solicitar camion">Solicitar camionr</option>
+          <option value="Solicitar camion">Solicitar camión</option>
           
         </select>
       </div>
