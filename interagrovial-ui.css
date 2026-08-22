@@ -1138,3 +1138,500 @@ body.page-facturas .captureSearch #dbStatus{border-radius:10px;font-size:10px}
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+
+/* ================================================================
+   CARPETAS · MESA OPERATIVA 2026
+   Rediseño específico del alta y la grilla de registros.
+   ================================================================ */
+
+body.page-carpetas #addSection{
+  position:relative;
+  overflow:hidden;
+  border:1px solid #d6e1d3;
+  border-top:0;
+  border-radius:20px;
+  background:#fff;
+  box-shadow:0 18px 46px rgba(20,49,24,.09)
+}
+
+body.page-carpetas #addSection::after{
+  content:"";
+  position:absolute;
+  z-index:5;
+  inset:0 0 auto;
+  height:4px;
+  background:linear-gradient(90deg,var(--ia-yellow) 0 8%,var(--ia-green) 8% 100%)
+}
+
+body.page-carpetas #addSection .sectionHead{
+  min-height:72px;
+  padding:0 22px;
+  border-bottom:1px solid #e1e8df;
+  background:linear-gradient(90deg,#fff 0%,#fbfcfa 66%,#f1f6ef 100%)
+}
+
+body.page-carpetas #addSection .sectionIcon{
+  width:38px;
+  height:38px;
+  flex-basis:38px;
+  border:1px solid #cfe0cb;
+  border-radius:11px;
+  color:var(--ia-green-800);
+  background:#eaf4e7;
+  box-shadow:inset 0 1px 0 #fff
+}
+
+body.page-carpetas #addSection .sectionIcon svg{width:18px;height:18px}
+body.page-carpetas #addSection .sectionTitle{color:var(--ia-ink);font-size:14px;letter-spacing:-.015em}
+body.page-carpetas #addSection .sectionSubtitle{margin-top:4px;color:var(--ia-muted);font-size:9px}
+body.page-carpetas #addSection .sectionMeta{
+  min-height:29px;
+  display:inline-flex;
+  align-items:center;
+  padding:0 11px;
+  border:1px solid #d3e3cf;
+  border-radius:999px;
+  color:var(--ia-green-800);
+  background:#eef6eb;
+  font-size:8px;
+  font-weight:800;
+  letter-spacing:.055em;
+  text-transform:uppercase
+}
+
+body.page-carpetas #addSection .cardBody{padding:16px;background:#f6f8f5}
+
+body.page-carpetas #addSection .addWorkspace{
+  display:grid;
+  grid-template-columns:minmax(0,1.65fr) minmax(350px,.55fr);
+  gap:14px;
+  align-items:stretch
+}
+
+body.page-carpetas #addSection .primaryDataPanel{
+  min-width:0;
+  padding:16px;
+  border:1px solid #dde5da;
+  border-radius:16px;
+  background:#fff;
+  box-shadow:0 6px 18px rgba(20,49,24,.045)
+}
+
+body.page-carpetas #addSection .workspaceEyebrow,
+body.page-carpetas #addSection .statusSectionHead{
+  min-height:38px;
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  gap:10px;
+  margin:0 0 13px
+}
+
+body.page-carpetas #addSection .workspaceStep{
+  width:32px;
+  height:32px;
+  display:grid;
+  place-items:center;
+  flex:0 0 32px;
+  border-radius:10px;
+  color:var(--ia-yellow);
+  background:var(--ia-green-900);
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:.04em
+}
+
+body.page-carpetas #addSection .workspaceEyebrow strong,
+body.page-carpetas #addSection .statusSectionHead strong{display:block;color:var(--ia-ink);font-size:11px;font-weight:800}
+
+body.page-carpetas #addSection .workspaceEyebrow span:not(.workspaceStep),
+body.page-carpetas #addSection .statusSectionHead span{display:block;margin-top:2px;color:#79847c;font-size:8.5px;font-weight:550}
+
+body.page-carpetas #addSection .formGrid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:9px;
+  padding:0;
+  border:0;
+  border-radius:0;
+  background:transparent
+}
+
+body.page-carpetas #addSection .formGrid>div{
+  min-width:0;
+  padding:9px;
+  border:1px solid #e1e8df;
+  border-radius:12px;
+  background:#f8faf7;
+  transition:border-color .16s ease,background .16s ease,box-shadow .16s ease,transform .16s ease
+}
+
+body.page-carpetas #addSection .formGrid>div:focus-within{
+  border-color:#a7c4a1;
+  background:#fff;
+  box-shadow:0 0 0 3px rgba(54,124,43,.08),0 7px 16px rgba(20,49,24,.05);
+  transform:translateY(-1px)
+}
+
+body.page-carpetas #addSection label{
+  margin-bottom:6px;
+  color:#59665d;
+  font-size:8px;
+  font-weight:800;
+  letter-spacing:.065em;
+  text-transform:uppercase
+}
+
+body.page-carpetas #addSection .formGrid input{
+  min-height:40px;
+  border-color:#d2ddd0;
+  border-radius:9px;
+  color:#223027;
+  background:#fff;
+  font-size:10.5px;
+  font-weight:650;
+  box-shadow:0 1px 2px rgba(20,49,24,.025)
+}
+
+body.page-carpetas #addSection .statusSection{
+  min-width:0;
+  margin:0;
+  padding:16px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:16px;
+  background:
+    radial-gradient(circle at 102% -8%,rgba(255,222,0,.20),transparent 11rem),
+    linear-gradient(145deg,var(--ia-green-800),var(--ia-green-950));
+  box-shadow:0 12px 28px rgba(10,40,16,.18)
+}
+
+body.page-carpetas #addSection .statusSection .workspaceStep{
+  color:var(--ia-green-950);
+  background:var(--ia-yellow);
+  box-shadow:0 5px 12px rgba(0,0,0,.12)
+}
+
+body.page-carpetas #addSection .statusSectionHead strong{color:#fff}
+body.page-carpetas #addSection .statusSectionHead span{color:rgba(255,255,255,.54)}
+
+body.page-carpetas #addSection .statusGrid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:9px
+}
+
+body.page-carpetas #addSection .statusGrid>div:last-child{grid-column:1/-1}
+body.page-carpetas #addSection .statusGrid label{color:rgba(255,255,255,.68);font-size:7.5px}
+
+body.page-carpetas #addSection .statusGrid select{
+  min-height:40px;
+  appearance:none;
+  padding-right:34px;
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:9px;
+  color:var(--ia-green-950);
+  background-color:#fff;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23286522' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m7 10 5 5 5-5'/%3E%3C/svg%3E");
+  background-position:right 10px center;
+  background-repeat:no-repeat;
+  background-size:14px;
+  font-size:10px;
+  font-weight:750;
+  box-shadow:0 4px 10px rgba(0,0,0,.09)
+}
+
+body.page-carpetas #addSection .statusGrid select:focus{
+  border-color:var(--ia-yellow);
+  box-shadow:0 0 0 3px rgba(255,222,0,.20)
+}
+
+body.page-carpetas #addSection .formActions{
+  min-height:64px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  margin-top:12px;
+  padding:10px 11px 10px 15px;
+  border:1px solid #dde5da;
+  border-radius:14px;
+  background:#fff
+}
+
+body.page-carpetas #addSection .formActionCopy{min-width:0}
+body.page-carpetas #addSection .formActionCopy #msg:empty{display:none}
+body.page-carpetas #addSection .formActionCopy strong{display:block;color:#344139;font-size:10px;font-weight:800}
+body.page-carpetas #addSection .formActionCopy span{display:block;margin-top:2px;color:#7a857d;font-size:8.5px}
+
+body.page-carpetas #addSection .formActions #addBtn{
+  min-width:178px;
+  min-height:43px;
+  justify-content:center;
+  border-color:#e2c700;
+  border-radius:11px;
+  color:var(--ia-green-950);
+  background:var(--ia-yellow);
+  box-shadow:0 9px 20px rgba(110,94,0,.16)
+}
+
+body.page-carpetas #addSection .formActions #addBtn:hover{background:#ffe62e;box-shadow:0 12px 24px rgba(110,94,0,.20)}
+
+body.page-carpetas #tableSection{
+  overflow:hidden;
+  border:1px solid #d4dfd1;
+  border-radius:20px;
+  background:#fff;
+  box-shadow:0 18px 46px rgba(20,49,24,.10)
+}
+
+body.page-carpetas #tableSection .tableHead{
+  min-height:76px;
+  padding:0 20px;
+  border-top:4px solid var(--ia-green);
+  border-bottom:1px solid #dce5d9;
+  background:linear-gradient(90deg,#fff 0%,#fbfcfa 62%,#eff5ed 100%)
+}
+
+body.page-carpetas #tableSection .sectionIcon{
+  width:38px;
+  height:38px;
+  flex-basis:38px;
+  border:1px solid #cfe0cb;
+  border-radius:11px;
+  color:var(--ia-green-800);
+  background:#eaf4e7
+}
+
+body.page-carpetas #tableSection .sectionTitle{font-size:14px;letter-spacing:-.015em}
+body.page-carpetas #tableSection .sectionSubtitle{margin-top:4px;font-size:9px}
+
+body.page-carpetas #tableSection .tableToolbar{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  color:inherit
+}
+
+body.page-carpetas #tableSection .tableLive{
+  min-height:29px;
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  padding:0 10px;
+  border:1px solid #d5e4d1;
+  border-radius:999px;
+  color:var(--ia-green-800);
+  background:#f3f8f1;
+  font-size:8px;
+  font-weight:750
+}
+
+body.page-carpetas #tableSection .tableLive>span{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#45a961;
+  box-shadow:0 0 0 4px rgba(69,169,97,.12)
+}
+
+body.page-carpetas #tableSection .resultCounter{
+  min-height:38px;
+  display:flex;
+  align-items:center;
+  gap:7px;
+  padding:0 12px;
+  border:1px solid #d5dfd2;
+  border-radius:11px;
+  background:#fff;
+  box-shadow:0 3px 10px rgba(20,49,24,.04)
+}
+
+body.page-carpetas #tableSection .resultCounter strong{color:var(--ia-green-800);font-size:15px;font-weight:800;line-height:1}
+body.page-carpetas #tableSection .resultCounter span{color:#77827a;font-size:8px;font-weight:650}
+
+body.page-carpetas #tableSection .tableWrap{
+  width:100%;
+  max-height:68vh;
+  overflow:auto;
+  border:0;
+  background:#fff;
+  scrollbar-color:#91a38e #edf1eb
+}
+
+body.page-carpetas #tableSection table{
+  width:100%;
+  min-width:1780px;
+  border-collapse:separate;
+  border-spacing:0;
+  table-layout:auto;
+  background:#fff
+}
+
+body.page-carpetas #tableSection thead th{
+  position:sticky;
+  z-index:8;
+  top:0;
+  height:45px;
+  padding:0 10px;
+  border-right:1px solid rgba(255,255,255,.09);
+  border-bottom:3px solid var(--ia-yellow);
+  color:rgba(255,255,255,.88);
+  background:linear-gradient(180deg,var(--ia-green-800),var(--ia-green-900));
+  box-shadow:none;
+  font-size:8px;
+  font-weight:800;
+  letter-spacing:.065em;
+  line-height:1.2;
+  text-align:left;
+  text-transform:uppercase;
+  white-space:nowrap
+}
+
+body.page-carpetas #tableSection thead th:nth-child(1),body.page-carpetas #tableSection tbody td:nth-child(1){width:96px;min-width:96px;max-width:96px}
+body.page-carpetas #tableSection thead th:nth-child(2),body.page-carpetas #tableSection tbody td:nth-child(2){width:88px;min-width:88px;max-width:88px}
+body.page-carpetas #tableSection thead th:nth-child(3),body.page-carpetas #tableSection tbody td:nth-child(3){min-width:135px}
+body.page-carpetas #tableSection thead th:nth-child(4),body.page-carpetas #tableSection tbody td:nth-child(4){min-width:105px}
+body.page-carpetas #tableSection thead th:nth-child(5),body.page-carpetas #tableSection tbody td:nth-child(5){min-width:95px}
+body.page-carpetas #tableSection thead th:nth-child(6),body.page-carpetas #tableSection tbody td:nth-child(6){min-width:82px}
+body.page-carpetas #tableSection thead th:nth-child(7),body.page-carpetas #tableSection tbody td:nth-child(7){min-width:118px}
+body.page-carpetas #tableSection thead th:nth-child(8),body.page-carpetas #tableSection tbody td:nth-child(8){min-width:116px}
+body.page-carpetas #tableSection thead th:nth-child(n+9):nth-child(-n+12),body.page-carpetas #tableSection tbody td:nth-child(n+9):nth-child(-n+12){min-width:94px}
+body.page-carpetas #tableSection thead th:nth-child(13),body.page-carpetas #tableSection tbody td:nth-child(13){min-width:116px}
+body.page-carpetas #tableSection thead th:nth-child(14),body.page-carpetas #tableSection tbody td:nth-child(14){min-width:148px}
+body.page-carpetas #tableSection thead th:nth-child(15),body.page-carpetas #tableSection tbody td:nth-child(15){min-width:132px}
+body.page-carpetas #tableSection thead th:nth-child(16),body.page-carpetas #tableSection tbody td:nth-child(16){min-width:138px}
+body.page-carpetas #tableSection thead th:nth-child(17),body.page-carpetas #tableSection tbody td:nth-child(17){width:188px;min-width:188px;max-width:188px}
+
+body.page-carpetas #tableSection thead th:nth-child(1),
+body.page-carpetas #tableSection tbody td:nth-child(1){position:sticky;left:0}
+body.page-carpetas #tableSection thead th:nth-child(2),
+body.page-carpetas #tableSection tbody td:nth-child(2){position:sticky;left:96px;box-shadow:10px 0 20px -17px rgba(10,40,16,.65)}
+body.page-carpetas #tableSection thead th:nth-child(17),
+body.page-carpetas #tableSection tbody td:nth-child(17){position:sticky;right:0;box-shadow:-10px 0 20px -17px rgba(10,40,16,.65)}
+body.page-carpetas #tableSection thead th:nth-child(1),body.page-carpetas #tableSection thead th:nth-child(2),body.page-carpetas #tableSection thead th:nth-child(17){z-index:12}
+
+body.page-carpetas #tableSection tbody td{
+  padding:0;
+  border-right:1px solid #edf1eb;
+  border-bottom:1px solid #e5ebe3;
+  color:#344139;
+  background:#fff;
+  font-size:9.5px;
+  font-weight:550
+}
+
+body.page-carpetas #tableSection tbody tr:nth-child(even) td{background:#f8faf7}
+body.page-carpetas #tableSection tbody tr:hover td{background:#edf6ea}
+body.page-carpetas #tableSection tbody td:nth-child(1),body.page-carpetas #tableSection tbody td:nth-child(2),body.page-carpetas #tableSection tbody td:nth-child(17){z-index:4}
+body.page-carpetas #tableSection tbody td:nth-child(2) .cellInner{color:var(--ia-green-800);font-weight:800}
+
+body.page-carpetas #tableSection .cellInner{
+  min-height:56px;
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  padding:8px 10px;
+  color:inherit;
+  background:transparent!important;
+  font-size:inherit;
+  font-weight:inherit
+}
+
+body.page-carpetas #tableSection .cellInner .cell-input{
+  min-height:34px;
+  border:1px solid #cbd7c8;
+  border-radius:8px;
+  color:#243029;
+  background:#fff;
+  font-size:9px;
+  box-shadow:0 1px 2px rgba(20,49,24,.03)
+}
+
+body.page-carpetas #tableSection .statusBadge{
+  min-width:49px;
+  min-height:24px;
+  justify-content:center;
+  padding:0 8px;
+  border-radius:999px;
+  font-size:7.5px;
+  font-weight:800
+}
+
+body.page-carpetas #tableSection .statusBadge.yes{color:#12613c;background:#e4f6ec;border-color:#bde4ce}
+body.page-carpetas #tableSection .statusBadge.no{color:#65716a;background:#f0f3f1;border-color:#dbe1de}
+body.page-carpetas #tableSection .statusDot{width:5px;height:5px}
+
+body.page-carpetas #tableSection .attLinks a{
+  min-height:23px;
+  display:inline-flex;
+  align-items:center;
+  padding:0 7px;
+  border:1px solid #cfe1ca;
+  border-radius:7px;
+  color:var(--ia-green-800);
+  background:#eef6eb;
+  font-size:8px
+}
+
+body.page-carpetas #tableSection .pillX{width:21px;height:21px;font-size:10px}
+
+body.page-carpetas #tableSection button.small.secondary{
+  min-height:31px;
+  padding:0 9px;
+  border:1px solid #bcd2b7;
+  border-radius:8px;
+  color:var(--ia-green-800);
+  background:#fff;
+  box-shadow:0 3px 9px rgba(20,49,24,.05);
+  font-size:8px
+}
+
+body.page-carpetas #tableSection button.small.secondary:hover{border-color:var(--ia-green);color:#fff;background:var(--ia-green);box-shadow:0 6px 12px rgba(54,124,43,.15)}
+body.page-carpetas #tableSection .actions{display:flex;justify-content:flex-start;gap:5px;flex-wrap:wrap}
+body.page-carpetas #tableSection .actions button[data-action="edit"]{min-width:68px;font-size:0}
+body.page-carpetas #tableSection .actions button[data-action="edit"]::before{content:"Editar";font-size:8px}
+
+body.page-carpetas #tableSection .tableFooter{
+  min-height:48px;
+  padding:0 16px;
+  border-top:1px solid #dce4da;
+  color:#758079;
+  background:#f8faf7;
+  font-size:8.5px
+}
+
+body.page-carpetas #tableSection .tableFooter b{color:var(--ia-green-800);font-weight:800}
+
+@media(max-width:1320px){
+  body.page-carpetas #addSection .addWorkspace{grid-template-columns:1fr}
+  body.page-carpetas #addSection .statusGrid{grid-template-columns:repeat(5,minmax(0,1fr))}
+  body.page-carpetas #addSection .statusGrid>div:last-child{grid-column:auto}
+}
+
+@media(max-width:900px){
+  body.page-carpetas #addSection .formGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  body.page-carpetas #addSection .statusGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  body.page-carpetas #addSection .statusGrid>div:last-child{grid-column:1/-1}
+  body.page-carpetas #tableSection .tableLive{display:none}
+}
+
+@media(max-width:720px){
+  body.page-carpetas #addSection .sectionHead,
+  body.page-carpetas #tableSection .tableHead{min-height:66px;padding:0 15px}
+  body.page-carpetas #addSection .cardBody{padding:10px}
+  body.page-carpetas #addSection .primaryDataPanel,
+  body.page-carpetas #addSection .statusSection{padding:13px}
+  body.page-carpetas #addSection .formGrid,
+  body.page-carpetas #addSection .statusGrid{grid-template-columns:1fr}
+  body.page-carpetas #addSection .statusGrid>div:last-child{grid-column:auto}
+  body.page-carpetas #addSection .formActions{align-items:stretch;flex-direction:column;padding:12px}
+  body.page-carpetas #addSection .formActions #addBtn{width:100%}
+  body.page-carpetas #tableSection .resultCounter span{display:none}
+  body.page-carpetas #tableSection thead th:nth-child(1),
+  body.page-carpetas #tableSection thead th:nth-child(2),
+  body.page-carpetas #tableSection thead th:nth-child(17){left:auto;right:auto}
+  body.page-carpetas #tableSection tbody td:nth-child(1),
+  body.page-carpetas #tableSection tbody td:nth-child(2),
+  body.page-carpetas #tableSection tbody td:nth-child(17){position:static;box-shadow:none}
+}
