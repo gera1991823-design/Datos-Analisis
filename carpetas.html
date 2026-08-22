@@ -848,25 +848,25 @@
             <div class="filterField">
               <label>Condiciones</label>
               <select id="fCond">
-                <option value="">(Todas)</option><option value="__EMPTY__">(Vacío)</option><option value="SI">SI</option><option value="NO">NO</option>
+                <option value="">Todos los estados</option><option value="__EMPTY__">Sin información</option><option value="SI">Cumplidas</option><option value="NO">Pendientes</option>
               </select>
             </div>
             <div class="filterField">
               <label>WIS</label>
               <select id="fWis">
-                <option value="">(Todas)</option><option value="__EMPTY__">(Vacío)</option><option value="SI">SI</option><option value="NO">NO</option>
+                <option value="">Todos los estados</option><option value="__EMPTY__">Sin información</option><option value="SI">Completado</option><option value="NO">Pendiente</option>
               </select>
             </div>
             <div class="filterField">
               <label>Cierre de carpeta</label>
               <select id="fCierre">
-                <option value="">(Todas)</option><option value="__EMPTY__">(Vacío)</option><option value="SI">SI</option><option value="NO">NO</option>
+                <option value="">Todos los estados</option><option value="__EMPTY__">Sin información</option><option value="SI">Cerrada</option><option value="NO">Abierta</option>
               </select>
             </div>
             <div class="filterField">
               <label>Confirmación llegada</label>
               <select id="fConfirmacionLlegada">
-                <option value="">(Todas)</option><option value="__EMPTY__">(Vacío)</option><option value="SI">SI</option><option value="NO">NO</option>
+                <option value="">Todos los estados</option><option value="__EMPTY__">Sin información</option><option value="SI">Confirmada</option><option value="NO">Sin confirmar</option>
               </select>
             </div>
             <div class="filterField filterDate">
@@ -924,11 +924,11 @@
               <div><strong>Estado inicial</strong><span>Configuración del proceso</span></div>
             </div>
             <div class="statusGrid">
-              <div><label>Cierre de carpeta</label><select id="cierre"><option value="SI">SI</option><option value="NO" selected>NO</option></select></div>
-              <div><label>Condiciones</label><select id="cond"><option value="SI">SI</option><option value="NO" selected>NO</option></select></div>
-              <div><label>Distribuido</label><select id="distribuido"><option value="SI">SI</option><option value="NO" selected>NO</option></select></div>
-              <div><label>WIS</label><select id="wis"><option value="SI">SI</option><option value="NO" selected>NO</option></select></div>
-              <div><label>Confirmación de llegada</label><select id="confirmacion_llegada"><option value="SI">SI</option><option value="NO" selected>NO</option></select></div>
+              <div><label>Cierre de carpeta</label><select id="cierre"><option value="SI">Carpeta cerrada</option><option value="NO" selected>Carpeta abierta</option></select></div>
+              <div><label>Condiciones</label><select id="cond"><option value="SI">Cumplidas</option><option value="NO" selected>Pendientes</option></select></div>
+              <div><label>Distribución</label><select id="distribuido"><option value="SI">Distribuido</option><option value="NO" selected>Pendiente</option></select></div>
+              <div><label>Estado WIS</label><select id="wis"><option value="SI">WIS completado</option><option value="NO" selected>WIS pendiente</option></select></div>
+              <div><label>Llegada</label><select id="confirmacion_llegada"><option value="SI">Llegada confirmada</option><option value="NO" selected>Sin confirmar</option></select></div>
             </div>
           </div>
         </div>
@@ -971,8 +971,13 @@
         <table>
           <thead>
             <tr>
-              <th>Fecha carga</th><th>Factura</th><th>División</th><th>Transporte</th><th>Carpeta</th><th>DUA</th><th>Fecha estimada UY</th><th>Orden compra</th>
-              <th>WIS</th><th>Distribuido</th><th>Cierre carpeta</th><th>Condiciones</th><th>Fecha depósito</th><th>Confirmación de llegada</th><th>Packing</th><th>Adjuntos</th><th>Acciones</th>
+              <th>Registro</th>
+              <th>Gestión logística</th>
+              <th>Planificación</th>
+              <th>Orden de compra</th>
+              <th>Estado operativo</th>
+              <th>Documentación</th>
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody id="tbody"></tbody>
@@ -980,7 +985,7 @@
       </div>
       <div class="tableFooter">
         <span>Mostrando <b id="tableResultCountFooter">0</b> de <b id="tableTotalCount">0</b> registros</span>
-        <span>Desplazate horizontalmente para visualizar todas las columnas.</span>
+        <span>Información agrupada para revisar cada operación con mayor rapidez.</span>
       </div>
     </section>
   </main>
@@ -1110,10 +1115,20 @@
     }
 
     function safeYesNo(v){ return (v === "NO") ? "NO" : "SI"; }
-    function statusBadge(v){
+    function statusBadge(v, type="generic"){
       const value = (v ?? "").toString().trim().toUpperCase();
-      if (value !== "SI" && value !== "NO") return `<span class="statusBadge empty"><span class="statusDot"></span>—</span>`;
-      return `<span class="statusBadge ${value === "SI" ? "yes" : "no"}"><span class="statusDot"></span>${value}</span>`;
+      const labels = {
+        wis: { SI:"WIS completado", NO:"WIS pendiente" },
+        distribuido: { SI:"Distribuido", NO:"Sin distribuir" },
+        cierre: { SI:"Carpeta cerrada", NO:"Carpeta abierta" },
+        cond: { SI:"Condiciones OK", NO:"Condiciones pendientes" },
+        llegada: { SI:"Llegada confirmada", NO:"Sin confirmar" },
+        generic: { SI:"Completado", NO:"Pendiente" }
+      };
+      if (value !== "SI" && value !== "NO") return `<span class="statusBadge empty"><span class="statusSymbol">—</span><span>Sin datos</span></span>`;
+      const state = value === "SI" ? "yes" : "no";
+      const label = labels[type]?.[value] || labels.generic[value];
+      return `<span class="statusBadge ${state} status-${type}"><span class="statusSymbol">${value === "SI" ? "✓" : "○"}</span><span>${label}</span></span>`;
     }
     function uid(){ return (crypto?.randomUUID ? crypto.randomUUID() : `${Date.now()}_${Math.random().toString(16).slice(2)}`); }
     function norm(s){ return (s ?? "").toString().trim().toLowerCase(); }
@@ -1850,40 +1865,6 @@
       const dtTxt = dt ? formatDateVal(dt) : "";
       const isEditing = (editingRowId === id);
 
-      if (!isEditing) {
-        return `
-          <tr data-id="${id}">
-            <td><div class="cellInner">${escapeHtml(dtTxt)}</div></td>
-            <td><div class="cellInner">${escapeHtml(r.factura)}</div></td>
-            <td><div class="cellInner">${escapeHtml(r.division)}</div></td>
-            <td><div class="cellInner">${escapeHtml(r.transporte)}</div></td>
-            <td><div class="cellInner">${escapeHtml(r.carpeta)}</div></td>
-            <td><div class="cellInner">${escapeHtml(r.dua)}</div></td>
-            <td><div class="cellInner">${escapeHtml(formatDateVal(r.fecha_estimada))}</div></td>
-            <td><div class="cellInner">${escapeHtml(r.oc)}</div></td>
-
-            <td><div class="cellInner">${statusBadge(r.wis)}</div></td>
-            <td><div class="cellInner">${statusBadge(r.distribuido)}</div></td>
-            <td><div class="cellInner">${statusBadge(r.cierre)}</div></td>
-            <td><div class="cellInner">${statusBadge(r.cond)}</div></td>
-
-            <td><div class="cellInner">${escapeHtml(formatDateVal(r.fecha_deposito))}</div></td>
-            <td><div class="cellInner">${statusBadge(r.confirmacion_llegada)}</div></td>
-
-            <td><div class="cellInner">${renderPackingCell(id, r)}</div></td>
-            <td><div class="cellInner">${renderAttachmentsCell(id, r)}</div></td>
-
-            <td>
-              <div class="cellInner">
-                <div class="actions">
-                  <button class="small secondary" data-action="edit" title="Editar">✏️</button>
-                </div>
-              </div>
-            </td>
-          </tr>
-        `;
-      }
-
       const factura = escapeHtml(r.factura || "");
       const division = escapeHtml(r.division || "");
       const transporte = escapeHtml(r.transporte || "");
@@ -1893,6 +1874,62 @@
       const fecha_deposito = escapeHtml(r.fecha_deposito || "");
       const oc = escapeHtml(r.oc || "");
 
+      if (!isEditing) {
+        return `
+          <tr data-id="${id}">
+            <td>
+              <div class="groupCell recordGroup">
+                <span class="cellKicker">Factura</span>
+                <strong class="recordNumber">${factura || "Sin número"}</strong>
+                <div class="recordMeta">
+                  <span>${escapeHtml(dtTxt || "Sin fecha")}</span>
+                  <span class="divisionChip">${division || "Sin división"}</span>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="groupCell infoStack">
+                <div class="infoLine"><span>Transporte</span><strong>${transporte || "—"}</strong></div>
+                <div class="infoLine"><span>Carpeta</span><strong>${carpeta || "—"}</strong></div>
+                <div class="infoLine"><span>DUA</span><strong>${dua || "—"}</strong></div>
+              </div>
+            </td>
+            <td>
+              <div class="groupCell infoStack dateStack">
+                <div class="infoLine"><span>Estimada UY</span><strong>${escapeHtml(formatDateVal(r.fecha_estimada) || "Sin fecha")}</strong></div>
+                <div class="infoLine"><span>Depósito</span><strong>${escapeHtml(formatDateVal(r.fecha_deposito) || "Sin fecha")}</strong></div>
+              </div>
+            </td>
+            <td>
+              <div class="groupCell orderGroup">
+                <span class="cellKicker">O/C</span>
+                <strong>${oc || "Sin asignar"}</strong>
+              </div>
+            </td>
+            <td>
+              <div class="groupCell processGrid">
+                ${statusBadge(r.wis,"wis")}
+                ${statusBadge(r.distribuido,"distribuido")}
+                ${statusBadge(r.cierre,"cierre")}
+                ${statusBadge(r.cond,"cond")}
+                ${statusBadge(r.confirmacion_llegada,"llegada")}
+              </div>
+            </td>
+            <td>
+              <div class="groupCell documentsGroup">
+                <div class="documentBlock"><span class="cellKicker">Packing</span>${renderPackingCell(id, r)}</div>
+                <div class="documentBlock"><span class="cellKicker">Adjuntos</span>${renderAttachmentsCell(id, r)}</div>
+              </div>
+            </td>
+            <td>
+              <div class="groupCell actionGroup">
+                <button class="small secondary" data-action="edit" title="Editar registro">Editar</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }
+
       const wis = safeYesNo(r.wis || "SI");
       const distribuido = safeYesNo(r.distribuido || "NO");
       const cierre = safeYesNo(r.cierre || "SI");
@@ -1900,64 +1937,52 @@
       const confirmacion_llegada = safeYesNo(r.confirmacion_llegada || "NO");
 
       return `
-        <tr data-id="${id}">
-          <td><div class="cellInner">${escapeHtml(dtTxt)}</div></td>
-          <td><div class="cellInner"><input class="cell-input w140" data-field="factura" value="${factura}"></div></td>
-          <td><div class="cellInner"><input class="cell-input w200" data-field="division" value="${division}"></div></td>
-          <td><div class="cellInner"><input class="cell-input w200" data-field="transporte" value="${transporte}"></div></td>
-          <td><div class="cellInner"><input class="cell-input w140" data-field="carpeta" value="${carpeta}"></div></td>
-          <td><div class="cellInner"><input class="cell-input w140" data-field="dua" value="${dua}"></div></td>
-
-          <td><div class="cellInner"><input class="cell-input w160" type="date" data-field="fecha_estimada" value="${fecha_estimada}"></div></td>
-          <td><div class="cellInner"><input class="cell-input w140" data-field="oc" value="${oc}"></div></td>
-
-          <td><div class="cellInner">
-            <select class="cell-input w110" data-field="wis">
-              <option value="SI" ${wis==="SI" ? "selected" : ""}>SI</option>
-              <option value="NO" ${wis==="NO" ? "selected" : ""}>NO</option>
-            </select>
-          </div></td>
-
-          <td><div class="cellInner">
-            <select class="cell-input w110" data-field="distribuido">
-              <option value="SI" ${distribuido==="SI" ? "selected" : ""}>SI</option>
-              <option value="NO" ${distribuido==="NO" ? "selected" : ""}>NO</option>
-            </select>
-          </div></td>
-
-          <td><div class="cellInner">
-            <select class="cell-input w110" data-field="cierre">
-              <option value="SI" ${cierre==="SI" ? "selected" : ""}>SI</option>
-              <option value="NO" ${cierre==="NO" ? "selected" : ""}>NO</option>
-            </select>
-          </div></td>
-
-          <td><div class="cellInner">
-            <select class="cell-input w110" data-field="cond">
-              <option value="SI" ${cond==="SI" ? "selected" : ""}>SI</option>
-              <option value="NO" ${cond==="NO" ? "selected" : ""}>NO</option>
-            </select>
-          </div></td>
-
-          <td><div class="cellInner"><input class="cell-input w160" type="date" data-field="fecha_deposito" value="${fecha_deposito}"></div></td>
-
-          <td><div class="cellInner">
-            <select class="cell-input w160" data-field="confirmacion_llegada">
-              <option value="SI" ${confirmacion_llegada==="SI" ? "selected" : ""}>SI</option>
-              <option value="NO" ${confirmacion_llegada==="NO" ? "selected" : ""}>NO</option>
-            </select>
-          </div></td>
-
-          <td><div class="cellInner">${renderPackingCell(id, r)}</div></td>
-          <td><div class="cellInner">${renderAttachmentsCell(id, r)}</div></td>
-
+        <tr class="editingRow" data-id="${id}">
           <td>
-            <div class="cellInner">
-              <div class="actions">
-                <button class="small primary" data-action="save">Guardar</button>
-                <button class="small" data-action="cancel">Cancelar</button>
-                <button class="small danger" data-action="delete">Eliminar</button>
-              </div>
+            <div class="groupCell editGroup">
+              <span class="editDate">Creado ${escapeHtml(dtTxt || "sin fecha")}</span>
+              <label class="editField"><span>Factura</span><input class="cell-input" data-field="factura" value="${factura}"></label>
+              <label class="editField"><span>División</span><input class="cell-input" data-field="division" value="${division}"></label>
+            </div>
+          </td>
+          <td>
+            <div class="groupCell editGroup">
+              <label class="editField"><span>Transporte</span><input class="cell-input" data-field="transporte" value="${transporte}"></label>
+              <label class="editField"><span>Carpeta</span><input class="cell-input" data-field="carpeta" value="${carpeta}"></label>
+              <label class="editField"><span>DUA</span><input class="cell-input" data-field="dua" value="${dua}"></label>
+            </div>
+          </td>
+          <td>
+            <div class="groupCell editGroup">
+              <label class="editField"><span>Estimada UY</span><input class="cell-input" type="date" data-field="fecha_estimada" value="${fecha_estimada}"></label>
+              <label class="editField"><span>Depósito</span><input class="cell-input" type="date" data-field="fecha_deposito" value="${fecha_deposito}"></label>
+            </div>
+          </td>
+          <td>
+            <div class="groupCell editGroup">
+              <label class="editField"><span>Orden de compra</span><input class="cell-input" data-field="oc" value="${oc}"></label>
+            </div>
+          </td>
+          <td>
+            <div class="groupCell editStatusGrid">
+              <label class="editField"><span>WIS</span><select class="cell-input" data-field="wis"><option value="SI" ${wis==="SI" ? "selected" : ""}>Completado</option><option value="NO" ${wis==="NO" ? "selected" : ""}>Pendiente</option></select></label>
+              <label class="editField"><span>Distribución</span><select class="cell-input" data-field="distribuido"><option value="SI" ${distribuido==="SI" ? "selected" : ""}>Distribuido</option><option value="NO" ${distribuido==="NO" ? "selected" : ""}>Sin distribuir</option></select></label>
+              <label class="editField"><span>Carpeta</span><select class="cell-input" data-field="cierre"><option value="SI" ${cierre==="SI" ? "selected" : ""}>Cerrada</option><option value="NO" ${cierre==="NO" ? "selected" : ""}>Abierta</option></select></label>
+              <label class="editField"><span>Condiciones</span><select class="cell-input" data-field="cond"><option value="SI" ${cond==="SI" ? "selected" : ""}>Cumplidas</option><option value="NO" ${cond==="NO" ? "selected" : ""}>Pendientes</option></select></label>
+              <label class="editField wide"><span>Llegada</span><select class="cell-input" data-field="confirmacion_llegada"><option value="SI" ${confirmacion_llegada==="SI" ? "selected" : ""}>Confirmada</option><option value="NO" ${confirmacion_llegada==="NO" ? "selected" : ""}>Sin confirmar</option></select></label>
+            </div>
+          </td>
+          <td>
+            <div class="groupCell documentsGroup">
+              <div class="documentBlock"><span class="cellKicker">Packing</span>${renderPackingCell(id, r)}</div>
+              <div class="documentBlock"><span class="cellKicker">Adjuntos</span>${renderAttachmentsCell(id, r)}</div>
+            </div>
+          </td>
+          <td>
+            <div class="groupCell actionGroup editActions">
+              <button class="small primary" data-action="save">Guardar</button>
+              <button class="small" data-action="cancel">Cancelar</button>
+              <button class="small danger" data-action="delete">Eliminar</button>
             </div>
           </td>
         </tr>
@@ -1984,7 +2009,7 @@
       if (!dataToDraw.length){
         tbody.innerHTML = `
           <tr class="emptyRow">
-            <td colspan="17">
+            <td colspan="7">
               <div class="emptyState">
                 <div class="emptyIcon">⌕</div>
                 <strong>No hay registros para mostrar</strong>
