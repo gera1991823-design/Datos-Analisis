@@ -1635,3 +1635,310 @@ body.page-carpetas #tableSection .tableFooter b{color:var(--ia-green-800);font-w
   body.page-carpetas #tableSection tbody td:nth-child(2),
   body.page-carpetas #tableSection tbody td:nth-child(17){position:static;box-shadow:none}
 }
+
+/* ================================================================
+   CARPETAS · REGISTROS AGRUPADOS
+   Siete bloques operativos en lugar de diecisiete columnas planas.
+   ================================================================ */
+
+body.page-carpetas #tableSection table{
+  min-width:1320px;
+  table-layout:fixed
+}
+
+body.page-carpetas #tableSection thead th,
+body.page-carpetas #tableSection tbody td{width:auto;min-width:0;max-width:none}
+
+body.page-carpetas #tableSection thead th:nth-child(1),body.page-carpetas #tableSection tbody td:nth-child(1){width:168px;min-width:168px;max-width:168px}
+body.page-carpetas #tableSection thead th:nth-child(2),body.page-carpetas #tableSection tbody td:nth-child(2){width:190px;min-width:190px;max-width:190px}
+body.page-carpetas #tableSection thead th:nth-child(3),body.page-carpetas #tableSection tbody td:nth-child(3){width:176px;min-width:176px;max-width:176px}
+body.page-carpetas #tableSection thead th:nth-child(4),body.page-carpetas #tableSection tbody td:nth-child(4){width:140px;min-width:140px;max-width:140px}
+body.page-carpetas #tableSection thead th:nth-child(5),body.page-carpetas #tableSection tbody td:nth-child(5){width:370px;min-width:370px;max-width:370px}
+body.page-carpetas #tableSection thead th:nth-child(6),body.page-carpetas #tableSection tbody td:nth-child(6){width:222px;min-width:222px;max-width:222px}
+body.page-carpetas #tableSection thead th:nth-child(7),body.page-carpetas #tableSection tbody td:nth-child(7){width:104px;min-width:104px;max-width:104px}
+
+body.page-carpetas #tableSection thead th:nth-child(2){position:sticky;left:auto;box-shadow:none}
+body.page-carpetas #tableSection tbody td:nth-child(2){position:static;left:auto;box-shadow:none}
+body.page-carpetas #tableSection thead th:nth-child(7),body.page-carpetas #tableSection tbody td:nth-child(7){position:sticky;right:0}
+body.page-carpetas #tableSection thead th:nth-child(1),body.page-carpetas #tableSection thead th:nth-child(7){z-index:14}
+body.page-carpetas #tableSection tbody td:nth-child(1),body.page-carpetas #tableSection tbody td:nth-child(7){z-index:5}
+body.page-carpetas #tableSection thead th:nth-child(7),body.page-carpetas #tableSection tbody td:nth-child(7){box-shadow:-12px 0 22px -19px rgba(10,40,16,.75)}
+
+body.page-carpetas #tableSection thead th{
+  height:49px;
+  padding:0 13px;
+  font-size:8.5px;
+  letter-spacing:.075em
+}
+
+body.page-carpetas #tableSection tbody td{
+  vertical-align:top;
+  white-space:normal
+}
+
+body.page-carpetas #tableSection tbody tr:nth-child(even) td{background:#f9fbf8}
+body.page-carpetas #tableSection tbody tr:hover td{background:#eef6ec}
+
+body.page-carpetas #tableSection .groupCell{
+  min-height:104px;
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  justify-content:center;
+  gap:7px;
+  padding:12px 13px;
+  color:#344139;
+  background:transparent
+}
+
+body.page-carpetas #tableSection .cellKicker{
+  display:block;
+  color:#7b867e;
+  font-size:7px;
+  font-weight:800;
+  letter-spacing:.085em;
+  line-height:1;
+  text-transform:uppercase
+}
+
+body.page-carpetas #tableSection .recordGroup{gap:8px}
+body.page-carpetas #tableSection .recordNumber{color:var(--ia-green-900);font-size:16px;font-weight:800;letter-spacing:-.025em;line-height:1.05}
+
+body.page-carpetas #tableSection .recordMeta{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex-wrap:wrap;
+  color:#737f77;
+  font-size:8px;
+  font-weight:650
+}
+
+body.page-carpetas #tableSection .divisionChip{
+  min-height:21px;
+  display:inline-flex;
+  align-items:center;
+  padding:0 7px;
+  border:1px solid #eadb82;
+  border-radius:999px;
+  color:#594e00;
+  background:#fff8c9;
+  font-size:7px;
+  font-weight:800;
+  text-transform:uppercase
+}
+
+body.page-carpetas #tableSection .infoStack{gap:0}
+
+body.page-carpetas #tableSection .infoLine{
+  min-height:27px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  border-bottom:1px solid #e7ece5
+}
+
+body.page-carpetas #tableSection .infoLine:last-child{border-bottom:0}
+body.page-carpetas #tableSection .infoLine span{color:#7a857d;font-size:7.5px;font-weight:650}
+body.page-carpetas #tableSection .infoLine strong{overflow:hidden;color:#334039;font-size:8.5px;font-weight:750;text-align:right;text-overflow:ellipsis;white-space:nowrap}
+body.page-carpetas #tableSection .dateStack .infoLine strong{font-variant-numeric:tabular-nums}
+
+body.page-carpetas #tableSection .orderGroup{
+  min-height:76px;
+  justify-content:center;
+  margin:14px 10px;
+  padding:12px;
+  border:1px solid #cfe0cb;
+  border-radius:12px;
+  background:linear-gradient(145deg,#f2f8f0,#e9f3e6)
+}
+
+body.page-carpetas #tableSection .orderGroup strong{
+  overflow:hidden;
+  color:var(--ia-green-900);
+  font-size:11px;
+  font-weight:800;
+  line-height:1.2;
+  text-overflow:ellipsis;
+  white-space:nowrap
+}
+
+body.page-carpetas #tableSection .processGrid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:6px;
+  align-content:center
+}
+
+body.page-carpetas #tableSection .processGrid .status-llegada{grid-column:1/-1}
+
+body.page-carpetas #tableSection .statusBadge{
+  width:100%;
+  min-width:0;
+  min-height:29px;
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  gap:7px;
+  padding:4px 8px 4px 5px;
+  border-radius:9px;
+  font-size:7.5px;
+  font-weight:750;
+  letter-spacing:0;
+  line-height:1.15;
+  white-space:nowrap
+}
+
+body.page-carpetas #tableSection .statusBadge.yes{
+  border:1px solid #bde0c8;
+  color:#155f39;
+  background:linear-gradient(90deg,#e3f5ea,#edf9f2)
+}
+
+body.page-carpetas #tableSection .statusBadge.no{
+  border:1px solid #e7d98d;
+  color:#625600;
+  background:linear-gradient(90deg,#fff7c7,#fffbdf)
+}
+
+body.page-carpetas #tableSection .statusBadge.empty{border-color:#dfe5e1;color:#7c8780;background:#f5f7f6}
+
+body.page-carpetas #tableSection .statusSymbol{
+  width:18px;
+  height:18px;
+  display:grid;
+  place-items:center;
+  flex:0 0 18px;
+  border-radius:6px;
+  color:#fff;
+  background:currentColor;
+  font-size:0
+}
+
+body.page-carpetas #tableSection .statusSymbol::before{font-size:10px;font-weight:900}
+body.page-carpetas #tableSection .statusBadge.yes .statusSymbol::before{content:"✓";color:#fff}
+body.page-carpetas #tableSection .statusBadge.no .statusSymbol::before{content:"•";color:#fff;font-size:13px}
+body.page-carpetas #tableSection .statusBadge.empty .statusSymbol::before{content:"—";color:#fff}
+
+body.page-carpetas #tableSection .documentsGroup{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:7px;
+  align-content:center
+}
+
+body.page-carpetas #tableSection .documentBlock{
+  min-width:0;
+  min-height:80px;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+  padding:8px;
+  border:1px solid #dce5d9;
+  border-radius:10px;
+  background:#f7faf6
+}
+
+body.page-carpetas #tableSection .documentBlock>div[style]{margin-top:7px!important}
+body.page-carpetas #tableSection .documentBlock .muted{margin-top:7px;font-size:8px}
+body.page-carpetas #tableSection .documentBlock button.small.secondary{width:100%;min-height:29px;padding:0 6px;white-space:normal;line-height:1.15}
+body.page-carpetas #tableSection .documentBlock .attLinks{margin-top:7px}
+
+body.page-carpetas #tableSection .actionGroup{
+  align-items:center;
+  justify-content:center;
+  padding:10px
+}
+
+body.page-carpetas #tableSection .actionGroup button[data-action="edit"]{
+  width:100%;
+  min-width:0;
+  min-height:39px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid var(--ia-green-700);
+  border-radius:10px;
+  color:#fff;
+  background:linear-gradient(135deg,var(--ia-green),var(--ia-green-700));
+  box-shadow:0 8px 16px rgba(54,124,43,.18);
+  font-size:8px
+}
+
+body.page-carpetas #tableSection .actions button[data-action="edit"]::before{content:none}
+
+body.page-carpetas #tableSection .editingRow td{background:#f1f6ef}
+body.page-carpetas #tableSection .editingRow:hover td{background:#f1f6ef}
+body.page-carpetas #tableSection .editingRow .groupCell{min-height:260px;justify-content:flex-start;padding:10px}
+body.page-carpetas #tableSection .editGroup{gap:8px}
+
+body.page-carpetas #tableSection .editDate{
+  min-height:25px;
+  display:flex;
+  align-items:center;
+  padding:0 8px;
+  border:1px solid #d7e3d4;
+  border-radius:8px;
+  color:var(--ia-green-800);
+  background:#eaf3e7;
+  font-size:7.5px;
+  font-weight:750
+}
+
+body.page-carpetas #tableSection .editField{
+  display:block;
+  margin:0;
+  color:#69756d;
+  font-size:7px;
+  font-weight:800;
+  letter-spacing:.045em;
+  text-align:left;
+  text-transform:uppercase
+}
+
+body.page-carpetas #tableSection .editField>span{display:block;margin-bottom:4px}
+
+body.page-carpetas #tableSection .editField .cell-input{
+  width:100%;
+  min-width:0;
+  min-height:36px;
+  padding:0 8px;
+  border:1px solid #c7d5c4;
+  border-radius:8px;
+  color:#26332b;
+  background:#fff;
+  font-size:8px;
+  font-weight:650;
+  text-align:left
+}
+
+body.page-carpetas #tableSection .editStatusGrid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+  align-content:start
+}
+
+body.page-carpetas #tableSection .editStatusGrid .wide{grid-column:1/-1}
+body.page-carpetas #tableSection .editingRow .documentsGroup{min-height:260px;align-content:start}
+
+body.page-carpetas #tableSection .editActions{
+  min-height:260px;
+  align-items:stretch;
+  justify-content:center;
+  gap:7px
+}
+
+body.page-carpetas #tableSection .editActions button{width:100%;min-height:36px;padding:0 7px;border-radius:8px;font-size:8px}
+
+body.page-carpetas #tableSection .emptyRow td{position:static!important;width:auto!important;max-width:none!important}
+
+@media(max-width:720px){
+  body.page-carpetas #tableSection table{min-width:1180px}
+  body.page-carpetas #tableSection thead th:nth-child(1),
+  body.page-carpetas #tableSection thead th:nth-child(7){position:sticky;left:auto;right:auto}
+  body.page-carpetas #tableSection tbody td:nth-child(1),
+  body.page-carpetas #tableSection tbody td:nth-child(7){position:static;box-shadow:none}
+}
