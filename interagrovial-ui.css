@@ -67,16 +67,29 @@ body.enterprise-ui{
   --shadow2:var(--ia-shadow-xs);
   color:var(--ia-ink);
   background:var(--ia-bg);
+  font-family:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:13px;
+  font-weight:400;
+  line-height:1.5;
+  letter-spacing:-.006em;
+  font-optical-sizing:auto;
   -webkit-font-smoothing:antialiased;
   text-rendering:optimizeLegibility
 }
 
 body.enterprise-ui a{color:inherit;text-decoration:none}
 body.enterprise-ui svg{display:block}
+body.enterprise-ui :where(h1,h2,h3,h4,h5,h6,p,span,strong,small,label,button,input,select,textarea,table,th,td){font-family:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif}
 body.enterprise-ui button,
 body.enterprise-ui input,
 body.enterprise-ui select,
-body.enterprise-ui textarea{font-family:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif}
+body.enterprise-ui textarea{
+  font-family:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:12px;
+  line-height:1.4;
+  letter-spacing:-.004em
+}
+body.enterprise-ui table{font-variant-numeric:tabular-nums}
 
 body.enterprise-ui :focus-visible{outline:3px solid var(--ia-yellow);outline-offset:3px}
 body.enterprise-ui ::selection{color:#fff;background:var(--ia-green-700)}
@@ -691,6 +704,364 @@ body.page-facturas .grid{grid-template-columns:minmax(300px,.8fr) minmax(420px,1
 body.page-facturas .upload-box{border:1px dashed #b9c9b5;border-radius:14px;background:#f5f8f4}
 body.page-facturas .card>.manual-grid,body.page-facturas .card>.grid{margin:18px 20px}
 body.page-facturas .card>.summary,body.page-facturas .card>.table-wrap,body.page-facturas .card>.buttons,body.page-facturas .card>label,body.page-facturas .card>#updateStatus{margin-right:20px;margin-left:20px}
+
+/* ================================================================
+   FILTROS Y BUSQUEDA · LENGUAJE VISUAL UNIFICADO
+   ================================================================ */
+
+body.enterprise-ui .modernFilters,
+body.page-facturas .captureWorkspace,
+body.page-facturas .captureSearch{
+  position:relative;
+  border-color:#d4dfd1;
+  box-shadow:0 12px 32px rgba(20,49,24,.08)
+}
+
+body.enterprise-ui .modernFilters::after,
+body.page-facturas .captureWorkspace::after,
+body.page-facturas .captureSearch::after{
+  content:"";
+  position:absolute;
+  z-index:5;
+  top:0;
+  left:22px;
+  width:78px;
+  height:4px;
+  border-radius:0 0 999px 999px;
+  background:linear-gradient(90deg,var(--ia-yellow) 0 34%,var(--ia-green) 34% 100%);
+  box-shadow:0 2px 7px rgba(54,124,43,.16)
+}
+
+body.page-stock .modernFilters .panel-title,
+body.page-reclamos .modernFilters .cardHeader,
+body.page-solicitudes .modernFilters .cardHeader,
+body.page-reservas .modernFilters .sectionHead,
+body.page-carpetas #filtersSection.modernFilters .cardHeader{
+  min-height:68px;
+  border-bottom:1px solid #e3e9e1;
+  background:linear-gradient(90deg,#fff 0%,#fbfcfa 66%,#f3f7f1 100%)
+}
+
+body.page-stock .modernFilters .panel-title{
+  display:flex;
+  align-items:center;
+  gap:11px;
+  margin:-22px -22px 16px;
+  padding:0 22px
+}
+
+body.page-stock .modernFilters .panel-title::before,
+body.page-reclamos .modernFilters .cardHeader h3::before,
+body.page-solicitudes .modernFilters .cardHeader h3::before{
+  content:"";
+  width:34px;
+  height:34px;
+  display:block;
+  flex:0 0 34px;
+  border:1px solid #d4e4d0;
+  border-radius:10px;
+  background-color:#edf5eb;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23286522' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 5h16l-6.2 7.1v5.2L10.2 19v-6.9L4 5Z'/%3E%3C/svg%3E");
+  background-position:center;
+  background-repeat:no-repeat;
+  background-size:17px
+}
+
+body.page-stock .modernFilters .panel-title::after{
+  content:"Aplicación automática";
+  min-height:28px;
+  display:inline-flex;
+  align-items:center;
+  margin-left:auto;
+  padding:0 10px 0 24px;
+  border:1px solid #d5e4d1;
+  border-radius:999px;
+  color:var(--ia-green-800);
+  background:
+    radial-gradient(circle at 13px 50%,#48ad65 0 3px,rgba(72,173,101,.16) 3.5px 6px,transparent 6.5px),
+    #f2f8f0;
+  font-size:8px;
+  font-weight:800;
+  letter-spacing:.045em;
+  text-transform:uppercase
+}
+
+body.page-reclamos .modernFilters .cardHeader,
+body.page-solicitudes .modernFilters .cardHeader{
+  margin:-22px -22px 16px;
+  padding:0 22px
+}
+
+body.page-reclamos .modernFilters .cardHeader h3,
+body.page-solicitudes .modernFilters .cardHeader h3{
+  display:flex;
+  align-items:center;
+  gap:11px
+}
+
+body.page-reclamos .modernFilters .cardHeader .row,
+body.page-solicitudes .modernFilters .cardHeader .row{gap:7px!important}
+
+body.page-reclamos .modernFilters .cardHeader button,
+body.page-solicitudes .modernFilters .cardHeader button{
+  min-height:36px;
+  padding-right:13px;
+  padding-left:13px;
+  border-radius:10px;
+  font-size:9px
+}
+
+body.page-carpetas #filtersSection.modernFilters .cardHeader{
+  padding:0 20px;
+  color:var(--ia-ink)
+}
+
+body.page-carpetas #filtersSection.modernFilters .sectionIcon{
+  border-color:#d4e4d0;
+  color:var(--ia-green-800);
+  background:#edf5eb;
+  box-shadow:none
+}
+
+body.page-carpetas #filtersSection.modernFilters .sectionTitle{color:var(--ia-ink);font-size:13px}
+body.page-carpetas #filtersSection.modernFilters .sectionSubtitle{color:var(--ia-muted);font-size:9px}
+
+body.enterprise-ui .modernFilters .sectionMeta,
+body.page-carpetas #filtersSection.modernFilters .sectionMeta{
+  min-height:28px;
+  display:inline-flex;
+  align-items:center;
+  padding:0 10px 0 24px;
+  border:1px solid #d5e4d1;
+  border-radius:999px;
+  color:var(--ia-green-800);
+  background:
+    radial-gradient(circle at 13px 50%,#48ad65 0 3px,rgba(72,173,101,.16) 3.5px 6px,transparent 6.5px),
+    #f2f8f0;
+  font-size:8px;
+  font-weight:800;
+  letter-spacing:.04em;
+  text-transform:uppercase
+}
+
+body.page-stock .modernFilters .filters{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px
+}
+
+body.page-stock .modernFilters .filterSearch{grid-column:span 2}
+
+body.page-reclamos .modernFilters>.row,
+body.page-solicitudes .modernFilters>.row{
+  grid-template-columns:minmax(250px,1.55fr) repeat(3,minmax(145px,1fr));
+  gap:10px;
+  align-items:stretch
+}
+
+body.page-reservas .modernFilters .filters{
+  max-width:820px;
+  display:grid;
+  grid-template-columns:minmax(280px,2fr) minmax(180px,.75fr);
+  gap:10px;
+  align-items:stretch
+}
+
+body.page-carpetas #filtersSection.modernFilters .filtersBody{
+  padding:16px 20px 18px;
+  background:#fff
+}
+
+body.page-carpetas #filtersSection.modernFilters .filterRowWrap{
+  overflow:visible;
+  margin:0;
+  padding:0
+}
+
+body.page-carpetas #filtersSection.modernFilters .filtersSingleRow{
+  min-width:0;
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:10px;
+  align-items:stretch
+}
+
+body.page-carpetas #filtersSection.modernFilters .filterSearch{grid-column:span 2}
+
+body.page-stock .modernFilters .filters>div,
+body.page-reclamos .modernFilters>.row>div,
+body.page-solicitudes .modernFilters>.row>div,
+body.page-reservas .modernFilters .filters>div,
+body.page-carpetas #filtersSection.modernFilters .filterField,
+body.page-facturas .captureWorkspace .manual-grid>div,
+body.page-facturas .captureSearch .grid>div:last-child{
+  position:relative;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  padding:10px;
+  border:1px solid #e0e8dd;
+  border-radius:14px;
+  background:linear-gradient(145deg,#fafcfa,#f5f8f3);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.85);
+  transition:border-color .16s ease,box-shadow .16s ease,transform .16s ease,background .16s ease
+}
+
+body.page-stock .modernFilters .filters>div:focus-within,
+body.page-reclamos .modernFilters>.row>div:focus-within,
+body.page-solicitudes .modernFilters>.row>div:focus-within,
+body.page-reservas .modernFilters .filters>div:focus-within,
+body.page-carpetas #filtersSection.modernFilters .filterField:focus-within,
+body.page-facturas .captureWorkspace .manual-grid>div:focus-within,
+body.page-facturas .captureSearch .grid>div:last-child:focus-within{
+  border-color:#a8c5a2;
+  background:#fff;
+  box-shadow:0 0 0 3px rgba(54,124,43,.08),0 8px 18px rgba(20,49,24,.06);
+  transform:translateY(-1px)
+}
+
+body.enterprise-ui .modernFilters label,
+body.page-facturas .captureWorkspace label,
+body.page-facturas .captureSearch label{
+  margin-bottom:7px;
+  color:#526057;
+  font-size:9px;
+  letter-spacing:.065em
+}
+
+body.enterprise-ui .modernFilters input:not([type="checkbox"]):not([type="radio"]),
+body.enterprise-ui .modernFilters select,
+body.page-facturas .captureWorkspace input,
+body.page-facturas .captureSearch textarea{
+  width:100%!important;
+  min-width:0!important;
+  min-height:42px;
+  padding:0 12px;
+  border-color:#d5dfd2;
+  border-radius:10px;
+  color:#223027;
+  background-color:#fff;
+  box-shadow:0 1px 2px rgba(20,49,24,.03);
+  font-size:11px;
+  font-weight:600
+}
+
+body.enterprise-ui .modernFilters select{
+  appearance:none;
+  padding-right:36px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23536058' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m7 10 5 5 5-5'/%3E%3C/svg%3E");
+  background-position:right 11px center;
+  background-repeat:no-repeat;
+  background-size:15px
+}
+
+body.enterprise-ui .modernFilters .filterSearch input{
+  padding-left:39px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23536058' stroke-width='1.9' stroke-linecap='round'%3E%3Ccircle cx='10.7' cy='10.7' r='5.7'/%3E%3Cpath d='m15 15 4.2 4.2'/%3E%3C/svg%3E");
+  background-position:left 12px center;
+  background-repeat:no-repeat;
+  background-size:16px
+}
+
+body.page-stock .modernFilters>.grid{gap:12px}
+body.page-stock .modernFilters>.grid>div:last-child{
+  padding:12px;
+  border:1px solid #e0e8dd;
+  border-radius:14px;
+  background:linear-gradient(145deg,#fafcfa,#f5f8f3)
+}
+body.page-stock .modernFilters .upload-box{min-height:126px;background:#fff}
+body.page-stock .modernFilters .instructions{margin-top:9px;border-radius:10px;font-size:9px;line-height:1.45}
+
+body.enterprise-ui .modernFilters .helper,
+body.page-carpetas #filtersSection.modernFilters .filterHelper{
+  min-height:36px;
+  margin-top:10px;
+  padding:8px 11px;
+  border:1px solid #dce7d8;
+  border-radius:10px;
+  color:#5b685f;
+  background:#f6f9f4;
+  font-size:9px
+}
+
+body.page-carpetas #filtersSection.modernFilters .filterHelper b{color:var(--ia-green-800)}
+
+body.page-facturas .captureWorkspace h2,
+body.page-facturas .captureSearch h2{
+  min-height:68px;
+  background:linear-gradient(90deg,#fff 0%,#fbfcfa 66%,#f3f7f1 100%)
+}
+
+body.page-facturas .captureWorkspace h2::before,
+body.page-facturas .captureSearch h2::before{
+  width:34px;
+  height:34px;
+  border:1px solid #d4e4d0;
+  border-radius:10px;
+  background-color:#edf5eb;
+  background-position:center;
+  background-repeat:no-repeat;
+  background-size:17px;
+  box-shadow:none
+}
+
+body.page-facturas .captureWorkspace h2::before{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23286522' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 5h16v14H4zM8 9h8M8 13h5'/%3E%3C/svg%3E")
+}
+
+body.page-facturas .captureSearch h2::before{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23286522' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='10.7' cy='10.7' r='5.7'/%3E%3Cpath d='m15 15 4.2 4.2'/%3E%3C/svg%3E")
+}
+
+body.page-facturas .captureWorkspace .manual-grid{gap:10px}
+body.page-facturas .captureSearch .grid{gap:10px}
+body.page-facturas .captureSearch .grid>div:last-child{padding:12px}
+body.page-facturas .captureSearch #facturas{
+  min-height:178px;
+  padding:12px 13px;
+  resize:vertical;
+  line-height:1.55
+}
+body.page-facturas .captureSearch #searchBtn{
+  border-color:#e1c600;
+  color:var(--ia-green-950);
+  background:var(--ia-yellow);
+  box-shadow:0 8px 18px rgba(110,94,0,.14)
+}
+body.page-facturas .captureSearch #dbStatus{border-radius:10px;font-size:10px}
+
+@media(max-width:1320px){
+  body.page-carpetas #filtersSection.modernFilters .filtersSingleRow{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+
+@media(max-width:1100px){
+  body.page-stock .modernFilters .filters{grid-template-columns:repeat(2,minmax(0,1fr))}
+  body.page-reclamos .modernFilters>.row,
+  body.page-solicitudes .modernFilters>.row{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+@media(max-width:900px){
+  body.page-carpetas #filtersSection.modernFilters .filtersSingleRow{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+@media(max-width:720px){
+  body.page-stock .modernFilters .panel-title::after{display:none}
+  body.page-stock .modernFilters .panel-title,
+  body.page-reclamos .modernFilters .cardHeader,
+  body.page-solicitudes .modernFilters .cardHeader{margin-top:-17px;margin-right:-17px;margin-left:-17px;padding-right:17px;padding-left:17px}
+  body.page-stock .modernFilters .filters,
+  body.page-reclamos .modernFilters>.row,
+  body.page-solicitudes .modernFilters>.row,
+  body.page-reservas .modernFilters .filters,
+  body.page-carpetas #filtersSection.modernFilters .filtersSingleRow{grid-template-columns:1fr}
+  body.page-stock .modernFilters .filterSearch,
+  body.page-carpetas #filtersSection.modernFilters .filterSearch{grid-column:auto}
+  body.page-carpetas #filtersSection.modernFilters .filtersBody{padding:14px}
+  body.page-facturas .captureWorkspace::after,
+  body.page-facturas .captureSearch::after,
+  body.enterprise-ui .modernFilters::after{left:16px}
+}
 
 /* ================================================================
    RESPONSIVE
