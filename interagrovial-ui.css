@@ -2141,3 +2141,281 @@ body.page-carpetas #tableSection .editActions button.isSaving::before{
   body.page-carpetas #filtersSection.modernFilters .cardHeader{min-height:69px;padding:0 15px}
   body.page-carpetas #filtersSection.modernFilters .filtersBody{padding:14px}
 }
+
+/* ================================================================
+   CARPETAS · TITULOS DE FILTRO Y CALENDARIO COMPACTO
+   ================================================================ */
+
+body.page-carpetas #filtersSection.modernFilters .filterField label{
+  min-height:22px;
+  display:flex;
+  align-items:center;
+  gap:7px;
+  margin-bottom:7px;
+  color:rgba(255,255,255,.78);
+  font-size:8px;
+  line-height:1.2
+}
+
+body.page-carpetas #filtersSection.modernFilters .filterField label::before{
+  content:"";
+  width:21px;
+  height:21px;
+  flex:0 0 21px;
+  border:1px solid rgba(255,222,0,.30);
+  border-radius:7px;
+  background-color:rgba(255,222,0,.96);
+  background-image:var(--filter-title-icon);
+  background-position:center;
+  background-repeat:no-repeat;
+  background-size:13px;
+  box-shadow:0 4px 10px rgba(0,0,0,.12)
+}
+
+body.page-carpetas #filtersSection .filterIcon-search{
+  --filter-title-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23173c1b' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='5.5'/%3E%3Cpath d='m15 15 4.5 4.5'/%3E%3C/svg%3E")
+}
+
+body.page-carpetas #filtersSection .filterIcon-order{
+  --filter-title-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23173c1b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 3h7l4 4v14H7zM14 3v5h5M10 13h5M10 17h5'/%3E%3C/svg%3E")
+}
+
+body.page-carpetas #filtersSection .filterIcon-division{
+  --filter-title-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23173c1b' stroke-width='2' stroke-linejoin='round'%3E%3Crect x='4' y='4' width='6' height='6' rx='1'/%3E%3Crect x='14' y='4' width='6' height='6' rx='1'/%3E%3Crect x='4' y='14' width='6' height='6' rx='1'/%3E%3Crect x='14' y='14' width='6' height='6' rx='1'/%3E%3C/svg%3E")
+}
+
+body.page-carpetas #filtersSection .filterIcon-conditions{
+  --filter-title-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23173c1b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 7 2 2 3-4M12 7h8M4 15l2 2 3-4M12 15h8'/%3E%3C/svg%3E")
+}
+
+body.page-carpetas #filtersSection .filterIcon-wis{
+  --filter-title-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23173c1b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='6' y='5' width='12' height='16' rx='2'/%3E%3Cpath d='M9 5V3h6v2M9 11h6M9 15h4'/%3E%3C/svg%3E")
+}
+
+body.page-carpetas #filtersSection .filterIcon-folder{
+  --filter-title-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23173c1b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'/%3E%3Cpath d='m9 13 2 2 4-4'/%3E%3C/svg%3E")
+}
+
+body.page-carpetas #filtersSection .filterIcon-arrival{
+  --filter-title-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23173c1b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 7h11v9H3zM14 10h4l3 3v3h-7z'/%3E%3Ccircle cx='7' cy='18' r='2'/%3E%3Ccircle cx='18' cy='18' r='2'/%3E%3C/svg%3E")
+}
+
+body.page-carpetas #filtersSection .filterIcon-calendar{
+  --filter-title-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23173c1b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5' width='18' height='16' rx='2'/%3E%3Cpath d='M8 3v4M16 3v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01'/%3E%3C/svg%3E")
+}
+
+body.page-carpetas #filtersSection.modernFilters .filterDate input{
+  padding-left:39px!important;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23536058' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5' width='18' height='16' rx='2'/%3E%3Cpath d='M8 3v4M16 3v4M3 10h18'/%3E%3C/svg%3E");
+  background-position:left 12px center;
+  background-repeat:no-repeat;
+  background-size:16px
+}
+
+/* Evita que los estilos generales de inputs/selects agranden el mes y el año. */
+body.page-carpetas .flatpickr-calendar{
+  width:326px;
+  overflow:hidden;
+  border:1px solid #d8e2d6;
+  border-radius:16px;
+  color:#26342a;
+  background:#fff;
+  box-shadow:0 22px 55px rgba(9,39,14,.24);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif
+}
+
+body.page-carpetas .flatpickr-calendar::before{border-bottom-color:#d8e2d6}
+body.page-carpetas .flatpickr-calendar::after{border-bottom-color:var(--ia-green-900)}
+
+body.page-carpetas .flatpickr-months{
+  height:56px;
+  padding:0 9px;
+  background:linear-gradient(135deg,var(--ia-green-800),var(--ia-green-950))
+}
+
+body.page-carpetas .flatpickr-months .flatpickr-month{
+  height:56px;
+  color:#fff;
+  fill:#fff;
+  background:transparent
+}
+
+body.page-carpetas .flatpickr-current-month{
+  top:0;
+  left:45px;
+  width:218px;
+  height:56px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  padding:0;
+  color:#fff;
+  font-size:12px;
+  line-height:1
+}
+
+body.page-carpetas .flatpickr-current-month .flatpickr-monthDropdown-months{
+  width:134px!important;
+  min-width:134px!important;
+  height:32px!important;
+  min-height:32px!important;
+  margin:0!important;
+  padding:0 8px!important;
+  border:1px solid rgba(255,255,255,.28)!important;
+  border-radius:8px!important;
+  color:#fff!important;
+  background:rgba(255,255,255,.10)!important;
+  box-shadow:none!important;
+  font-size:12px!important;
+  font-weight:750!important;
+  line-height:30px!important
+}
+
+body.page-carpetas .flatpickr-current-month .flatpickr-monthDropdown-months:hover{
+  background:rgba(255,255,255,.17)!important
+}
+
+body.page-carpetas .flatpickr-current-month .flatpickr-monthDropdown-months option{
+  color:#26342a;
+  background:#fff
+}
+
+body.page-carpetas .flatpickr-current-month .numInputWrapper{
+  width:70px!important;
+  height:32px!important
+}
+
+body.page-carpetas .flatpickr-current-month input.cur-year{
+  width:70px!important;
+  min-width:70px!important;
+  height:32px!important;
+  min-height:32px!important;
+  margin:0!important;
+  padding:0 7px!important;
+  border:1px solid rgba(255,255,255,.28)!important;
+  border-radius:8px!important;
+  color:#fff!important;
+  background:rgba(255,255,255,.10)!important;
+  box-shadow:none!important;
+  font-size:12px!important;
+  font-weight:800!important;
+  line-height:30px!important;
+  text-align:center!important
+}
+
+body.page-carpetas .flatpickr-current-month .numInputWrapper span{display:none}
+
+body.page-carpetas .flatpickr-prev-month,
+body.page-carpetas .flatpickr-next-month{
+  top:8px;
+  width:40px;
+  height:40px;
+  display:grid;
+  place-items:center;
+  padding:0;
+  border-radius:10px;
+  color:#fff!important;
+  fill:#fff!important
+}
+
+body.page-carpetas .flatpickr-prev-month:hover,
+body.page-carpetas .flatpickr-next-month:hover{
+  color:var(--ia-yellow)!important;
+  fill:var(--ia-yellow)!important;
+  background:rgba(255,255,255,.10)
+}
+
+body.page-carpetas .flatpickr-prev-month svg,
+body.page-carpetas .flatpickr-next-month svg{width:13px;height:13px;fill:currentColor}
+
+body.page-carpetas .flatpickr-weekdays{
+  height:38px;
+  padding:0 10px;
+  background:#f1f6f0
+}
+
+body.page-carpetas span.flatpickr-weekday{
+  color:#5f6e63;
+  font-size:9px;
+  font-weight:850;
+  letter-spacing:.04em;
+  text-transform:uppercase
+}
+
+body.page-carpetas .flatpickr-days,
+body.page-carpetas .dayContainer{
+  width:326px;
+  min-width:326px;
+  max-width:326px
+}
+
+body.page-carpetas .dayContainer{padding:9px 10px 12px}
+
+body.page-carpetas .flatpickr-day{
+  max-width:none;
+  height:40px;
+  border-radius:10px;
+  color:#314137;
+  font-size:11px;
+  font-weight:650;
+  line-height:40px
+}
+
+body.page-carpetas .flatpickr-day:hover,
+body.page-carpetas .flatpickr-day:focus{
+  border-color:#dce8da;
+  background:#edf5eb
+}
+
+body.page-carpetas .flatpickr-day.today{
+  border-color:var(--ia-yellow);
+  color:var(--ia-green-900);
+  font-weight:850
+}
+
+body.page-carpetas .flatpickr-day.selected,
+body.page-carpetas .flatpickr-day.startRange,
+body.page-carpetas .flatpickr-day.endRange,
+body.page-carpetas .flatpickr-day.selected:hover,
+body.page-carpetas .flatpickr-day.startRange:hover,
+body.page-carpetas .flatpickr-day.endRange:hover{
+  border-color:var(--ia-green-700);
+  color:#fff;
+  background:var(--ia-green-700);
+  box-shadow:none
+}
+
+body.page-carpetas .flatpickr-day.inRange{
+  border-color:#e4f0e1;
+  color:var(--ia-green-900);
+  background:#e4f0e1;
+  box-shadow:-5px 0 0 #e4f0e1,5px 0 0 #e4f0e1
+}
+
+body.page-carpetas .flatpickr-day.flatpickr-disabled,
+body.page-carpetas .flatpickr-day.prevMonthDay,
+body.page-carpetas .flatpickr-day.nextMonthDay{color:#aeb8b0}
+
+@media(max-width:420px){
+  body.page-carpetas .flatpickr-calendar{
+    width:calc(100vw - 24px)
+  }
+
+  body.page-carpetas .flatpickr-days,
+  body.page-carpetas .dayContainer{
+    width:calc(100vw - 24px);
+    min-width:calc(100vw - 24px);
+    max-width:calc(100vw - 24px)
+  }
+
+  body.page-carpetas .flatpickr-current-month{
+    left:43px;
+    width:calc(100% - 86px)
+  }
+
+  body.page-carpetas .flatpickr-current-month .flatpickr-monthDropdown-months{
+    width:118px!important;
+    min-width:118px!important
+  }
+}
