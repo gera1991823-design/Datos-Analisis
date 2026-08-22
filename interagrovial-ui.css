@@ -1,223 +1,769 @@
-/* Interagrovial UI · sistema visual compartido */
-:root {
-  --ia-green:#2f7629;
-  --ia-green-strong:#245f21;
-  --ia-green-deep:#163d1b;
+/* ================================================================
+   INTERAGROVIAL OPERATIONS SUITE · DESIGN SYSTEM 2026
+   Capa exclusivamente visual. La logica y los datos no se modifican.
+   ================================================================ */
+
+:root{
+  --ia-green:#367c2b;
+  --ia-green-700:#286522;
+  --ia-green-800:#1d4f1d;
+  --ia-green-900:#123717;
+  --ia-green-950:#0a2810;
   --ia-yellow:#ffde00;
-  --ia-bg:#f3f6f2;
-  --ia-surface:#fff;
-  --ia-soft:#f8faf7;
-  --ia-text:#18231b;
-  --ia-muted:#68746b;
-  --ia-line:#dfe6dc;
-  --ia-line-strong:#cfd9cc;
-  --ia-shadow-sm:0 4px 14px rgba(24,54,29,.06);
-  --ia-shadow:0 14px 38px rgba(24,54,29,.09);
-  --ia-shadow-lg:0 22px 60px rgba(15,46,23,.14);
-  --ia-radius:16px;
-  --ia-radius-lg:22px;
+  --ia-yellow-soft:#fff7bf;
+  --ia-bg:#f1f4ef;
+  --ia-panel:#f7f9f6;
+  --ia-white:#ffffff;
+  --ia-ink:#172018;
+  --ia-muted:#667168;
+  --ia-line:#dce4da;
+  --ia-line-strong:#cbd6c8;
+  --ia-danger:#b42318;
+  --ia-success:#227a3d;
+  --ia-shadow-xs:0 2px 8px rgba(20,49,24,.05);
+  --ia-shadow-sm:0 8px 22px rgba(20,49,24,.07);
+  --ia-shadow:0 18px 48px rgba(20,49,24,.10);
+  --ia-shadow-lg:0 30px 80px rgba(10,40,16,.18);
+  --ia-r8:8px;
+  --ia-r12:12px;
+  --ia-r16:16px;
+  --ia-r20:20px;
+  --ia-rail:252px;
+  --ia-top:76px;
 }
 
-*{scrollbar-color:#b7c7b4 transparent;scrollbar-width:thin}
+*{scrollbar-width:thin;scrollbar-color:#aebdaa transparent}
 *::-webkit-scrollbar{width:10px;height:10px}
 *::-webkit-scrollbar-track{background:transparent}
-*::-webkit-scrollbar-thumb{border:2px solid transparent;border-radius:999px;background:#b7c7b4;background-clip:padding-box}
+*::-webkit-scrollbar-thumb{border:2px solid transparent;border-radius:999px;background:#aebdaa;background-clip:padding-box}
 
 body.enterprise-ui{
   --green:var(--ia-green);
-  --green-dark:var(--ia-green-deep);
-  --green-deep:#102d16;
-  --green-mid:var(--ia-green-strong);
+  --green-dark:var(--ia-green-900);
+  --green-deep:var(--ia-green-950);
+  --green-mid:var(--ia-green-700);
   --green-soft:#edf5eb;
   --brand:var(--ia-green);
-  --brand-2:var(--ia-green-deep);
-  --brand-3:var(--ia-green-strong);
+  --brand-2:var(--ia-green-900);
+  --brand-3:var(--ia-green-700);
   --jd-green:var(--ia-green);
-  --jd-green-dark:var(--ia-green-deep);
-  --jd-green-900:#102d16;
-  --jd-green-800:#19461f;
-  --jd-green-light:#4b9144;
+  --jd-green-dark:var(--ia-green-900);
+  --jd-green-900:var(--ia-green-950);
+  --jd-green-800:var(--ia-green-900);
+  --jd-green-light:#5b9950;
   --yellow:var(--ia-yellow);
   --jd-yellow:var(--ia-yellow);
   --bg:var(--ia-bg);
-  --surface:var(--ia-surface);
-  --surface-2:var(--ia-soft);
-  --surface-alt:var(--ia-soft);
-  --text:var(--ia-text);
+  --surface:var(--ia-white);
+  --surface-2:var(--ia-panel);
+  --surface-alt:var(--ia-panel);
+  --text:var(--ia-ink);
   --muted:var(--ia-muted);
   --border:var(--ia-line);
   --border-strong:var(--ia-line-strong);
   --line:var(--ia-line);
   --line-strong:var(--ia-line-strong);
   --shadow:var(--ia-shadow-sm);
-  --shadow2:var(--ia-shadow-sm);
-  color:var(--ia-text);
-  background:radial-gradient(circle at 4% 0%,rgba(54,124,43,.08),transparent 25rem),linear-gradient(180deg,#f8faf7 0,var(--ia-bg) 28rem)
+  --shadow2:var(--ia-shadow-xs);
+  color:var(--ia-ink);
+  background:var(--ia-bg);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility
 }
 
-body.enterprise-ui :focus-visible{outline:3px solid rgba(255,222,0,.9);outline-offset:2px}
+body.enterprise-ui a{color:inherit;text-decoration:none}
+body.enterprise-ui svg{display:block}
 body.enterprise-ui button,
 body.enterprise-ui input,
 body.enterprise-ui select,
 body.enterprise-ui textarea{font-family:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif}
 
+body.enterprise-ui :focus-visible{outline:3px solid var(--ia-yellow);outline-offset:3px}
+body.enterprise-ui ::selection{color:#fff;background:var(--ia-green-700)}
+
+body.enterprise-ui label{
+  display:block;
+  margin:0 0 7px;
+  color:#435046;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.055em;
+  text-align:left;
+  text-transform:uppercase
+}
+
 body.enterprise-ui input:not([type="checkbox"]):not([type="radio"]),
 body.enterprise-ui select,
 body.enterprise-ui textarea{
-  border-color:var(--ia-line-strong);
-  background-color:#fff;
-  color:var(--ia-text);
-  box-shadow:inset 0 1px 2px rgba(20,45,25,.025)
+  min-height:44px;
+  border:1px solid var(--ia-line-strong);
+  border-radius:var(--ia-r12);
+  background:#fff;
+  color:var(--ia-ink);
+  box-shadow:inset 0 1px 2px rgba(15,42,20,.025);
+  transition:border-color .15s ease,box-shadow .15s ease,background .15s ease
 }
+
+body.enterprise-ui input::placeholder,
+body.enterprise-ui textarea::placeholder{color:#9ba59d}
 
 body.enterprise-ui input:not([type="checkbox"]):not([type="radio"]):hover,
 body.enterprise-ui select:hover,
-body.enterprise-ui textarea:hover{border-color:#aebda9}
+body.enterprise-ui textarea:hover{border-color:#aebbaa}
 
 body.enterprise-ui input:not([type="checkbox"]):not([type="radio"]):focus,
 body.enterprise-ui select:focus,
-body.enterprise-ui textarea:focus{border-color:var(--ia-green);box-shadow:0 0 0 4px rgba(54,124,43,.12);outline:none}
+body.enterprise-ui textarea:focus{
+  border-color:var(--ia-green);
+  background:#fff;
+  box-shadow:0 0 0 4px rgba(54,124,43,.12);
+  outline:0
+}
 
-body.enterprise-ui label{color:#425047;font-weight:750;letter-spacing:.005em;text-align:left}
-body.enterprise-ui button{font-weight:750;letter-spacing:-.005em}
+body.enterprise-ui button,
+body.enterprise-ui .btn{
+  min-height:42px;
+  border-radius:var(--ia-r12);
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.005em;
+  transition:transform .15s ease,box-shadow .15s ease,background .15s ease,border-color .15s ease
+}
+
+body.enterprise-ui button:hover:not(:disabled),
+body.enterprise-ui .btn:hover:not(:disabled){transform:translateY(-2px)}
+body.enterprise-ui button:active:not(:disabled),
+body.enterprise-ui .btn:active:not(:disabled){transform:translateY(0)}
+body.enterprise-ui button:disabled,
+body.enterprise-ui .btn:disabled{cursor:not-allowed;opacity:.48}
 
 body.enterprise-ui button.primary,
 body.enterprise-ui .btn.primary{
+  border-color:var(--ia-green-700);
   color:#fff;
-  border-color:var(--ia-green-strong);
-  background:linear-gradient(135deg,var(--ia-green),var(--ia-green-strong));
-  box-shadow:0 8px 18px rgba(47,118,41,.2)
+  background:linear-gradient(135deg,var(--ia-green),var(--ia-green-700));
+  box-shadow:0 9px 20px rgba(54,124,43,.22)
 }
+
+body.enterprise-ui button.primary:hover,
+body.enterprise-ui .btn.primary:hover{box-shadow:0 13px 26px rgba(54,124,43,.27)}
 
 body.enterprise-ui button.secondary,
 body.enterprise-ui .btn.secondary,
 body.enterprise-ui button.ghost,
-body.enterprise-ui .btn.ghost{color:var(--ia-green-deep);border-color:var(--ia-line-strong);background:#fff;box-shadow:var(--ia-shadow-sm)}
-
-body.enterprise-ui button:hover:not(:disabled),
-body.enterprise-ui .btn:hover:not(:disabled){transform:translateY(-1px);filter:none;box-shadow:0 10px 22px rgba(29,74,31,.14)}
-body.enterprise-ui button:active:not(:disabled),body.enterprise-ui .btn:active:not(:disabled){transform:translateY(0)}
-body.enterprise-ui button:disabled,body.enterprise-ui .btn:disabled{cursor:not-allowed;opacity:.52}
-
-body.enterprise-ui .card,
-body.enterprise-ui .tableCard,
-body.enterprise-ui .table-wrapper{border-color:var(--ia-line);background:rgba(255,255,255,.98);box-shadow:var(--ia-shadow-sm)}
-body.enterprise-ui .toast{border-radius:12px;box-shadow:var(--ia-shadow-lg)}
-
-/* Acceso al portal desde cada herramienta */
-.suite-home{min-height:40px;display:inline-flex;align-items:center;gap:9px;flex:0 0 auto;padding:0 13px;border:1px solid rgba(255,255,255,.16);border-radius:11px;color:#fff;background:rgba(255,255,255,.08);font-size:11px;font-weight:800;text-decoration:none;transition:background .15s ease,transform .15s ease}
-.suite-home:hover{color:#fff;background:rgba(255,255,255,.15);transform:translateY(-1px)}
-.suite-home svg{width:17px;height:17px}
-.suite-nav-home{text-decoration:none}
-
-/* Portal principal */
-body.page-portal{min-height:100vh;background:radial-gradient(circle at 10% -5%,rgba(54,124,43,.15),transparent 28rem),linear-gradient(180deg,#f8faf7,#eef3ec)}
-body.page-portal .header{position:sticky;top:0;z-index:30;background:linear-gradient(105deg,#143b1b 0%,#245f21 55%,#2f7629 100%);border-bottom:3px solid var(--ia-yellow);box-shadow:0 8px 28px rgba(13,50,21,.2)}
-body.page-portal .header-inner{width:min(1480px,calc(100% - 48px));min-height:82px}
-body.page-portal .logo-wrap{width:236px;height:52px;padding:5px 9px;border-radius:10px;box-shadow:0 5px 16px rgba(0,0,0,.18)}
-body.page-portal .header-copy strong{font-size:14px}
-body.page-portal .header-copy span{color:rgba(255,255,255,.68)}
-body.page-portal .main,body.page-portal .footer{width:min(1480px,calc(100% - 48px))}
-body.page-portal .main{padding:32px 0 42px}
-
-body.page-portal .intro{position:relative;align-items:center;overflow:hidden;min-height:152px;margin-bottom:20px;padding:30px 32px;border:1px solid var(--ia-line);border-left:6px solid var(--ia-green);border-radius:var(--ia-radius-lg);background:linear-gradient(105deg,rgba(255,255,255,.98),rgba(241,247,239,.96));box-shadow:var(--ia-shadow)}
-body.page-portal .intro::after{content:"";position:absolute;width:230px;height:230px;right:12%;top:-145px;border:36px solid rgba(54,124,43,.055);border-radius:50%;pointer-events:none}
-body.page-portal .intro small{margin-bottom:10px;color:var(--ia-green-strong);font-size:10px;letter-spacing:.13em}
-body.page-portal .intro h1{color:#17231a;font-size:clamp(32px,4vw,46px);letter-spacing:-.045em}
-body.page-portal .apps-count{z-index:1;min-height:38px;display:inline-flex;align-items:center;padding:0 14px;border-color:#cbd9c7;color:var(--ia-green-deep);background:rgba(255,255,255,.86);box-shadow:var(--ia-shadow-sm)}
-body.page-portal .grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-body.page-portal .card{min-height:216px;padding:22px;border:1px solid var(--ia-line);border-left:4px solid var(--module);border-top:1px solid var(--ia-line);border-radius:var(--ia-radius);background:linear-gradient(150deg,#fff 0 72%,var(--module-soft) 100%);box-shadow:var(--ia-shadow-sm)}
-body.page-portal .card.carpetas{border-left-color:#d1b800}
-body.page-portal .card:hover{transform:translateY(-4px);border-color:var(--module-border);box-shadow:var(--ia-shadow)}
-body.page-portal .icon{width:54px;height:54px;border-radius:13px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.55)}
-body.page-portal .icon svg{width:27px;height:27px}
-body.page-portal .code{padding:6px 9px;border:1px solid var(--ia-line);border-radius:999px;color:#7b877d;background:rgba(255,255,255,.7);font-size:9px}
-body.page-portal .card h2{margin-top:19px;color:#1b281e;font-size:20px;letter-spacing:-.03em}
-body.page-portal .module-line{width:42px;height:3px;margin-top:11px}
-body.page-portal .card-action{padding-top:22px}
-body.page-portal .tag{min-height:27px;font-size:8px}
-body.page-portal .enter{font-size:11px}
-body.page-portal .enter-icon{width:34px;height:34px;border-radius:10px}
-body.page-portal .footer{padding-bottom:24px;font-size:10px}
-
-/* Aplicaciones con barra lateral */
-body.page-carpetas,body.page-reservas,body.page-facturas{--sidebar:236px;--sidebar-w:236px;--topbar:68px;--topbar-h:68px}
-body.page-carpetas.navCollapsed,body.page-reservas.navCollapsed{--sidebar:76px}
-body.page-carpetas .sidebar,body.page-reservas .sidebar,body.page-facturas .sidebar{background:radial-gradient(circle at 12% 0%,rgba(255,222,0,.13),transparent 15rem),linear-gradient(180deg,#1f5b25 0%,#17491e 45%,#102f16 100%);border-right-color:rgba(255,255,255,.1);box-shadow:10px 0 28px rgba(16,48,22,.09)}
-body.page-carpetas .topbar,body.page-reservas .topbar,body.page-facturas .app-topbar{background:linear-gradient(105deg,#173f1c,#2f7629);border-bottom:3px solid var(--ia-yellow);box-shadow:0 7px 22px rgba(15,46,21,.14)}
-body.page-carpetas .sideNav,body.page-reservas .sideNav,body.page-facturas .side-nav{gap:5px}
-body.page-carpetas .navItem,body.page-reservas .navItem,body.page-facturas .nav-item{min-height:44px;border-radius:10px;color:rgba(255,255,255,.76)}
-body.page-carpetas .navItem.active,body.page-reservas .navItem.active,body.page-facturas .nav-item.active{color:#fff;background:rgba(255,255,255,.12);box-shadow:inset 3px 0 0 var(--ia-yellow)}
-body.page-carpetas .suite-nav-home,body.page-reservas .suite-nav-home,body.page-facturas .suite-nav-home{margin-bottom:8px;color:#fff;background:rgba(0,0,0,.08);border:1px solid rgba(255,255,255,.08)}
-body.page-carpetas .suite-nav-home svg,body.page-reservas .suite-nav-home svg{color:var(--ia-yellow)}
-body.page-facturas .content,body.page-carpetas .appMain,body.page-reservas .appMain{max-width:1700px}
-body.page-carpetas .appMain,body.page-reservas .appMain{padding-top:calc(var(--topbar) + 24px)}
-body.page-facturas .content{padding-top:26px}
-
-body.page-carpetas .pageHeader,body.page-reservas .pageHeader,body.page-facturas .page-head{padding:22px 24px;border:1px solid var(--ia-line);border-radius:var(--ia-radius);background:linear-gradient(110deg,#fff,#f3f8f1);box-shadow:var(--ia-shadow-sm)}
-body.page-carpetas .pageHeader h1,body.page-reservas .pageHeader h1,body.page-facturas .page-head h1{color:#17241a;font-size:28px;font-weight:800}
-body.page-carpetas .pageHeader p,body.page-reservas .pageHeader p{color:var(--ia-muted);font-size:12px}
-body.page-carpetas .statsGrid{gap:12px}
-body.page-carpetas .statCard{min-height:88px;border-radius:14px;background:#fff;box-shadow:var(--ia-shadow-sm)}
-body.page-carpetas .card,body.page-reservas .card,body.page-facturas .card,body.page-carpetas .tableCard,body.page-reservas .tableCard{border-radius:var(--ia-radius);box-shadow:var(--ia-shadow-sm)}
-body.page-carpetas .sectionHead,body.page-reservas .sectionHead,body.page-carpetas .tableHead,body.page-reservas .tableHead,body.page-facturas .card h2{background:linear-gradient(90deg,#fbfcfa,#f3f7f1)}
-body.page-carpetas .cardBody,body.page-reservas .cardBody{padding-top:20px;padding-bottom:20px}
-
-body.page-carpetas input:not([type="checkbox"]):not([type="radio"]),body.page-carpetas select,
-body.page-reservas input:not([type="checkbox"]):not([type="radio"]),body.page-reservas select,
-body.page-facturas input:not([type="checkbox"]):not([type="radio"]),body.page-facturas select{min-height:42px;border-radius:10px}
-body.page-carpetas .primary,body.page-reservas .primary,body.page-facturas .primary,
-body.page-carpetas .secondary,body.page-reservas .secondary,body.page-facturas .secondary,
-body.page-carpetas .ghost,body.page-facturas .ghost{min-height:42px;border-radius:10px}
-body.page-carpetas .tableWrap,body.page-reservas .tableWrap,body.page-facturas .table-wrap{border-top:1px solid var(--ia-line);background:#fff}
-body.page-carpetas thead th,body.page-reservas thead th,body.page-facturas thead th{background:#1f5726;color:#fff;border-color:rgba(255,255,255,.12);font-size:10px;letter-spacing:.035em}
-body.page-carpetas tbody tr:hover td,body.page-reservas tbody tr:hover td,body.page-facturas tbody tr:hover td{background:#f0f7ed}
-
-/* Aplicaciones operativas sin barra lateral */
-body.page-stock,body.page-reclamos,body.page-solicitudes{min-height:100vh;margin:0;padding:0 24px 82px}
-body.page-stock .topbar,body.page-reclamos .topbar,body.page-solicitudes .topbar{min-height:74px;margin:0 -24px 24px;padding:12px 24px;border:0;border-bottom:3px solid var(--ia-yellow);border-radius:0;background:linear-gradient(105deg,#163d1b,#2f7629);box-shadow:0 8px 28px rgba(14,47,20,.18)}
-body.page-stock .company,body.page-reclamos .companyName{color:rgba(255,255,255,.8);font-size:11px;letter-spacing:.08em}
-body.page-stock .title,body.page-reclamos .title,body.page-solicitudes .title{position:static;transform:none;order:initial;width:auto;margin:0 auto;padding:0;color:#fff;background:transparent;border:0;box-shadow:none;font-size:25px;letter-spacing:-.025em}
-body.page-stock .title span{border-bottom:0;padding-bottom:0}
-body.page-reclamos .title::after{display:none}
-body.page-reclamos .titleIcon{width:42px;height:42px;border-radius:11px}
-body.page-reclamos .titleIcon svg{width:23px;height:23px}
-body.page-reclamos .titleText small{margin-top:5px;font-size:9px}
-body.page-stock .container{padding:0;max-width:1700px}
-body.page-stock .card,body.page-reclamos .card,body.page-solicitudes .card{border:1px solid var(--ia-line);border-radius:var(--ia-radius);background:#fff;box-shadow:var(--ia-shadow-sm)}
-body.page-stock .card::before,body.page-reclamos .accentBar,body.page-solicitudes .accentBar{width:5px;background:var(--ia-green)}
-body.page-stock .panel-title,body.page-reclamos .card h3,body.page-solicitudes .card h3,body.page-reclamos .cardHeader h3,body.page-solicitudes .cardHeader h3{color:var(--ia-green-deep);background:#f1f7ef;border-color:#dce9d9;box-shadow:none}
-
-body.page-stock input:not([type="checkbox"]),body.page-stock select,body.page-stock textarea,
-body.page-reclamos input:not([type="checkbox"]),body.page-reclamos select,body.page-reclamos textarea,
-body.page-solicitudes input:not([type="checkbox"]),body.page-solicitudes select,body.page-solicitudes textarea{min-height:43px;border-radius:10px}
-body.page-stock .btn,body.page-reclamos button,body.page-solicitudes button{min-height:42px;border-radius:10px}
-body.page-stock .upload-box{border-radius:14px;background:#f3f8f1}
-body.page-stock .table-wrapper,body.page-reclamos>table,body.page-solicitudes>table{border:1px solid var(--ia-line);border-radius:var(--ia-radius);background:#fff;box-shadow:var(--ia-shadow-sm)}
-body.page-reclamos>table,body.page-solicitudes>table{width:100%;max-height:calc(100vh - 190px);overflow:auto}
-body.page-stock thead th,body.page-reclamos thead th,body.page-solicitudes thead th{background:#1f5726;color:#fff;border-color:rgba(255,255,255,.12);font-size:10px;letter-spacing:.035em}
-body.page-stock tbody tr:nth-child(even) td,body.page-reclamos tbody tr:nth-child(even) td,body.page-solicitudes tbody tr:nth-child(even) td{background:#f8faf7}
-body.page-stock tbody tr:hover td,body.page-reclamos tbody tr:hover td,body.page-solicitudes tbody tr:hover td{background:#eef6eb}
-body.page-stock .footer,body.page-reclamos .footer,body.page-solicitudes .footer{left:24px;bottom:16px;border:1px solid var(--ia-line);border-left:4px solid var(--ia-green);border-radius:10px;box-shadow:var(--ia-shadow-sm)}
-
-@media(max-width:1200px){body.page-portal .grid{grid-template-columns:repeat(2,minmax(0,1fr))}body.page-facturas{--sidebar-w:76px}}
-@media(max-width:980px){body.page-carpetas,body.page-reservas,body.page-facturas{--sidebar:236px;--sidebar-w:236px}body.page-carpetas .pageHeader,body.page-reservas .pageHeader,body.page-facturas .page-head{padding:19px}}
-
-@media(max-width:720px){
-  body.page-portal .header-inner,body.page-portal .main,body.page-portal .footer{width:calc(100% - 28px)}
-  body.page-portal .header-inner{min-height:72px}
-  body.page-portal .logo-wrap{width:194px;height:47px}
-  body.page-portal .main{padding-top:20px}
-  body.page-portal .intro{min-height:0;padding:24px 20px}
-  body.page-portal .intro h1{font-size:31px}
-  body.page-portal .grid{grid-template-columns:1fr;gap:12px}
-  body.page-portal .card{min-height:198px;padding:19px}
-  body.page-stock,body.page-reclamos,body.page-solicitudes{padding-right:14px;padding-left:14px}
-  body.page-stock .topbar,body.page-reclamos .topbar,body.page-solicitudes .topbar{min-height:66px;margin-right:-14px;margin-left:-14px;padding:10px 14px}
-  body.page-stock .title,body.page-reclamos .title,body.page-solicitudes .title{font-size:20px}
-  body.page-reclamos .titleIcon{display:none}
-  .suite-home span{display:none}
-  .suite-home{width:40px;justify-content:center;padding:0}
+body.enterprise-ui .btn.ghost{
+  border:1px solid var(--ia-line-strong);
+  color:var(--ia-green-900);
+  background:#fff;
+  box-shadow:var(--ia-shadow-xs)
 }
 
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+body.enterprise-ui button.danger,
+body.enterprise-ui .btn.danger{border-color:#efc5c1;color:var(--ia-danger);background:#fff5f4;box-shadow:none}
+
+body.enterprise-ui .toast{border-radius:14px;box-shadow:var(--ia-shadow-lg)}
+
+/* ================================================================
+   PORTAL · CENTRO DE OPERACIONES
+   ================================================================ */
+
+body.page-portal{
+  min-height:100vh;
+  padding-left:var(--ia-rail);
+  background:
+    radial-gradient(circle at 82% 2%,rgba(54,124,43,.09),transparent 27rem),
+    var(--ia-bg)
+}
+
+.portalSidebar{
+  position:fixed;
+  inset:0 auto 0 0;
+  z-index:120;
+  width:var(--ia-rail);
+  display:flex;
+  flex-direction:column;
+  padding:0 16px 18px;
+  color:#fff;
+  background:
+    radial-gradient(circle at 10% -2%,rgba(255,222,0,.20),transparent 14rem),
+    linear-gradient(165deg,var(--ia-green-800),var(--ia-green-950) 78%);
+  box-shadow:12px 0 35px rgba(10,40,16,.12)
+}
+
+.portalBrand{
+  min-height:92px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin:0 -16px 18px;
+  padding:0 18px;
+  border-bottom:1px solid rgba(255,255,255,.10)
+}
+
+.portalBrandMark,
+.suiteRailMark,
+.suiteSideMark{
+  width:40px;
+  height:40px;
+  display:grid;
+  place-items:center;
+  flex:0 0 40px;
+  border-radius:12px;
+  color:var(--ia-green-950);
+  background:var(--ia-yellow);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.35),0 8px 18px rgba(0,0,0,.16);
+  font-size:13px;
+  font-weight:900;
+  letter-spacing:-.04em
+}
+
+.portalBrandCopy strong,
+.suiteRailBrand strong,
+.suiteSideBrand strong{display:block;color:#fff;font-size:12px;font-weight:850;letter-spacing:.015em}
+.portalBrandCopy small,
+.suiteRailBrand small,
+.suiteSideBrand small{display:block;margin-top:3px;color:rgba(255,255,255,.52);font-size:8px;font-weight:750;letter-spacing:.11em;text-transform:uppercase}
+.portalNavLabel,.suiteRailLabel{padding:7px 10px;color:rgba(255,255,255,.38);font-size:8px;font-weight:850;letter-spacing:.14em;text-transform:uppercase}
+.portalNav{display:grid;gap:5px}
+
+.portalNavItem,
+.suiteRailItem{
+  min-height:46px;
+  display:flex;
+  align-items:center;
+  gap:11px;
+  padding:0 12px;
+  border:1px solid transparent;
+  border-radius:12px;
+  color:rgba(255,255,255,.72);
+  font-size:11px;
+  font-weight:750
+}
+
+.portalNavItem svg,.suiteRailItem svg{width:18px;height:18px;flex:0 0 18px}
+.portalNavItem:hover,.suiteRailItem:hover{color:#fff;background:rgba(255,255,255,.07)}
+.portalNavItem.active,.suiteRailItem.active{
+  color:#fff;
+  background:rgba(255,255,255,.11);
+  border-color:rgba(255,255,255,.08);
+  box-shadow:inset 3px 0 0 var(--ia-yellow)
+}
+.portalNavItem.active svg,.suiteRailItem.active svg{color:var(--ia-yellow)}
+.portalSidebarSpace,.suiteRailSpace{flex:1}
+
+.portalStatus{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:13px;
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:13px;
+  background:rgba(255,255,255,.045)
+}
+.portalStatus>span,.suiteRailStatus>span{width:8px;height:8px;flex:0 0 8px;border-radius:50%;background:#78dc99;box-shadow:0 0 0 5px rgba(120,220,153,.11)}
+.portalStatus strong{display:block;font-size:9px;font-weight:800}
+.portalStatus small{display:block;margin-top:3px;color:rgba(255,255,255,.48);font-size:8px}
+
+body.page-portal .header{
+  position:sticky;
+  top:0;
+  z-index:90;
+  height:var(--ia-top);
+  border:0;
+  border-bottom:1px solid var(--ia-line);
+  background:rgba(255,255,255,.92);
+  box-shadow:0 5px 22px rgba(20,49,24,.05);
+  backdrop-filter:blur(18px)
+}
+
+body.page-portal .header-inner{width:auto;max-width:none;min-height:var(--ia-top);margin:0;padding:0 34px}
+body.page-portal .logo-wrap{width:205px;height:46px;padding:5px 9px;border:1px solid var(--ia-line);border-radius:11px;background:#fff;box-shadow:var(--ia-shadow-xs)}
+body.page-portal .header-copy{color:var(--ia-ink)}
+body.page-portal .header-copy strong{font-size:12px;font-weight:800}
+body.page-portal .header-copy span{color:var(--ia-muted);font-size:9px}
+
+body.page-portal .main{width:auto;max-width:1580px;margin:0 auto;padding:34px clamp(24px,3vw,48px) 42px}
+body.page-portal .intro{
+  position:relative;
+  min-height:210px;
+  align-items:flex-end;
+  overflow:hidden;
+  margin:0 0 18px;
+  padding:34px 36px;
+  border:0;
+  border-radius:22px;
+  color:#fff;
+  background:
+    radial-gradient(circle at 87% 10%,rgba(255,222,0,.24),transparent 12rem),
+    linear-gradient(125deg,var(--ia-green-900),var(--ia-green) 78%);
+  box-shadow:var(--ia-shadow)
+}
+
+body.page-portal .intro::before{
+  content:"";
+  position:absolute;
+  width:260px;
+  height:260px;
+  right:-45px;
+  bottom:-150px;
+  border:38px solid rgba(255,255,255,.08);
+  border-radius:50%
+}
+
+body.page-portal .intro small{margin:0 0 12px;color:var(--ia-yellow);font-size:9px;letter-spacing:.15em}
+body.page-portal .intro h1{margin:0;color:#fff;font-size:clamp(34px,4vw,52px);font-weight:780;letter-spacing:-.052em}
+body.page-portal .apps-count{
+  position:relative;
+  z-index:1;
+  min-height:40px;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:0 14px;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:999px;
+  color:#fff;
+  background:rgba(255,255,255,.10);
+  box-shadow:none;
+  backdrop-filter:blur(8px)
+}
+body.page-portal .apps-count>span{width:7px;height:7px;border-radius:50%;background:var(--ia-yellow);box-shadow:0 0 0 4px rgba(255,222,0,.12)}
+
+body.page-portal .grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:14px}
+body.page-portal .card{
+  min-height:218px;
+  grid-column:span 3;
+  padding:22px;
+  border:1px solid var(--ia-line);
+  border-radius:18px;
+  color:var(--ia-ink);
+  background:#fff;
+  box-shadow:var(--ia-shadow-xs);
+  transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease
+}
+
+body.page-portal .card:nth-child(1){grid-column:span 7;min-height:252px}
+body.page-portal .card:nth-child(2){grid-column:span 5;min-height:252px}
+body.page-portal .card:hover{transform:translateY(-5px);border-color:#bdccb9;box-shadow:var(--ia-shadow)}
+body.page-portal .card.reservas{
+  color:#fff;
+  border-color:transparent;
+  background:linear-gradient(145deg,var(--ia-green-800),var(--ia-green-700));
+  box-shadow:0 18px 42px rgba(28,86,30,.20)
+}
+body.page-portal .card.carpetas{border-color:#e1d47b;background:linear-gradient(145deg,#fff,#fffbe1)}
+body.page-portal .icon{width:56px;height:56px;border:1px solid var(--module-border);border-radius:15px;background:var(--module-soft);box-shadow:none}
+body.page-portal .icon svg{width:27px;height:27px}
+body.page-portal .card.reservas .icon{border-color:rgba(255,255,255,.16);color:var(--ia-yellow);background:rgba(255,255,255,.10)}
+body.page-portal .code{padding:6px 9px;border:1px solid var(--ia-line);border-radius:999px;color:#7b867e;background:#fff;font-size:8px}
+body.page-portal .card.reservas .code{border-color:rgba(255,255,255,.16);color:rgba(255,255,255,.72);background:rgba(255,255,255,.08)}
+body.page-portal .card h2{margin:21px 0 0;color:inherit;font-size:20px;font-weight:780;letter-spacing:-.032em}
+body.page-portal .card:nth-child(-n+2) h2{font-size:25px}
+body.page-portal .module-line{width:36px;height:3px;margin-top:12px;background:var(--module)}
+body.page-portal .card.reservas .module-line{background:var(--ia-yellow)}
+body.page-portal .card-action{padding-top:22px}
+body.page-portal .tag{min-height:27px;padding:0 10px;font-size:8px}
+body.page-portal .card.reservas .tag{border-color:rgba(255,255,255,.15);color:#fff;background:rgba(255,255,255,.08)}
+body.page-portal .enter{font-size:10px}
+body.page-portal .card.reservas .enter{color:#fff}
+body.page-portal .enter-icon{width:35px;height:35px;border-radius:11px}
+body.page-portal .card.reservas .enter-icon{color:var(--ia-green-950);background:var(--ia-yellow)}
+body.page-portal .footer{width:auto;max-width:1580px;margin:0 auto;padding:0 clamp(24px,3vw,48px) 28px;color:#7a857d;font-size:9px}
+
+/* ================================================================
+   NAVEGACION COMUN DE LAS HERRAMIENTAS SIMPLES
+   ================================================================ */
+
+.suiteRail{
+  position:fixed;
+  inset:0 auto 0 0;
+  z-index:120;
+  width:var(--ia-rail);
+  display:flex;
+  flex-direction:column;
+  padding:0 15px 18px;
+  color:#fff;
+  background:
+    radial-gradient(circle at 10% -2%,rgba(255,222,0,.17),transparent 14rem),
+    linear-gradient(165deg,var(--ia-green-800),var(--ia-green-950) 80%);
+  box-shadow:12px 0 35px rgba(10,40,16,.11)
+}
+
+.suiteRailBrand{min-height:92px;display:flex;align-items:center;gap:11px;margin:0 -15px 18px;padding:0 17px;border-bottom:1px solid rgba(255,255,255,.10)}
+.suiteRail nav{display:grid;gap:5px}
+.suiteRailStatus{display:flex;align-items:center;gap:10px;padding:13px;border:1px solid rgba(255,255,255,.08);border-radius:12px;color:rgba(255,255,255,.68);background:rgba(255,255,255,.04);font-size:8px;font-weight:750}
+
+.suite-home{min-height:40px;display:inline-flex;align-items:center;gap:8px;padding:0 12px;border:1px solid var(--ia-line);border-radius:11px;color:var(--ia-green-900);background:#fff;font-size:10px;font-weight:800;box-shadow:var(--ia-shadow-xs)}
+.suite-home svg{width:17px;height:17px}
+
+body.page-stock,
+body.page-reclamos,
+body.page-solicitudes{
+  min-height:100vh;
+  margin:0;
+  padding:0 28px 86px calc(var(--ia-rail) + 28px);
+  background:radial-gradient(circle at 90% 0,rgba(54,124,43,.07),transparent 24rem),var(--ia-bg)
+}
+
+body.page-stock .topbar,
+body.page-reclamos .topbar,
+body.page-solicitudes .topbar{
+  position:sticky;
+  top:0;
+  z-index:80;
+  min-height:var(--ia-top);
+  margin:0 -28px 26px;
+  padding:0 28px;
+  border:0;
+  border-bottom:1px solid var(--ia-line);
+  border-radius:0;
+  color:var(--ia-ink);
+  background:rgba(255,255,255,.93);
+  box-shadow:0 5px 22px rgba(20,49,24,.05);
+  backdrop-filter:blur(18px);
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+  gap:14px
+}
+
+body.page-stock .topbar>*:last-child,
+body.page-reclamos .topbar>*:last-child,
+body.page-solicitudes .topbar>*:last-child{justify-self:end}
+
+body.page-stock .suite-home,
+body.page-reclamos .suite-home,
+body.page-solicitudes .suite-home{visibility:hidden}
+
+body.page-stock .title,
+body.page-reclamos .title,
+body.page-solicitudes .title{
+  position:static;
+  transform:none;
+  width:auto;
+  margin:0 auto;
+  padding:0;
+  border:0;
+  color:var(--ia-ink);
+  background:transparent;
+  box-shadow:none;
+  font-size:21px;
+  font-weight:800;
+  letter-spacing:-.03em
+}
+
+body.page-stock .title span{padding:0;border:0}
+body.page-reclamos .title::after{display:none}
+body.page-reclamos .titleIcon{width:38px;height:38px;border:1px solid #d6e3d2;border-radius:11px;background:#edf5eb;box-shadow:none}
+body.page-reclamos .titleIcon svg{width:21px;height:21px}
+body.page-reclamos .titleText small{margin-top:5px;color:var(--ia-muted);font-size:8px}
+body.page-reclamos .subpill,body.page-solicitudes .subpill{border-color:var(--ia-line);color:var(--ia-muted);background:#fff;box-shadow:none}
+body.page-reclamos .subpill b,body.page-solicitudes .subpill b{color:var(--ia-green-700)}
+body.page-stock .container{max-width:1650px;margin:0 auto;padding:0}
+
+body.page-stock .card,
+body.page-reclamos .card,
+body.page-solicitudes .card{
+  overflow:hidden;
+  margin-bottom:16px;
+  padding:22px;
+  border:1px solid var(--ia-line);
+  border-radius:18px;
+  background:#fff;
+  box-shadow:var(--ia-shadow-xs)
+}
+
+body.page-stock .card::before,
+body.page-reclamos .accentBar,
+body.page-solicitudes .accentBar{display:none}
+
+body.page-stock .panel-title,
+body.page-reclamos .card>h3,
+body.page-solicitudes .card>h3,
+body.page-reclamos .cardHeader h3,
+body.page-solicitudes .cardHeader h3{
+  position:static;
+  transform:none;
+  width:auto;
+  display:block;
+  margin:0;
+  padding:0;
+  border:0;
+  border-radius:0;
+  color:var(--ia-ink);
+  background:transparent;
+  box-shadow:none;
+  font-size:14px;
+  font-weight:800;
+  letter-spacing:-.015em;
+  text-align:left;
+  text-transform:none
+}
+
+body.page-stock .panel-title{margin:-22px -22px 20px;padding:18px 22px;border-bottom:1px solid var(--ia-line);background:linear-gradient(90deg,#fff,#f6f9f5)}
+body.page-reclamos .cardHeader,body.page-solicitudes .cardHeader{min-height:58px;margin:-22px -22px 20px;padding:0 22px;border-bottom:1px solid var(--ia-line);background:linear-gradient(90deg,#fff,#f6f9f5)}
+body.page-reclamos .cardHeader .row,body.page-solicitudes .cardHeader .row{display:flex;gap:8px;margin-left:auto}
+body.page-reclamos .card>.row,body.page-reclamos .row-add,body.page-solicitudes .card>.row,body.page-solicitudes .row-add{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:14px;align-items:end}
+body.page-reclamos .card>.row>div,body.page-reclamos .row-add>div,body.page-solicitudes .card>.row>div,body.page-solicitudes .row-add>div{width:auto!important;min-width:0!important}
+body.page-reclamos .w110,body.page-reclamos .w140,body.page-reclamos .w160,body.page-reclamos .w200,body.page-reclamos .w220,
+body.page-solicitudes .w110,body.page-solicitudes .w140,body.page-solicitudes .w160,body.page-solicitudes .w200,body.page-solicitudes .w220{width:100%!important}
+body.page-reclamos .row-add>button,body.page-solicitudes .row-add>button{min-height:44px;align-self:end}
+
+body.page-stock .grid{grid-template-columns:minmax(0,1.45fr) minmax(330px,.55fr);gap:18px}
+body.page-stock .filters{grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:14px}
+body.page-stock .upload-box{min-height:150px;border:1.5px dashed #9fba99;border-radius:15px;background:#f1f7ef}
+body.page-stock .toolbar{padding:4px 2px}
+body.page-stock .row-count{border:1px solid #d4e3d0;color:var(--ia-green-800);background:#edf5eb;box-shadow:none}
+
+body.page-stock .table-wrapper,
+body.page-reclamos>table,
+body.page-solicitudes>table{
+  overflow:auto;
+  border:1px solid var(--ia-line);
+  border-radius:18px;
+  background:#fff;
+  box-shadow:var(--ia-shadow-xs)
+}
+
+body.page-reclamos>table,body.page-solicitudes>table{display:block;width:100%;max-height:58vh}
+body.page-stock thead th,body.page-reclamos thead th,body.page-solicitudes thead th{
+  position:sticky;
+  top:0;
+  z-index:4;
+  padding:12px 11px;
+  border-right:1px solid var(--ia-line);
+  border-bottom:1px solid var(--ia-line-strong);
+  color:var(--ia-green-900);
+  background:#eef4ec;
+  font-size:9px;
+  font-weight:850;
+  letter-spacing:.055em
+}
+body.page-stock tbody td,body.page-reclamos tbody td,body.page-solicitudes tbody td{border-color:#e7ece5;background:#fff}
+body.page-stock tbody tr:nth-child(even) td,body.page-reclamos tbody tr:nth-child(even) td,body.page-solicitudes tbody tr:nth-child(even) td{background:#fafbf9}
+body.page-stock tbody tr:hover td,body.page-reclamos tbody tr:hover td,body.page-solicitudes tbody tr:hover td{background:#eef6eb}
+body.page-stock tbody input:not([type="checkbox"]),body.page-stock tbody select,body.page-stock tbody textarea,
+body.page-reclamos tbody input:not([type="checkbox"]),body.page-reclamos tbody select,body.page-reclamos tbody textarea,
+body.page-solicitudes tbody input:not([type="checkbox"]),body.page-solicitudes tbody select,body.page-solicitudes tbody textarea{min-height:36px;border-radius:8px}
+body.page-stock .footer,body.page-reclamos .footer,body.page-solicitudes .footer{left:calc(var(--ia-rail) + 28px);bottom:16px;border:1px solid var(--ia-line);border-left:4px solid var(--ia-green);border-radius:11px;background:#fff;box-shadow:var(--ia-shadow-sm)}
+
+/* ================================================================
+   HERRAMIENTAS CON SIDEBAR PROPIA
+   ================================================================ */
+
+body.page-carpetas,body.page-reservas,body.page-facturas{
+  --sidebar:252px;
+  --sidebar-w:252px;
+  --topbar:76px;
+  --topbar-h:76px;
+  background:var(--ia-bg)
+}
+
+body.page-carpetas.navCollapsed,body.page-reservas.navCollapsed{--sidebar:76px}
+body.page-carpetas .sidebar,body.page-reservas .sidebar,body.page-facturas .sidebar{
+  color:#fff;
+  background:
+    radial-gradient(circle at 10% -2%,rgba(255,222,0,.17),transparent 14rem),
+    linear-gradient(165deg,var(--ia-green-800),var(--ia-green-950) 80%);
+  border-right:0;
+  box-shadow:12px 0 35px rgba(10,40,16,.11)
+}
+
+.suiteSideBrand{min-height:92px;display:flex;align-items:center;gap:11px;padding:0 17px;border-bottom:1px solid rgba(255,255,255,.10)}
+body.page-carpetas.navCollapsed .suiteSideBrand{justify-content:center;padding:0}
+body.page-carpetas.navCollapsed .suiteSideBrand>span:last-child{display:none}
+body.page-carpetas .sideNavSingle{padding-top:16px}
+body.page-reservas .brand{height:92px;padding:0 17px;border-color:rgba(255,255,255,.10)}
+body.page-reservas .brandLogo{width:42px;height:42px;border-radius:12px}
+body.page-reservas .brandText strong{font-size:11px}
+body.page-facturas .brand-card{min-height:92px;margin:0 -4px 14px;padding:15px 4px;border-bottom:1px solid rgba(255,255,255,.10);border-radius:0;background:transparent;box-shadow:none}
+body.page-facturas .brand-word{color:#fff;font-size:12px}
+body.page-facturas .brand-line{background:linear-gradient(90deg,var(--ia-yellow) 0 36%,rgba(255,255,255,.18) 36%)}
+body.page-facturas .brand-sub{color:rgba(255,255,255,.48)}
+body.page-facturas .company-meta{padding:0 6px 12px;color:rgba(255,255,255,.48);font-size:8px}
+
+body.page-carpetas .navItem,body.page-reservas .navItem,body.page-facturas .nav-item{
+  min-height:46px;
+  border:1px solid transparent;
+  border-radius:12px;
+  color:rgba(255,255,255,.70);
+  font-size:10px;
+  font-weight:750
+}
+body.page-carpetas .navItem:hover,body.page-reservas .navItem:hover,body.page-facturas .nav-item:hover{color:#fff;background:rgba(255,255,255,.07)}
+body.page-carpetas .navItem.active,body.page-reservas .navItem.active,body.page-facturas .nav-item.active{color:#fff;background:rgba(255,255,255,.11);border-color:rgba(255,255,255,.08);box-shadow:inset 3px 0 0 var(--ia-yellow)}
+body.page-carpetas .suite-nav-home,body.page-reservas .suite-nav-home,body.page-facturas .suite-nav-home{margin-bottom:7px;color:rgba(255,255,255,.82);background:rgba(0,0,0,.09)}
+body.page-carpetas .suite-nav-home svg,body.page-reservas .suite-nav-home svg{color:var(--ia-yellow)}
+
+body.page-carpetas .topbar,body.page-reservas .topbar,body.page-facturas .app-topbar{
+  border:0;
+  border-bottom:1px solid var(--ia-line);
+  color:var(--ia-ink);
+  background:rgba(255,255,255,.93);
+  box-shadow:0 5px 22px rgba(20,49,24,.05);
+  backdrop-filter:blur(18px)
+}
+body.page-carpetas .menuBtn,body.page-reservas .menuBtn{color:var(--ia-green-900);background:#f1f5ef}
+body.page-carpetas .menuBtn:hover,body.page-reservas .menuBtn:hover{color:var(--ia-green-900);background:#e7efe4}
+body.page-carpetas .topHeading small{color:var(--ia-muted)}
+body.page-carpetas .topTitle,body.page-reservas .topTitle,body.page-facturas .app-title{color:var(--ia-ink);font-size:14px;font-weight:800}
+body.page-facturas .menu-glyph{color:var(--ia-green-700)}
+body.page-carpetas .live,body.page-reservas .live,body.page-facturas .live-pill{border-color:#d6e4d2;color:var(--ia-green-800);background:#edf5eb}
+body.page-carpetas .liveDot,body.page-reservas .liveDot,body.page-facturas .live-dot{background:#48ad65;box-shadow:0 0 0 4px rgba(72,173,101,.12)}
+
+body.page-carpetas .appMain,body.page-reservas .appMain{max-width:none;padding:calc(var(--topbar) + 24px) clamp(20px,2.4vw,38px) 38px}
+body.page-facturas .content{max-width:1720px;padding:24px clamp(18px,2.4vw,38px) 38px}
+
+body.page-carpetas .pageHeader,body.page-reservas .pageHeader,body.page-facturas .page-head{
+  position:relative;
+  overflow:hidden;
+  align-items:flex-end;
+  min-height:152px;
+  margin-bottom:16px;
+  padding:27px 28px;
+  border:0;
+  border-radius:20px;
+  color:#fff;
+  background:
+    radial-gradient(circle at 91% 2%,rgba(255,222,0,.22),transparent 12rem),
+    linear-gradient(125deg,var(--ia-green-900),var(--ia-green) 82%);
+  box-shadow:var(--ia-shadow-sm)
+}
+
+body.page-carpetas .pageHeader::after,body.page-reservas .pageHeader::after,body.page-facturas .page-head::after{content:"";position:absolute;width:180px;height:180px;right:-50px;bottom:-105px;border:26px solid rgba(255,255,255,.08);border-radius:50%;pointer-events:none}
+body.page-carpetas .pageEyebrow,body.page-reservas .pageEyebrow,body.page-facturas .page-kicker{color:var(--ia-yellow)}
+body.page-carpetas .pageEyebrow svg,body.page-reservas .pageEyebrow svg{stroke:var(--ia-yellow)}
+body.page-carpetas .pageHeader h1,body.page-reservas .pageHeader h1,body.page-facturas .page-head h1{position:relative;z-index:1;color:#fff;font-size:30px;font-weight:800;letter-spacing:-.045em}
+body.page-carpetas .pageHeader p,body.page-reservas .pageHeader p{position:relative;z-index:1;max-width:720px;color:rgba(255,255,255,.68);font-size:11px}
+body.page-carpetas .pageActions,body.page-reservas .pageActions{position:relative;z-index:2}
+body.page-carpetas .pageActions .ghost,body.page-reservas .pageActions button:first-child{border-color:rgba(255,255,255,.20);color:#fff;background:rgba(255,255,255,.09);box-shadow:none}
+body.page-carpetas .pageActions .secondary,body.page-reservas .pageActions .secondary{border-color:var(--ia-yellow);color:var(--ia-green-950);background:var(--ia-yellow);box-shadow:0 9px 20px rgba(0,0,0,.12)}
+body.page-reservas .sectionBadge{position:relative;z-index:2;border-color:rgba(255,255,255,.15);color:#fff;background:rgba(255,255,255,.09)}
+body.page-reservas .sectionBadgeDot{background:var(--ia-yellow)}
+
+body.page-carpetas .statsGrid{gap:12px;margin-bottom:16px}
+body.page-carpetas .statCard{min-height:92px;padding:16px;border:1px solid var(--ia-line);border-radius:16px;background:#fff;box-shadow:var(--ia-shadow-xs)}
+body.page-carpetas .statCard::after{height:3px;background:var(--ia-green)}
+body.page-carpetas .statIcon{border-color:#d6e4d2;color:var(--ia-green-800);background:#edf5eb}
+body.page-carpetas .statValue{font-size:24px}
+
+body.page-carpetas .card,body.page-reservas .card,body.page-facturas .card,body.page-carpetas .tableCard,body.page-reservas .tableCard{
+  overflow:hidden;
+  margin-bottom:16px;
+  border:1px solid var(--ia-line);
+  border-radius:18px;
+  background:#fff;
+  box-shadow:var(--ia-shadow-xs)
+}
+body.page-carpetas .sectionHead,body.page-reservas .sectionHead,body.page-carpetas .tableHead,body.page-reservas .tableHead,body.page-facturas .card h2{min-height:61px;padding:0 20px;border-bottom:1px solid var(--ia-line);background:linear-gradient(90deg,#fff,#f6f9f5)}
+body.page-facturas .card h2{margin:0;display:flex;align-items:center;font-size:13px}
+body.page-facturas .card h2::before{width:8px;height:8px;border:0;background:var(--ia-yellow);box-shadow:0 0 0 4px rgba(255,222,0,.15)}
+body.page-carpetas .sectionTitle,body.page-reservas .sectionTitle{color:var(--ia-ink);font-size:12px;font-weight:800}
+body.page-carpetas .sectionIcon{border-color:#d6e4d2;color:var(--ia-green-800);background:#edf5eb}
+body.page-carpetas .cardBody,body.page-reservas .cardBody{padding:20px}
+body.page-carpetas .formGrid{grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:14px}
+body.page-reservas .row-add{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;align-items:end}
+body.page-reservas .row-add>div{width:auto!important;min-width:0!important}
+body.page-reservas .w110,body.page-reservas .w140,body.page-reservas .w160,body.page-reservas .w220{width:100%!important}
+body.page-carpetas .helper,body.page-reservas .helper{border-color:#d6e4d2;color:#536358;background:#f2f7f0}
+
+body.page-carpetas .tableWrap,body.page-reservas .tableWrap,body.page-facturas .table-wrap{border-top:0;background:#fff}
+body.page-carpetas thead th,body.page-reservas thead th,body.page-facturas thead th{
+  position:sticky;
+  top:0;
+  z-index:4;
+  padding:12px 11px;
+  border-right:1px solid var(--ia-line);
+  border-bottom:1px solid var(--ia-line-strong);
+  color:var(--ia-green-900);
+  background:#eef4ec;
+  font-size:9px;
+  font-weight:850;
+  letter-spacing:.055em
+}
+body.page-carpetas tbody td,body.page-reservas tbody td,body.page-facturas tbody td{border-color:#e7ece5;background:#fff}
+body.page-carpetas tbody tr:nth-child(even) td,body.page-reservas tbody tr:nth-child(even) td,body.page-facturas tbody tr:nth-child(even) td{background:#fafbf9}
+body.page-carpetas tbody tr:hover td,body.page-reservas tbody tr:hover td,body.page-facturas tbody tr:hover td{background:#eef6eb}
+body.page-carpetas tbody input:not([type="checkbox"]),body.page-carpetas tbody select,body.page-reservas tbody input:not([type="checkbox"]),body.page-reservas tbody select,body.page-facturas tbody input:not([type="checkbox"]),body.page-facturas tbody select{min-height:36px;border-radius:8px}
+body.page-carpetas .tableFooter,body.page-reservas .tableFooter{color:#78837a;background:#fafbf9}
+
+body.page-facturas .manual-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+body.page-facturas .grid{grid-template-columns:minmax(300px,.8fr) minmax(420px,1.2fr);gap:16px}
+body.page-facturas .upload-box{border:1px dashed #b9c9b5;border-radius:14px;background:#f5f8f4}
+body.page-facturas .card>.manual-grid,body.page-facturas .card>.grid{margin:18px 20px}
+body.page-facturas .card>.summary,body.page-facturas .card>.table-wrap,body.page-facturas .card>.buttons,body.page-facturas .card>label,body.page-facturas .card>#updateStatus{margin-right:20px;margin-left:20px}
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+
+@media(max-width:1320px){
+  body.page-portal .card{grid-column:span 6}
+  body.page-portal .card:nth-child(1),body.page-portal .card:nth-child(2){grid-column:span 6}
+  body.page-facturas{--sidebar-w:76px}
+}
+
+@media(max-width:1100px){
+  body.page-stock .grid{grid-template-columns:1fr}
+  body.page-facturas .grid{grid-template-columns:1fr}
+}
+
+@media(max-width:980px){
+  body.page-portal{padding-left:0}
+  .portalSidebar{display:none}
+  body.page-portal .header-inner{padding:0 20px}
+  body.page-portal .main{padding:24px 18px 34px}
+  body.page-portal .footer{padding-right:18px;padding-left:18px}
+
+  .suiteRail{display:none}
+  body.page-stock,body.page-reclamos,body.page-solicitudes{padding-right:18px;padding-left:18px}
+  body.page-stock .topbar,body.page-reclamos .topbar,body.page-solicitudes .topbar{margin-right:-18px;margin-left:-18px;padding:0 18px}
+  body.page-stock .suite-home,body.page-reclamos .suite-home,body.page-solicitudes .suite-home{visibility:visible}
+  body.page-stock .footer,body.page-reclamos .footer,body.page-solicitudes .footer{left:18px}
+
+  body.page-carpetas,body.page-reservas{--sidebar:252px;--sidebar-w:252px}
+  body.page-facturas{--sidebar-w:76px}
+  body.page-carpetas .pageHeader,body.page-reservas .pageHeader,body.page-facturas .page-head{min-height:140px;padding:23px}
+}
+
+@media(max-width:720px){
+  body.page-portal .header{height:68px}
+  body.page-portal .header-inner{min-height:68px}
+  body.page-portal .logo-wrap{width:180px;height:44px}
+  body.page-portal .intro{min-height:188px;align-items:flex-start;flex-direction:column;padding:26px 22px}
+  body.page-portal .intro h1{font-size:32px}
+  body.page-portal .apps-count{margin-top:auto}
+  body.page-portal .grid{grid-template-columns:1fr}
+  body.page-portal .card,body.page-portal .card:nth-child(1),body.page-portal .card:nth-child(2){grid-column:1;min-height:205px}
+  body.page-portal .card:nth-child(-n+2) h2{font-size:22px}
+
+  body.page-stock,body.page-reclamos,body.page-solicitudes{padding-right:13px;padding-left:13px}
+  body.page-stock .topbar,body.page-reclamos .topbar,body.page-solicitudes .topbar{min-height:66px;margin-right:-13px;margin-left:-13px;padding:0 13px}
+  body.page-stock .title,body.page-reclamos .title,body.page-solicitudes .title{font-size:18px}
+  body.page-reclamos .titleIcon{display:none}
+  body.page-reclamos .subpill,body.page-solicitudes .subpill{display:none}
+  body.page-stock #exportBtn{width:40px;padding:0;font-size:0}
+  body.page-stock #exportBtn::before{content:"↓";font-size:17px;line-height:1}
+  body.page-stock .suite-home span,body.page-reclamos .suite-home span,body.page-solicitudes .suite-home span{display:none}
+  body.page-stock .suite-home,body.page-reclamos .suite-home,body.page-solicitudes .suite-home{width:40px;justify-content:center;padding:0}
+  body.page-stock .card,body.page-reclamos .card,body.page-solicitudes .card{padding:17px}
+  body.page-stock .panel-title{margin:-17px -17px 17px;padding:16px 17px}
+  body.page-reclamos .cardHeader,body.page-solicitudes .cardHeader{align-items:flex-start;flex-direction:column;min-height:0;margin:-17px -17px 17px;padding:16px 17px}
+  body.page-reclamos .cardHeader .row,body.page-solicitudes .cardHeader .row{width:100%;margin:10px 0 0;flex-wrap:wrap}
+  body.page-reclamos .cardHeader .row button,body.page-solicitudes .cardHeader .row button{flex:1 1 120px}
+
+  body.page-carpetas .appMain,body.page-reservas .appMain{padding:calc(var(--topbar) + 14px) 13px 28px}
+  body.page-facturas .content{padding:14px 13px 28px}
+  body.page-carpetas .pageHeader,body.page-reservas .pageHeader,body.page-facturas .page-head{min-height:0;align-items:flex-start;padding:21px 18px}
+  body.page-carpetas .pageHeader h1,body.page-reservas .pageHeader h1,body.page-facturas .page-head h1{font-size:25px}
+  body.page-carpetas .pageActions,body.page-reservas .pageActions{width:100%;margin-top:18px}
+  body.page-carpetas .pageActions button,body.page-reservas .pageActions button{flex:1}
+  body.page-carpetas .statsGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  body.page-carpetas .cardBody,body.page-reservas .cardBody{padding:16px}
+  body.page-facturas .manual-grid{grid-template-columns:1fr}
+  body.page-facturas .card>.manual-grid,body.page-facturas .card>.grid{margin:16px}
+  body.page-facturas .card>.summary,body.page-facturas .card>.table-wrap,body.page-facturas .card>.buttons,body.page-facturas .card>label,body.page-facturas .card>#updateStatus{margin-right:16px;margin-left:16px}
+}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
