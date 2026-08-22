@@ -900,35 +900,44 @@
         <div class="sectionMeta">Nuevo registro</div>
       </div>
       <div class="cardBody">
-        <div class="formGrid">
-          <div><label>Factura</label><input id="factura" class="w140" inputmode="numeric" placeholder="N.º factura" /></div>
-          <div><label>División</label><input id="division" class="w200" placeholder="División" /></div>
-          <div><label>Transporte</label><input id="transporte" class="w200" placeholder="Transporte" /></div>
-          <div><label>Carpeta</label><input id="carpeta" class="w140" placeholder="N.º carpeta" /></div>
-          <div><label>DUA</label><input id="dua" class="w140" placeholder="DUA" /></div>
-          <div><label>Fecha estimada UY</label><input id="fecha_estimada" type="date" /></div>
-          <div><label>Fecha depósito</label><input id="fecha_deposito" type="date" /></div>
-          <div><label>Orden de compra</label><input id="oc" class="w140" inputmode="numeric" placeholder="OC" /></div>
-        </div>
-
-        <div class="statusSection">
-          <div class="statusSectionHead">
-            <strong>Estado inicial del proceso</strong>
-            <span>Podrás modificar estos valores posteriormente desde la tabla.</span>
+        <div class="addWorkspace">
+          <div class="primaryDataPanel">
+            <div class="workspaceEyebrow">
+              <span class="workspaceStep">01</span>
+              <div><strong>Datos principales</strong><span>Identificación y logística de la carpeta</span></div>
+            </div>
+            <div class="formGrid">
+              <div><label>Factura</label><input id="factura" class="w140" inputmode="numeric" placeholder="N.º factura" /></div>
+              <div><label>División</label><input id="division" class="w200" placeholder="División" /></div>
+              <div><label>Transporte</label><input id="transporte" class="w200" placeholder="Transporte" /></div>
+              <div><label>Carpeta</label><input id="carpeta" class="w140" placeholder="N.º carpeta" /></div>
+              <div><label>DUA</label><input id="dua" class="w140" placeholder="DUA" /></div>
+              <div><label>Fecha estimada UY</label><input id="fecha_estimada" type="date" /></div>
+              <div><label>Fecha depósito</label><input id="fecha_deposito" type="date" /></div>
+              <div><label>Orden de compra</label><input id="oc" class="w140" inputmode="numeric" placeholder="OC" /></div>
+            </div>
           </div>
-          <div class="statusGrid">
-            <div><label>Cierre de carpeta</label><select id="cierre"><option value="SI">SI</option><option value="NO" selected>NO</option></select></div>
-            <div><label>Condiciones</label><select id="cond"><option value="SI">SI</option><option value="NO" selected>NO</option></select></div>
-            <div><label>Distribuido</label><select id="distribuido"><option value="SI">SI</option><option value="NO" selected>NO</option></select></div>
-            <div><label>WIS</label><select id="wis"><option value="SI">SI</option><option value="NO" selected>NO</option></select></div>
-            <div><label>Confirmación de llegada</label><select id="confirmacion_llegada"><option value="SI">SI</option><option value="NO" selected>NO</option></select></div>
+
+          <div class="statusSection">
+            <div class="statusSectionHead">
+              <div class="workspaceStep">02</div>
+              <div><strong>Estado inicial</strong><span>Configuración del proceso</span></div>
+            </div>
+            <div class="statusGrid">
+              <div><label>Cierre de carpeta</label><select id="cierre"><option value="SI">SI</option><option value="NO" selected>NO</option></select></div>
+              <div><label>Condiciones</label><select id="cond"><option value="SI">SI</option><option value="NO" selected>NO</option></select></div>
+              <div><label>Distribuido</label><select id="distribuido"><option value="SI">SI</option><option value="NO" selected>NO</option></select></div>
+              <div><label>WIS</label><select id="wis"><option value="SI">SI</option><option value="NO" selected>NO</option></select></div>
+              <div><label>Confirmación de llegada</label><select id="confirmacion_llegada"><option value="SI">SI</option><option value="NO" selected>NO</option></select></div>
+            </div>
           </div>
         </div>
 
         <div class="formActions">
-          <div>
+          <div class="formActionCopy">
             <div id="msg" class="muted"></div>
-            <div class="muted">Ingresá al menos un dato para crear el registro.</div>
+            <strong>Todo listo para registrar</strong>
+            <span>Ingresá al menos un dato principal para crear la carpeta.</span>
           </div>
           <button id="addBtn" class="primary" type="button">
             <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 5v14M5 12h14"/></svg>
@@ -952,7 +961,10 @@
             <span class="sectionSubtitle">Consultá, editá y administrá la documentación cargada</span>
           </div>
         </div>
-        <div class="tableToolbar"><strong id="tableResultCount">0</strong> resultados</div>
+        <div class="tableToolbar">
+          <div class="tableLive"><span></span>Actualización en vivo</div>
+          <div class="resultCounter"><strong id="tableResultCount">0</strong><span>resultados</span></div>
+        </div>
       </div>
 
       <div class="tableWrap">
