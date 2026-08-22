@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Solicitudes - Interagrovial</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <style>
@@ -458,18 +458,18 @@
   </div>
 
   <!-- FILTROS -->
-  <div class="card">
+  <div class="card modernFilters">
     <div class="accentBar"></div>
     <div class="cardHeader">
-      <h3>Filtros</h3>
+      <h3>Filtros de búsqueda</h3>
       <div class="row" style="gap:8px">
-        <button id="clearFiltersBtn" class="secondary" type="button">Limpiar</button>
+        <button id="clearFiltersBtn" class="secondary" type="button">Limpiar filtros</button>
         <button id="exportXlsxBtn" class="secondary" type="button">Descargar XLSX</button>
       </div>
     </div>
 
     <div class="row">
-      <div>
+      <div class="filterSearch">
         <label>Buscar (cualquier campo)</label>
         <input id="q" class="w220" placeholder="Ej: RE504836 / S001 / Solicitar..." />
       </div>
