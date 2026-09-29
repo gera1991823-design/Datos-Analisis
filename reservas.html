@@ -4,7 +4,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Reservas de Importaciones | Interagrovial S.A.</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <style>
@@ -705,10 +705,11 @@
       .tableFooter{align-items:flex-start;flex-direction:column;padding:12px 14px}
     }
   </style>
+  <link rel="stylesheet" href="interagrovial-ui.css">
 </head>
 
 
-<body>
+<body class="enterprise-ui page-reservas">
   <aside class="sidebar" id="sidebar">
     <div class="brand">
       <div class="brandLogo">
@@ -721,6 +722,10 @@
     </div>
 
     <nav class="sideNav">
+      <a class="navItem suite-nav-home" href="index.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m4 11 8-7 8 7"/><path d="M6.5 10v10h11V10M10 20v-6h4v6"/></svg>
+        <span>Inicio</span>
+      </a>
       <a class="navItem active" href="#" data-section="pendientes">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 8v4l2.5 2.5"/><circle cx="12" cy="12" r="8.5"/></svg>
         <span>Reservas pendientes</span>
@@ -745,7 +750,7 @@
     </div>
 
     <div class="topRight">
-      <div class="live"><span class="liveDot"></span><span>Firestore en vivo</span></div>
+      <div class="live"><span class="liveDot"></span><span>Datos sincronizados</span></div>
 </div>
   </header>
 
@@ -773,7 +778,7 @@
       </div>
     </section>
 
-    <section class="card">
+    <section class="card modernFilters">
       <div class="sectionHead">
         <div class="sectionTitle">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16l-6.2 7.1v5.2l-3.6 1.7v-6.9L4 5Z"/></svg>
@@ -784,7 +789,7 @@
 
       <div class="cardBody">
         <div class="row filters">
-          <div>
+          <div class="filterSearch">
             <label>Buscar (cualquier campo)</label>
             <input id="q" class="w220" placeholder="Ej.: caja, material, O/C, descripción"/>
           </div>
@@ -820,13 +825,13 @@
           <div><label>Caja</label><input id="caja" class="w140" placeholder="N° caja"/></div>
           <div><label>Material</label><input id="material" class="w160" placeholder="Material"/></div>
           <div><label>Cantidad pack</label><input id="cantidadPack" class="w140" placeholder="Cantidad"/></div>
-          <div><label>Cantid</label><input id="cantid" class="w110" placeholder="Cantidad"/></div>
+          <div><label>Cantidad</label><input id="cantid" class="w110" placeholder="Cantidad"/></div>
           <div><label>Descripción</label><input id="descripcion" class="w220" placeholder="Descripción"/></div>
           <div><label>Comentario</label><input id="comentario" class="w220" placeholder="Comentario"/></div>
           <div><label>O/C</label><input id="oc" class="w140" placeholder="Orden de compra"/></div>
           <div><label>Carpeta</label><input id="carpeta" class="w140" placeholder="N° carpeta"/></div>
-          <div><label>Pedido Trasla</label><input id="pedidoTrasla" class="w160" placeholder="Pedido traslado"/></div>
-          <div><label>Sucurs</label><input id="sucurs" class="w110" placeholder="Sucursal"/></div>
+          <div><label>Pedido de traslado</label><input id="pedidoTrasla" class="w160" placeholder="Pedido traslado"/></div>
+          <div><label>Sucursal</label><input id="sucurs" class="w110" placeholder="Sucursal"/></div>
           <div><label>Fecha</label><input id="fecha" class="w160" placeholder="dd/mm/yyyy"/></div>
           <div><label>Hora de carga</label><input id="horaCarga" class="w110" placeholder="hh:mm"/></div>
           <div>
@@ -861,13 +866,13 @@
               <th>Caja</th>
               <th>Material</th>
               <th>Cantidad pack</th>
-              <th>Cantid</th>
+              <th>Cantidad</th>
               <th>Descripción</th>
               <th>Comentario</th>
               <th>O/C</th>
               <th>Carpeta</th>
-              <th>Pedido Trasla</th>
-              <th>Sucurs</th>
+              <th>Pedido de traslado</th>
+              <th>Sucursal</th>
               <th>Fecha</th>
               <th>Hora de carga</th>
               <th>Cumplido</th>

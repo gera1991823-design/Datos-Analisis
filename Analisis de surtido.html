@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Stock por Centro - Firebase</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <title>Stock por Centro | Interagrovial S.A.</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <style>
@@ -165,21 +165,35 @@
     @media(max-width:1100px){.grid{grid-template-columns:1fr}.filters{grid-template-columns:1fr 1fr}.topbar{flex-wrap:wrap}.title{order:3;width:100%}}
     @media(max-width:700px){.container{padding:16px}.filters{grid-template-columns:1fr}.topbar{padding:14px 16px}}
   </style>
+  <link rel="stylesheet" href="interagrovial-ui.css">
 </head>
-<body>
+<body class="enterprise-ui page-stock">
+  <aside class="suiteRail" aria-label="Navegación principal">
+    <a class="suiteRailBrand" href="index.html"><span class="suiteRailMark">IA</span><span><strong>INTERAGROVIAL</strong><small>Suite operativa</small></span></a>
+    <div class="suiteRailLabel">Navegación</div>
+    <nav>
+      <a class="suiteRailItem" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m4 11 8-7 8 7"/><path d="M6.5 10v10h11V10M10 20v-6h4v6"/></svg><span>Inicio</span></a>
+      <div class="suiteRailItem active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V9l5 3V8l5 3V6l6 3v11H4Z"/><path d="M8 20v-4M13 20v-4M18 20v-4"/></svg><span>Stock por Centro</span></div>
+    </nav>
+    <div class="suiteRailSpace"></div>
+    <div class="suiteRailStatus"><span></span>Datos sincronizados</div>
+  </aside>
   <header class="topbar">
-    <div class="company">INTERAGROVIAL S.A</div>
+    <a class="suite-home" href="index.html" aria-label="Volver al inicio">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m4 11 8-7 8 7"/><path d="M6.5 10v10h11V10M10 20v-6h4v6"/></svg>
+      <span>Inicio</span>
+    </a>
     <h1 class="title"><span>Stock por Centro</span></h1>
     <button id="exportBtn" class="btn" type="button">Descargar XLSX</button>
   </header>
 
   <main class="container">
-    <section class="card">
-      <div class="panel-title">Filtros y carga CSV</div>
+    <section class="card modernFilters">
+      <div class="panel-title">Filtros y carga de archivo</div>
       <div class="grid">
         <div>
           <div class="filters">
-            <div><label>Centro</label><input id="centerFilter" type="text" placeholder="Buscar centro..."></div>
+            <div class="filterSearch"><label>Centro</label><input id="centerFilter" type="text" placeholder="Buscar centro..."></div>
             <div><label>Fecha</label><input id="dateFilter" type="date"></div>
             <div><label>Material</label><input id="materialFilter" type="text" placeholder="Buscar material..."></div>
             <div><label>Comentario</label><input id="commentFilter" type="text" placeholder="Buscar comentario..."></div>
@@ -191,8 +205,8 @@
           <div class="upload-box">
             <div>
               <span class="upload-icon">⬆</span>
-              <strong>Arrastra y suelta tu archivo aquí</strong><br>
-              <span>o selecciona un archivo CSV</span>
+              <strong>Arrastrá el archivo CSV aquí</strong><br>
+              <span>o hacé clic para seleccionarlo</span>
             </div>
             <input id="csvFile" type="file" accept=".csv,text/csv">
           </div>
