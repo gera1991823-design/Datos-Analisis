@@ -1,0 +1,312 @@
+/* Interagrovial · visual layer reconciled with main (September 2026).
+   Preserve scripts, DOM IDs, table schemas and existing sidebar breakpoints.
+   Scope every rule; the current portal retains its own layout and imagery. */
+
+body.enterprise-ui {
+  --ia-green: #367c2b;
+  --ia-green-dark: #1d4f1d;
+  --ia-green-deep: #123717;
+  --ia-yellow: #ffde00;
+  --ia-bg: #f3f6f2;
+  --ia-ink: #17251b;
+  --ia-muted: #58685c;
+  --ia-line: #dce5d9;
+  --ia-rail: 230px;
+  --green: var(--ia-green);
+  --green-dark: var(--ia-green-dark);
+  --green-mid: #286522;
+  --green-soft: #edf5eb;
+  --brand: var(--ia-green);
+  --brand-2: var(--ia-green-dark);
+  --brand-3: #286522;
+  --jd-green: var(--ia-green);
+  --jd-green-dark: var(--ia-green-dark);
+  --yellow: var(--ia-yellow);
+  --jd-yellow: var(--ia-yellow);
+  --bg: var(--ia-bg);
+  --text: var(--ia-ink);
+  --muted: var(--ia-muted);
+  --line: var(--ia-line);
+  --border: var(--ia-line);
+  --border-strong: #c7d5c3;
+  font-family: Inter, "Segoe UI", system-ui, sans-serif;
+  color: var(--ia-ink);
+}
+body.enterprise-ui :where(button, input, select, textarea, table) { font-family: inherit; }
+body.enterprise-ui :focus-visible { outline: 3px solid #367c2b; outline-offset: 3px; }
+body.enterprise-ui :where(.sidebar, .suiteRail, .pageHeader) :focus-visible { outline-color: var(--ia-yellow); }
+body.enterprise-ui :where(input, select, textarea) { accent-color: var(--ia-green); }
+body.enterprise-ui input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+body.enterprise-ui select,
+body.enterprise-ui textarea {
+  border-color: #c7d5c3;
+  border-radius: 10px;
+  color: var(--ia-ink);
+  background-color: #fff;
+  box-shadow: none;
+}
+body.enterprise-ui input::placeholder, body.enterprise-ui textarea::placeholder { color: #657568; }
+body.enterprise-ui input:not([type="checkbox"]):not([type="radio"]):focus,
+body.enterprise-ui select:focus,
+body.enterprise-ui textarea:focus { border-color: var(--ia-green); box-shadow: 0 0 0 3px rgb(54 124 43 / 14%); }
+body.enterprise-ui button, body.enterprise-ui .btn {
+  border-radius: 10px;
+  font-weight: 700;
+  transition: background-color .15s, border-color .15s;
+}
+body.enterprise-ui button:hover, body.enterprise-ui .btn:hover { transform: none; }
+body.enterprise-ui button.primary, body.enterprise-ui .btn.primary {
+  border-color: var(--ia-green-dark);
+  color: #fff;
+  background: var(--ia-green-dark);
+  box-shadow: 0 4px 12px rgb(29 79 29 / 12%);
+}
+body.enterprise-ui button.secondary, body.enterprise-ui .btn.secondary, body.enterprise-ui button.ghost {
+  border: 1px solid #c7d5c3;
+  color: var(--ia-green-dark);
+  background: #fff;
+  box-shadow: none;
+}
+body.enterprise-ui button.danger, body.enterprise-ui .btn.danger { color: #a51e16; background: #fff3f2; border-color: #ecc4c0; }
+body.enterprise-ui button:disabled { cursor: not-allowed; opacity: .6; }
+body.enterprise-ui :where(.card, .tableCard, .table-wrapper, .suiteTableScroll) {
+  border-color: var(--ia-line);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgb(20 49 24 / 5%);
+}
+body.enterprise-ui table { font-variant-numeric: tabular-nums; }
+body.enterprise-ui thead th { color: var(--ia-green-deep); background: #edf4ea; border-bottom-color: #c7d5c3; box-shadow: none; }
+body.enterprise-ui tbody tr:nth-child(even) td { background-color: #f7faf5; }
+body.enterprise-ui tbody tr:hover td { background-color: #edf5e9; }
+body.enterprise-ui .cellInner { min-height: 42px; height: auto; border-color: transparent; box-shadow: none; background: transparent; }
+body.enterprise-ui .cellInner .cell-input { box-shadow: none; }
+body.page-reclamos tbody tr .cellInner { border-color: transparent; background: transparent; box-shadow: none; }
+body.enterprise-ui .footer {
+  position: static;
+  width: fit-content;
+  margin: 24px 0 0 auto;
+  border: 0;
+  box-shadow: none;
+  background: transparent;
+  color: var(--ia-muted);
+  font-size: 11px;
+}
+
+/* September portal: preserve hero, six cards, photos and search script. */
+body.page-portal { --yellow: #ffdf00; }
+body.page-portal .search { margin: 0; text-transform: none; }
+body.page-portal .search input { box-shadow: none; background: transparent; border: 0; border-radius: 0; }
+body.page-portal .search input:focus { box-shadow: none; }
+body.page-portal .app-card:focus-visible { outline: 4px solid var(--ia-green); outline-offset: 4px; }
+
+/* PR rail adapted to the three tools which have no existing sidebar. */
+body.has-suite-rail { margin: 0; padding: 0 24px 28px calc(var(--ia-rail) + 24px); background: var(--ia-bg); }
+body.enterprise-ui .suiteRail {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 90;
+  width: var(--ia-rail);
+  display: flex;
+  flex-direction: column;
+  padding: 0 14px 20px;
+  color: #fff;
+  background: linear-gradient(160deg, var(--ia-green-dark), var(--ia-green-deep));
+}
+body.enterprise-ui .suiteRailBrand, body.enterprise-ui .suiteSideBrand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 90px;
+  padding: 16px 4px;
+  color: #fff;
+  text-decoration: none;
+}
+body.enterprise-ui .suiteSideBrand { padding: 16px; overflow: hidden; }
+body.enterprise-ui .suiteRailMark, body.enterprise-ui .suiteSideMark {
+  display: grid;
+  place-items: center;
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  font-weight: 800;
+  color: var(--ia-green-deep);
+  background: var(--ia-yellow);
+}
+body.enterprise-ui :where(.suiteRailBrand, .suiteSideBrand) strong { display: block; font-size: 11px; }
+body.enterprise-ui :where(.suiteRailBrand, .suiteSideBrand) small { display: block; margin-top: 4px; font-size: 11px; color: #d7e7d3; }
+body.enterprise-ui .suiteRailLabel { margin: 12px 8px; font-size: 11px; color: #d7e7d3; }
+body.enterprise-ui .suiteRail nav { display: grid; gap: 6px; }
+body.enterprise-ui .suiteRailItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 12px;
+  border-radius: 10px;
+  color: #fff;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+}
+body.enterprise-ui .suiteRailItem svg { width: 22px; height: 22px; flex-shrink: 0; }
+body.enterprise-ui .suiteRailItem.active, body.enterprise-ui .suiteRailItem:hover { color: var(--ia-yellow); background: rgb(255 255 255 / 9%); }
+body.enterprise-ui .suiteRailSpace { flex: 1; }
+body.enterprise-ui .suiteRailStatus { padding: 12px; font-size: 11px; line-height: 1.6; color: #d7e7d3; }
+body.enterprise-ui .suite-home {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 8px 12px;
+  border: 1px solid var(--ia-line);
+  border-radius: 10px;
+  color: var(--ia-green-dark);
+  background: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+body.enterprise-ui .suite-home svg { width: 20px; height: 20px; }
+body.has-suite-rail .topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 80px;
+  margin: 0 -24px 24px;
+  padding: 14px 24px;
+  border: 0;
+  border-bottom: 1px solid var(--ia-line);
+  border-radius: 0;
+  background: #fff;
+  box-shadow: none;
+}
+body.has-suite-rail .title {
+  position: static;
+  transform: none;
+  margin: 0;
+  padding: 0;
+  width: auto;
+  order: 0;
+  font-size: 22px;
+  letter-spacing: -.02em;
+  color: var(--ia-ink);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+body.has-suite-rail .title::after { display: none; }
+body.has-suite-rail .titleIcon { width: 38px; height: 38px; background: #edf5eb; box-shadow: none; }
+body.has-suite-rail .titleText small { font-size: 11px; color: var(--ia-muted); }
+body.has-suite-rail .notifBell, body.has-suite-rail .subpill { color: var(--ia-green-dark); background: #edf4ea; }
+body.has-suite-rail .card { margin: 0 0 18px; padding: 22px; overflow: visible; background: #fff; }
+body.has-suite-rail .accentBar { display: none; }
+body.has-suite-rail .cardHeader { display: flex; flex-wrap: wrap; gap: 16px; margin: 0 0 20px; }
+body.has-suite-rail .cardHeader h3, body.has-suite-rail .card > h3, body.has-suite-rail .panel-title {
+  position: static;
+  transform: none;
+  width: auto;
+  margin: 0 0 16px;
+  padding: 0;
+  border: 0;
+  color: var(--ia-green-dark);
+  background: transparent;
+  box-shadow: none;
+  font-size: 16px;
+  text-align: left;
+  text-transform: none;
+  letter-spacing: 0;
+}
+body.has-suite-rail .cardHeader h3 { margin: 0; }
+body.has-suite-rail .card > .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(175px, 1fr)); gap: 16px; align-items: end; }
+body.has-suite-rail .card .row > div { align-items: stretch; min-width: 0; }
+body.has-suite-rail .card label { text-align: left; font-size: 12px; }
+body.has-suite-rail .card :where(input, select, textarea) { width: 100%; min-width: 0; min-height: 44px; }
+body.has-suite-rail .row-add > button { min-height: 44px; }
+body.has-suite-rail .suiteTableScroll { max-width: 100%; overflow: auto; border: 1px solid var(--ia-line); background: #fff; }
+body.has-suite-rail .suiteTableScroll table { width: 100%; min-width: 1600px; margin: 0; border: 0; border-radius: 0; box-shadow: none; }
+body.has-suite-rail .suiteTableScroll thead th { position: sticky; top: 0; z-index: 2; }
+body.page-stock .container { max-width: none; padding: 0; }
+body.page-stock .filters { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 16px; }
+body.page-stock .upload-box { border-color: #b9cdb3; background: #f7faf5; box-shadow: none; }
+body.page-stock .toolbar { flex-wrap: wrap; gap: 16px; }
+body.page-stock .toolbar .actions { flex-wrap: wrap; }
+body.page-stock tbody tr.selected-row td { background: #d6efaf; }
+body.enterprise-ui tr.rowHighlight td,
+body.enterprise-ui tr.rowHighlight .cellInner { background: #fff7bf; border-color: #c3ab24; }
+
+/* Keep the existing widths, menu toggles and responsive breakpoints. */
+body.page-carpetas .sidebar, body.page-reservas .sidebar, body.page-facturas .sidebar { background: linear-gradient(160deg, var(--ia-green-dark), var(--ia-green-deep)); }
+body.page-carpetas .suite-nav-home, body.page-reservas .suite-nav-home { color: #fff; }
+body.page-carpetas .suite-nav-home svg, body.page-reservas .suite-nav-home svg { color: var(--ia-yellow); }
+body.page-carpetas.navCollapsed .suiteSideCopy { display: none; }
+body.page-carpetas.navCollapsed .suiteSideBrand { justify-content: center; padding-inline: 4px; }
+body.page-carpetas .topbar, body.page-reservas .topbar, body.page-facturas .app-topbar { background: #fff; border-bottom-color: var(--ia-line); box-shadow: 0 3px 12px rgb(20 49 24 / 4%); }
+body.page-carpetas .menuBtn, body.page-reservas .menuBtn { color: var(--ia-green-dark); background: #edf4ea; }
+body.page-carpetas .topTitle, body.page-reservas .topTitle { color: var(--ia-ink); }
+body.page-carpetas .topHeading small { color: var(--ia-muted); }
+body.page-carpetas .live, body.page-reservas .live { color: var(--ia-green-dark); background: #edf4ea; border-color: var(--ia-line); }
+body.page-carpetas .notifBell { color: var(--ia-green-dark); }
+body.page-facturas .app-topbar { color: var(--ia-ink); }
+body.page-facturas .live-pill { color: var(--ia-green-dark); background: #edf4ea; border-color: var(--ia-line); }
+body.page-facturas tr.missing td { color: #a51e16; background: #fff3f2; }
+body.page-carpetas .pageHeader, body.page-reservas .pageHeader, body.page-facturas .page-head {
+  padding: 24px;
+  border-radius: 16px;
+  color: #fff;
+  background: linear-gradient(120deg, var(--ia-green-deep), var(--ia-green-dark));
+}
+body.page-carpetas .pageHeader h1, body.page-reservas .pageHeader h1, body.page-facturas .page-head h1 { color: #fff; }
+body.page-carpetas .pageHeader p, body.page-reservas .pageHeader p { color: #e1ecde; }
+body.page-carpetas .pageEyebrow, body.page-reservas .pageEyebrow, body.page-facturas .page-kicker { color: var(--ia-yellow); }
+body.page-carpetas .pageActions .secondary { color: var(--ia-green-deep); background: var(--ia-yellow); border-color: var(--ia-yellow); }
+body.page-carpetas .statIcon { color: var(--ia-green-dark); background: #edf5eb; border-color: #c7d5c3; }
+body.page-carpetas .statCard::after { background: var(--ia-green); }
+body.page-reservas .row-add { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; align-items: end; }
+body.page-reservas .row-add :where(.w110, .w140, .w160, .w220) { width: 100%; min-width: 0; }
+body.page-reservas .row-add input, body.page-reservas .row-add select { min-height: 42px; }
+body.page-carpetas .footer, body.page-reservas .footer { margin-right: 24px; }
+
+/* No column-index overrides or forced sizing of calendar month/year inputs. */
+body.enterprise-ui .flatpickr-calendar input, body.enterprise-ui .flatpickr-calendar select { border-radius: 0; box-shadow: none; }
+@media (max-width: 1100px) {
+  body.has-suite-rail { padding-left: 24px; }
+  body.has-suite-rail .suiteRail { display: none; }
+  body.page-stock .grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 1050px) {
+  body.page-carpetas.navCollapsed .suiteSideCopy { display: block; }
+  body.page-carpetas.navCollapsed .suiteSideBrand { justify-content: flex-start; padding: 16px; }
+}
+@media (max-width: 700px) {
+  /* Original portal hid this input at the mobile breakpoint. */
+  body.page-portal .topbar-inner { flex-wrap: wrap; }
+  body.page-portal .top-actions { width: 100%; margin: 0; }
+  body.page-portal .nav-home span { display: inline; }
+  body.page-portal .search { flex: 1; width: auto; padding: 0 14px; }
+  body.page-portal .search input { position: static; opacity: 1; pointer-events: auto; width: 100%; min-width: 0; }
+  body.has-suite-rail { padding: 0 12px 24px; }
+  body.has-suite-rail .topbar { position: relative; margin-inline: -12px; padding: 12px; }
+  body.has-suite-rail .title { font-size: 19px; }
+  body.has-suite-rail .card { padding: 16px; }
+  body.has-suite-rail .cardHeader .row { flex-wrap: wrap; margin-left: 0; }
+  body.has-suite-rail .card > .row { grid-template-columns: 1fr; }
+  body.has-suite-rail .cardHeader button { min-height: 44px; }
+  body.page-stock .filters { grid-template-columns: 1fr; }
+  body.page-carpetas .pageHeader, body.page-reservas .pageHeader, body.page-facturas .page-head { padding: 20px; }
+  body.page-facturas .app-topbar { height: auto; min-height: 64px; padding: 12px; }
+  body.page-facturas .app-title { white-space: normal; font-size: 13px; }
+  body.page-facturas .live-pill { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.enterprise-ui *, body.enterprise-ui *::before, body.enterprise-ui *::after {
+    scroll-behavior: auto !important;
+    transition: none !important;
+    animation: none !important;
+  }
+}

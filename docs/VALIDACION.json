@@ -1,0 +1,297 @@
+{
+  "date": "2026-10-14",
+  "contract": {
+    "main": "faa906368d868016e92c2ae0b1067d4cb0782767",
+    "pr": "5400d87f9932d151a273708bfa0c5267458b82cd",
+    "files": [
+      {
+        "file": "Analisis de surtido.html",
+        "ids": 15,
+        "scripts": 2,
+        "table_columns": 25,
+        "script_sha256": "c6e5c5ea476a06719b7107353b9cda9e4fa828e2290a636c85e79e06dcdbe689"
+      },
+      {
+        "file": "Reclamos.html",
+        "ids": 41,
+        "scripts": 4,
+        "table_columns": 16,
+        "script_sha256": "04c34c0e51bc85201c995409a8bb8547917b510a935b92cca94c1ec503e780c4"
+      },
+      {
+        "file": "Solicitudes MD.html",
+        "ids": 20,
+        "scripts": 2,
+        "table_columns": 12,
+        "script_sha256": "eae152d20ace6fda55e88e479d41b065cbe4ffb67b3497a6e19cb0e25f3da1e6"
+      },
+      {
+        "file": "actualizar carpetas.html",
+        "ids": 19,
+        "scripts": 2,
+        "table_columns": 12,
+        "script_sha256": "c9c241a9e72554c71d0d74bf93cfe184a94567f8157694b4171e349adf294b3e"
+      },
+      {
+        "file": "carpetas.html",
+        "ids": 60,
+        "scripts": 5,
+        "table_columns": 17,
+        "script_sha256": "e29594fb807930e6647fa8406523b096b8212e55dcc7c4c627a845908772ba2c"
+      },
+      {
+        "file": "index.html",
+        "ids": 6,
+        "scripts": 1,
+        "table_columns": 0,
+        "script_sha256": "1dba88e1da69238fd9119dc86aeedbf1ef1462b63888a7a5a0d75ccafdbd942c"
+      },
+      {
+        "file": "reservas.html",
+        "ids": 30,
+        "scripts": 3,
+        "table_columns": 14,
+        "script_sha256": "fb3dd4f4550373bef7478b1dfbc8b63d22dd79179f5546c03df146a90298afdb"
+      }
+    ],
+    "scope": "static contract, not live Firebase",
+    "ids": 191,
+    "result": "PASS"
+  },
+  "ui": {
+    "mode": "isolated fixtures; no live Firebase",
+    "viewports": [
+      {
+        "file": "index.html",
+        "width": 1440,
+        "result": "PASS"
+      },
+      {
+        "file": "reservas.html",
+        "width": 1440,
+        "result": "PASS"
+      },
+      {
+        "file": "carpetas.html",
+        "width": 1440,
+        "result": "PASS"
+      },
+      {
+        "file": "Reclamos.html",
+        "width": 1440,
+        "result": "PASS"
+      },
+      {
+        "file": "Solicitudes MD.html",
+        "width": 1440,
+        "result": "PASS"
+      },
+      {
+        "file": "Analisis de surtido.html",
+        "width": 1440,
+        "result": "PASS"
+      },
+      {
+        "file": "actualizar carpetas.html",
+        "width": 1440,
+        "result": "PASS"
+      },
+      {
+        "file": "index.html",
+        "width": 1024,
+        "result": "PASS"
+      },
+      {
+        "file": "reservas.html",
+        "width": 1024,
+        "result": "PASS"
+      },
+      {
+        "file": "carpetas.html",
+        "width": 1024,
+        "result": "PASS"
+      },
+      {
+        "file": "Reclamos.html",
+        "width": 1024,
+        "result": "PASS"
+      },
+      {
+        "file": "Solicitudes MD.html",
+        "width": 1024,
+        "result": "PASS"
+      },
+      {
+        "file": "Analisis de surtido.html",
+        "width": 1024,
+        "result": "PASS"
+      },
+      {
+        "file": "actualizar carpetas.html",
+        "width": 1024,
+        "result": "PASS"
+      },
+      {
+        "file": "index.html",
+        "width": 768,
+        "result": "PASS"
+      },
+      {
+        "file": "reservas.html",
+        "width": 768,
+        "result": "PASS"
+      },
+      {
+        "file": "carpetas.html",
+        "width": 768,
+        "result": "PASS"
+      },
+      {
+        "file": "Reclamos.html",
+        "width": 768,
+        "result": "PASS"
+      },
+      {
+        "file": "Solicitudes MD.html",
+        "width": 768,
+        "result": "PASS"
+      },
+      {
+        "file": "Analisis de surtido.html",
+        "width": 768,
+        "result": "PASS"
+      },
+      {
+        "file": "actualizar carpetas.html",
+        "width": 768,
+        "result": "PASS"
+      },
+      {
+        "file": "index.html",
+        "width": 390,
+        "result": "PASS"
+      },
+      {
+        "file": "reservas.html",
+        "width": 390,
+        "result": "PASS"
+      },
+      {
+        "file": "carpetas.html",
+        "width": 390,
+        "result": "PASS"
+      },
+      {
+        "file": "Reclamos.html",
+        "width": 390,
+        "result": "PASS"
+      },
+      {
+        "file": "Solicitudes MD.html",
+        "width": 390,
+        "result": "PASS"
+      },
+      {
+        "file": "Analisis de surtido.html",
+        "width": 390,
+        "result": "PASS"
+      },
+      {
+        "file": "actualizar carpetas.html",
+        "width": 390,
+        "result": "PASS"
+      },
+      {
+        "file": "index.html",
+        "width": 320,
+        "result": "PASS"
+      },
+      {
+        "file": "reservas.html",
+        "width": 320,
+        "result": "PASS"
+      },
+      {
+        "file": "carpetas.html",
+        "width": 320,
+        "result": "PASS"
+      },
+      {
+        "file": "Reclamos.html",
+        "width": 320,
+        "result": "PASS"
+      },
+      {
+        "file": "Solicitudes MD.html",
+        "width": 320,
+        "result": "PASS"
+      },
+      {
+        "file": "Analisis de surtido.html",
+        "width": 320,
+        "result": "PASS"
+      },
+      {
+        "file": "actualizar carpetas.html",
+        "width": 320,
+        "result": "PASS"
+      }
+    ],
+    "flows": [
+      {
+        "file": "reservas.html",
+        "checks": "pending/fulfilled navigation and create",
+        "result": "PASS"
+      },
+      {
+        "file": "reservas.html",
+        "checks": "filter/clear, XLSX export, edit/cancel/save or CSV/manual row",
+        "result": "PASS"
+      },
+      {
+        "file": "carpetas.html",
+        "checks": "division/date filters, notifications panel, packing and PDF upload/delete, create, audit",
+        "result": "PASS"
+      },
+      {
+        "file": "carpetas.html",
+        "checks": "filter/clear, XLSX export, edit/cancel/save or CSV/manual row",
+        "result": "PASS"
+      },
+      {
+        "file": "Reclamos.html",
+        "checks": "XLSX import with date/header mapping and create",
+        "result": "PASS"
+      },
+      {
+        "file": "Reclamos.html",
+        "checks": "filter/clear, XLSX export, edit/cancel/save or CSV/manual row",
+        "result": "PASS"
+      },
+      {
+        "file": "Solicitudes MD.html",
+        "checks": "dependent centro/sucursal/nombre/responsable and create",
+        "result": "PASS"
+      },
+      {
+        "file": "Solicitudes MD.html",
+        "checks": "filter/clear, XLSX export, edit/cancel/save or CSV/manual row",
+        "result": "PASS"
+      },
+      {
+        "file": "Analisis de surtido.html",
+        "checks": "filter/clear, XLSX export, edit/cancel/save or CSV/manual row",
+        "result": "PASS"
+      },
+      {
+        "file": "actualizar carpetas.html",
+        "checks": "invoice match/missing, manual data, selective update, audit",
+        "result": "PASS"
+      }
+    ],
+    "baselineIssues": [
+      "Solicitudes MD: zero matches display all rows (pre-existing in main; scripts preserved)."
+    ],
+    "result": "PASS"
+  }
+}
