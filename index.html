@@ -417,8 +417,10 @@
       *{scroll-behavior:auto!important;transition:none!important}
     }
   </style>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="interagrovial-ui.css">
 </head>
-<body>
+<body class="enterprise-ui page-portal">
 
   <header class="topbar">
     <div class="topbar-inner">
@@ -439,7 +441,7 @@
             <circle cx="11" cy="11" r="7" stroke-width="2"/>
             <path d="m20 20-4-4" stroke-width="2"/>
           </svg>
-          <input id="appSearch" type="search" placeholder="Buscar aplicación..." autocomplete="off" />
+          <input id="appSearch" aria-label="Buscar aplicación" type="search" placeholder="Buscar aplicación..." autocomplete="off" />
         </label>
       </div>
     </div>
@@ -565,7 +567,7 @@
 
     </section>
 
-    <div class="empty-state" id="emptyState">No se encontraron aplicaciones con ese nombre.</div>
+    <div class="empty-state" id="emptyState" role="status">No se encontraron aplicaciones con ese nombre.</div>
   </main>
 
   <script>

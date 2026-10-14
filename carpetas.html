@@ -699,14 +699,23 @@
       .topHeading small{display:none}
     }
   </style>
+  <link rel="stylesheet" href="interagrovial-ui.css">
 </head>
 
-<body>
+<body class="enterprise-ui page-carpetas">
   <div class="mobileShade" id="mobileShade"></div>
 
   <aside class="sidebar" id="sidebar">
+    <a class="suiteSideBrand" href="index.html" aria-label="Interagrovial, volver al inicio">
+      <span class="suiteSideMark" aria-hidden="true">IA</span>
+      <span class="suiteSideCopy"><strong>INTERAGROVIAL</strong><small>Suite operativa</small></span>
+    </a>
     <nav class="sideNav sideNavSingle" aria-label="Navegación principal">
-      <a class="navItem active" href="#topPage">
+      <a class="navItem suite-nav-home" href="index.html" aria-label="Volver al inicio">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m4 11 8-7 8 7"/><path d="M6.5 10v10h11V10M10 20v-6h4v6"/></svg>
+        <span>Inicio</span>
+      </a>
+      <a class="navItem active" href="#topPage" aria-current="page">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5.5h16v13H4z"/><path d="M8 5.5V3.8h8v1.7M8 10h8M8 14h5"/></svg>
         <span>Carpetas</span>
         <span class="navCount" id="sideTotalCount">0</span>
@@ -729,7 +738,8 @@
     <div class="topRight">
       <div class="live"><span class="liveDot"></span> Datos en línea</div>
       <div class="notifWrap">
-        <button id="notifBell" class="notifBell" type="button" title="Notificaciones">
+        <button id="notifBell" class="notifBell" type="button" title="Notificaciones" aria-label="Notificaciones">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>
           <span id="notifBadge" class="notifBadge" style="display:none;">0</span>
         </button>
 
@@ -810,7 +820,7 @@
     </div>
 
     <!-- FILTROS -->
-    <section class="card" id="filtersSection">
+    <section class="card modernFilters" id="filtersSection">
       <div class="cardHeader">
         <div class="sectionTitleWrap">
           <div class="sectionIcon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M7 12h10M10 18h4"/></svg></div>
@@ -825,47 +835,47 @@
         <div class="filterRowWrap" aria-label="Filtros de búsqueda">
           <div class="filtersSingleRow">
             <div class="filterField filterSearch">
-              <label>Buscar en cualquier campo</label>
+              <label for="q">Buscar en cualquier campo</label>
               <input id="q" class="w220" placeholder="Factura, carpeta, transporte, DUA..." />
             </div>
             <div class="filterField">
-              <label>Orden de compra</label>
+              <label for="fOC">Orden de compra</label>
               <input id="fOC" class="w160" placeholder="Ej. 45001234" />
             </div>
             <div class="filterField">
-              <label>División</label>
+              <label for="fDivision">División</label>
               <select id="fDivision"><option value="">(Todas)</option></select>
             </div>
             <div class="filterField">
-              <label>Condiciones</label>
+              <label for="fCond">Condiciones</label>
               <select id="fCond">
                 <option value="">(Todas)</option><option value="__EMPTY__">(Vacío)</option><option value="SI">SI</option><option value="NO">NO</option>
               </select>
             </div>
             <div class="filterField">
-              <label>WIS</label>
+              <label for="fWis">WIS</label>
               <select id="fWis">
                 <option value="">(Todas)</option><option value="__EMPTY__">(Vacío)</option><option value="SI">SI</option><option value="NO">NO</option>
               </select>
             </div>
             <div class="filterField">
-              <label>Cierre de carpeta</label>
+              <label for="fCierre">Cierre de carpeta</label>
               <select id="fCierre">
                 <option value="">(Todas)</option><option value="__EMPTY__">(Vacío)</option><option value="SI">SI</option><option value="NO">NO</option>
               </select>
             </div>
             <div class="filterField">
-              <label>Confirmación llegada</label>
+              <label for="fConfirmacionLlegada">Confirmación llegada</label>
               <select id="fConfirmacionLlegada">
                 <option value="">(Todas)</option><option value="__EMPTY__">(Vacío)</option><option value="SI">SI</option><option value="NO">NO</option>
               </select>
             </div>
             <div class="filterField filterDate">
-              <label>Fecha estimada UY</label>
+              <label for="fFechaRange">Fecha estimada UY</label>
               <input id="fFechaRange" type="text" placeholder="DD/MM/YYYY - DD/MM/YYYY" />
             </div>
             <div class="filterField filterDate">
-              <label>Fecha depósito</label>
+              <label for="fDepositoRange">Fecha depósito</label>
               <input id="fDepositoRange" type="text" placeholder="DD/MM/YYYY - DD/MM/YYYY" />
             </div>
           </div>
@@ -892,14 +902,14 @@
       </div>
       <div class="cardBody">
         <div class="formGrid">
-          <div><label>Factura</label><input id="factura" class="w140" inputmode="numeric" placeholder="N.º factura" /></div>
-          <div><label>División</label><input id="division" class="w200" placeholder="División" /></div>
-          <div><label>Transporte</label><input id="transporte" class="w200" placeholder="Transporte" /></div>
-          <div><label>Carpeta</label><input id="carpeta" class="w140" placeholder="N.º carpeta" /></div>
-          <div><label>DUA</label><input id="dua" class="w140" placeholder="DUA" /></div>
-          <div><label>Fecha estimada UY</label><input id="fecha_estimada" type="date" /></div>
-          <div><label>Fecha depósito</label><input id="fecha_deposito" type="date" /></div>
-          <div><label>Orden de compra</label><input id="oc" class="w140" inputmode="numeric" placeholder="OC" /></div>
+          <div><label for="factura">Factura</label><input id="factura" class="w140" inputmode="numeric" placeholder="N.º factura" /></div>
+          <div><label for="division">División</label><input id="division" class="w200" placeholder="División" /></div>
+          <div><label for="transporte">Transporte</label><input id="transporte" class="w200" placeholder="Transporte" /></div>
+          <div><label for="carpeta">Carpeta</label><input id="carpeta" class="w140" placeholder="N.º carpeta" /></div>
+          <div><label for="dua">DUA</label><input id="dua" class="w140" placeholder="DUA" /></div>
+          <div><label for="fecha_estimada">Fecha estimada UY</label><input id="fecha_estimada" type="date" /></div>
+          <div><label for="fecha_deposito">Fecha depósito</label><input id="fecha_deposito" type="date" /></div>
+          <div><label for="oc">Orden de compra</label><input id="oc" class="w140" inputmode="numeric" placeholder="OC" /></div>
         </div>
 
         <div class="statusSection">
@@ -908,11 +918,11 @@
             <span>Podrás modificar estos valores posteriormente desde la tabla.</span>
           </div>
           <div class="statusGrid">
-            <div><label>Cierre de carpeta</label><select id="cierre"><option value="SI">SI</option><option value="NO" selected>NO</option></select></div>
-            <div><label>Condiciones</label><select id="cond"><option value="SI">SI</option><option value="NO" selected>NO</option></select></div>
-            <div><label>Distribuido</label><select id="distribuido"><option value="SI">SI</option><option value="NO" selected>NO</option></select></div>
-            <div><label>WIS</label><select id="wis"><option value="SI">SI</option><option value="NO" selected>NO</option></select></div>
-            <div><label>Confirmación de llegada</label><select id="confirmacion_llegada"><option value="SI">SI</option><option value="NO" selected>NO</option></select></div>
+            <div><label for="cierre">Cierre de carpeta</label><select id="cierre"><option value="SI">SI</option><option value="NO" selected>NO</option></select></div>
+            <div><label for="cond">Condiciones</label><select id="cond"><option value="SI">SI</option><option value="NO" selected>NO</option></select></div>
+            <div><label for="distribuido">Distribuido</label><select id="distribuido"><option value="SI">SI</option><option value="NO" selected>NO</option></select></div>
+            <div><label for="wis">WIS</label><select id="wis"><option value="SI">SI</option><option value="NO" selected>NO</option></select></div>
+            <div><label for="confirmacion_llegada">Confirmación de llegada</label><select id="confirmacion_llegada"><option value="SI">SI</option><option value="NO" selected>NO</option></select></div>
           </div>
         </div>
 

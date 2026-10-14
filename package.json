@@ -1,0 +1,15 @@
+{
+  "name": "interagrovial-ui-verification",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "verify": "python3 tests/verify-integration.py",
+    "test:ui": "node tests/ui-smoke.cjs",
+    "test": "npm run verify && npm run test:ui"
+  },
+  "devDependencies": {
+    "flatpickr": "4.6.13",
+    "playwright": "1.62.1",
+    "xlsx": "0.18.5"
+  }
+}
